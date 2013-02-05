@@ -35,7 +35,8 @@
         <div class="clearfix"></div>
         <!--======================  Main Container  ======================-->
         <div class="container">
-            <div class="row">
+            <div class="container-shadow">
+            <div class="row-fluid">
                 <div class="span4 bs-docs-sidebar">
                     <ul class="nav nav-list bs-docs-sidenav affix-top">
                         <li class="active">
@@ -64,19 +65,24 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#"><i class="icon-chevron-right"></i> 
+                            <a href="#">
                                 МОДУЛЬ 1
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
+                </div>
         </div> 
         <!--======================  Footer  ======================-->
         <footer class="footer">
             <div class="container"></div>
         </footer>
-        
-        <script type="text/javascript"></script>
+
+        <script type="text/javascript">
+            $(function(){
+                $(".nav.nav-list .parent").append("<i class='icon-chevron-right'></i>");
+            })
+        </script>
     </body>
 </html>
