@@ -1,12 +1,26 @@
 @font-face {
     font-family:PTSans;
-    src:url(../font/PTS55F.ttf);
+    src:url(../font/PTS55F.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family:CharisSilI;
+    src:url(../font/CharisSILI.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 
 body{font-family: PTSans, sans-serif;background: url(../img/bg.png) repeat;}
 body > .container{width: 960px;background: #f4f4f4;box-shadow: inset 0px 0px 100px 0px #ececec;border: 1px solid #bbb;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;}
 body > .container .container-shadow{border: 1px solid #f6f6f6;padding: 20px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;}
 /*body > .container .row-fluid{padding: 20px;}*/
+
+.footer > .container{width: 960px;}
+
+h2{font-family: CharisSilI, sans-serif;font-weight: normal;color: #74bdd8;}
+
+.separator{border-bottom: 1px dotted #ccc; width: 100%;}
 
 .navbar-fixed-top .container{width: 960px;}
 .header{padding: 30px 0;}
@@ -16,11 +30,13 @@ body > .container .container-shadow{border: 1px solid #f6f6f6;padding: 20px;bord
 
 .brand{margin: 20px 0;}
 .brand h1{font-weight: normal;}
-.brand h1 span{color: #333;}
+.brand h1 span{color: #333;font-size: 30px;}
 .brand a:hover{text-decoration: none; color: #0088cc;}
 
 .nav.nav-list{border-radius: 0px;-webkit-border-radius: 0px;-moz-border-radius: 0px;background-color: transparent;webkit-box-shadow: none;-moz-box-shadow: none;box-shadow: none;}
-.nav.nav-list > li > a{color: #303030;border-bottom: 1px solid #e5e5e5;}
+.nav.nav-list > li > a{color: #797979;border-bottom: 1px solid #e5e5e5;}
 .nav.nav-list > li:first-child > a{border-radius: 0px;-webkit-border-radius: 0px;-moz-border-radius: 0px;}
-.nav.nav-list > li.active > a{color: #303030;background-color: #74d89a;}
+.nav.nav-list > li.active > a{color: #303030;background-color: #74d89a;text-shadow: 1px 1px 1px #fff;}
+.nav.nav-list > li > a span.parent{font-size: 16px;color: #303030;}
 .nav.nav-list.bs-docs-sidenav > li > a{border: 0;border-bottom: 1px solid #e5e5e5;}
+.nav.nav-list.bs-docs-sidenav > li > a:hover{background-color: #fff;}
