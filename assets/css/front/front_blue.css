@@ -1,0 +1,66 @@
+.simple-head{
+    background: lightSteelBlue;
+    height: 130px;
+    margin-top: -59px;
+    border-radius: 13px 13px 0px 0px;
+}
+.head{
+    margin: 43px 362px 20px 4px;
+    color: #494949;
+    font-size: 25px;
+    float: right;
+}
+
+#front-content .span12{
+    background: #fff;
+    margin-top: 30px;
+}
+.parent{
+    color: grey;
+    font-weight: bold;
+}
+.navbar .navbar-inner{
+    background: #B0C4DE;
+}
+.navbar-fixed-top .brand{
+    background-image: url(../../img/ZNU_logo.gif);
+    height: 47px;
+    width: 45px;
+    float: left;
+    color: #494949;
+    font-size: 25px;
+    font-family: PTSans, sans-serif;
+}
+.span8 .material{
+    margin: 30px 5px 100px 5px; 
+}
+.material-info{
+    margin-right: 10px;
+    color: gray;
+    font-size: 13px;
+}
+.footer{
+    height: 0px;
+    padding: 28px 0px 43px 0px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #FFF;
+    *border-collapse: separate;
+    -webkit-border-radius: 0 0 13px 13px;
+    -moz-border-radius: 0 0 13px 13px;
+    border-radius: 0 0 13px 13px;
+}
+.row .footer
+{
+    background: #B0C4DE;
+}
+
+body{
+    background: #F0F0F0;
+}
+.navbar-inner{
+    background:#fff; 
+}
+.profile-info h5, h6{
+    font-size: 15px;
+}

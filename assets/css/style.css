@@ -1,0 +1,188 @@
+.head{
+    margin: 13px 0px 3px 4px;
+    color: #494949;
+    font-size: 25px;
+    float: left;
+}
+.footer{
+    padding: 28px 0px 43px 0px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #FFF;
+    *border-collapse: separate;
+    -webkit-border-radius: 0 0 13px 13px;
+    -moz-border-radius: 0 0 13px 13px;
+    border-radius: 0 0 13px 13px;
+}
+body{
+    background: #F0F0F0;
+}
+.my .navbar-inner{
+    background:#fff; 
+    height: 50px;
+}
+.navbar-fixed-top .my-brand{
+    float: right;
+    color: #494949;
+    font-size: 25px;
+    font-family: PTSans, sans-serif;
+    margin-top: 10px;
+}
+.navbar-fixed-top .my-brand .brand_A{
+    color: #4AA2D9;
+}
+.table-install-A{
+    font-weight: bold;
+    background: #FFF;
+}
+.table-install-A thead{
+    background: #00A7E3;
+}
+.table-install-A td{
+    padding: 20px;
+}
+.table-install-A h2{
+    margin: 3px 0 0 118px;
+    color: #333333;
+}
+.table-install-A span{
+    color: #169BDE;
+}
+.left-install
+{
+    background: #FFF;
+    height: 725px;
+}
+.content-install{
+    background: #FFF;
+    height: 725px;
+    *border-collapse: separate;
+    -webkit-border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
+}
+.install-steps{
+    background: #E4E4E4;
+    border: 1px solid #C6C9C9;
+    font-size: 20px;
+    margin: 5px;
+    padding: 10px;
+    *border-collapse: separate;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+.install-steps .span3
+{
+    float: left;   
+}
+.install-no{
+    color: #AA1816; 
+    font-weight: bold;
+}
+.install-yes{
+    color: #657E31; 
+    font-weight: bold;
+}
+.install-menu-active{
+    background: #ECF4CA;
+}
+.star
+{
+    font-weight: bold;
+    color: #BA0525;
+}
+table .install-database-info{
+    padding: 32px 0px 0px 7px;
+    color: #75797C;
+}
+.install-worning{
+    font-size: 20px;
+    color: #AA1816;
+    margin: 27px 0px 15px 0px;
+}
+.install-worning a{
+    margin-top: 20px;
+}
+
+.login
+{
+    background: #FFFFFF;
+    height: 300px;
+    width: 339px;
+    margin: 135px 0 0;
+}
+
+.login h3{
+    color: #56ACE4;
+    margin: 10px 0 0;
+}
+
+#overview .subnav .nav > li{
+    float: left;
+}
+
+#admin-content{
+    width: 940px;
+    background: white;
+    margin-left: 0px;
+    margin-top: 20px;
+}
+.well{
+    margin: 10px;
+}
+.well h4{
+    color: #3198B6;
+}
+#overview .dropdown-menu li > a:hover, .dropdown-menu .active > a:hover{
+    background: #F5F5F5;
+    color: #555555;
+}
+.row_menu{
+    width: 940px; margin-left: 0px;
+}
+#overview .btn-group{
+    margin: 10px 0px 0px 2px; 
+    float: left;
+}
+#overview .menu_list{
+    padding:9px; 
+    background-color: #E9E9E9;
+    border-right-color: #DDD;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.05) inset;
+    color: #777;
+}
+#overview .dropdown-toggle{
+    padding:9px; 
+    background-color: #E9E9E9;
+    border-right-color: #DDD;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.05) inset;
+    color: #777;
+}
+#overview .dropdown-menu{
+    margin-top: 8px;
+    margin-left: -2px;
+}
+
+table.tablesorter thead tr th{
+    vertical-align: middle; 
+    text-align: center;    
+}
+
+table.tablesorter thead tr .header {
+    background-image: url(../img/bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+table.tablesorter thead tr .headerSortUp {
+    background-image: url(../img/asc.gif);
+}
+table.tablesorter thead tr .headerSortDown {
+    background-image: url(../img/desc.gif);
+}
+.menu-dash{
+    color: #DDD;
+    font-weight: bold;
+    margin-right: 5px;
+}
