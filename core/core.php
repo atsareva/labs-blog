@@ -1,14 +1,19 @@
 <?php
 
-require_once 'db.php';
+//require_once 'db.php';
 define('CLER', 'Controller_');
 
-class Core extends Db
+class Core //extends Db
 {
 
-    private $_path = array(CPATH, VPATH, MPATH);
+   private $_path = array(CPATH, VPATH, MPATH);
 
-    static function auto_load()
+   static function run()
+   {
+       echo EXT;
+   }
+
+   static function auto_load()
     {
         if (isset($_SERVER['REQUESTED_URI']) && !empty($_SERVER['REQUESTED_URI']))
         {
