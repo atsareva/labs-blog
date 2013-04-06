@@ -7,7 +7,7 @@ Class Controller_Home extends Model
 
     function index()
     {
-        var_dump(time());
+        var_dump(time()); die();
         if (isset($_GET['id']) && $_GET['id'] > 0)
         {
             if (isset($_GET['page']) && $_GET['page'] == 'material')

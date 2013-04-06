@@ -5,11 +5,20 @@ require_once 'config.php';
 class Db extends Config
 {
 
+    private $_host;
+    private $_user;
+    private $_pass;
+    private $_name;
+
     private $connection;
 
-    function __construct()
+    function __construct($host, $user, $pass, $name)
     {
-        //$this->open_connection();
+        // set parameter for connect with database
+        $this->_host = $host;
+        $this->_user = $user;
+        $this->_pass = $pass;
+        $this->_name = $name;
     }
 
     private function open_connection()
@@ -33,7 +42,7 @@ class Db extends Config
     private function handing($query)
     {
         $return_data = array();
-        $count = 0;
+        $count       = 0;
 
         while ($row = mysql_fetch_array($query))
         {
@@ -74,5 +83,4 @@ class Db extends Config
 
 }
 
-$obj = new Db();
 ?>

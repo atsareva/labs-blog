@@ -2,16 +2,15 @@
     class Config
     {
  
-        protected $BASE_URL = 'patent.loc';
+        public $BASE_URL = 'patent.loc';
  
         public static $DEFULT_CONTROLLER = 'home';
  
-        protected $DB_HOST = 'localhost';
-        protected $DB_USER = 'root';
-        protected $DB_PASS = 'root';
-        protected $DB_NAME = '';
+        public $DB_HOST = 'localhost';
+        public $DB_USER = 'root';
+        public $DB_PASS = 'root';
+        public $DB_NAME = '';
  
     }
  
-$config = new Config();
 ?>

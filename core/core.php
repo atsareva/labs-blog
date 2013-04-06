@@ -1,39 +1,53 @@
 <?php
 
-//require_once 'db.php';
+require_once CORE_PATH . 'db/db' . EXT;
+require_once CONFIG_PATH . 'config' . EXT;
+
 define('CLER', 'Controller_');
 
-class Core //extends Db
+class Core
 {
 
-   private $_path = array(CPATH, VPATH, MPATH);
+    static private $_path = array(CPATH, VPATH, MPATH);
+    static private $_config;
+    static private $_db;
 
-   static function run()
-   {
-       echo EXT;
-   }
-
-   static function auto_load()
+    public static function run()
     {
-        if (isset($_SERVER['REQUESTED_URI']) && !empty($_SERVER['REQUESTED_URI']))
+        self::$_config = new Config();
+        self::setDataBaseConnection();
+
+        // create object by requested uri
+        self::autoLoad();
+    }
+
+    private static function setDataBaseConnection()
+    {
+        self::$_db = new Db(self::$_config->DB_HOST, self::$_config->DB_USER, self::$_config->DB_PASS, self::$_config->DB_NAME);
+    }
+
+    private static function autoLoad()
+    {
+        $class  = NULL;
+        $method = NULL;
+        $param  = array();
+
+        if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != '/')
         {
-            foreach ($_SERVER['REQUESTED_URI'] as $key => $value)
-            {
-                $get = explode('/', $key);
-                break;
-            }
-            $param = array();
-            foreach ($get as $key => $value)
+            $requestedPathArray = explode('/', $_SERVER['REQUEST_URI']);
+
+
+            foreach ($requestedPathArray as $key => $value)
             {
                 switch ($key)
                 {
                     case 0:
                         break;
                     case 1:
-                        $class = strtolower($value);
+                        $class   = strtolower($value);
                         break;
                     case 2:
-                        $function = strtolower($value);
+                        $method  = strtolower($value);
                         break;
                     default:
                         $param[] = $value;
@@ -41,55 +55,35 @@ class Core //extends Db
                 }
             }
 
-            $found = Core::find_file($class);
-
-            if ($found)
-            {
-                ($param) ? $param : $param = NULL;
-                (count($param) == 1) ? $param = $param[0] : $param;
-                require $found;
-                $class = CLER . ucwords(strtolower($class));
-                $instance = new $class;
-                if (isset($function) && !empty($function) && method_exists($instance, $function))
-                {
-                    $instance->$function($param);
-                }
-                else
-                {
-                    $function = 'index';
-                    $instance->$function();
-                }
-            }
-            else
-            {
-                require_once 'error.php';
-            }
+            if (!self::find_file($class))
+                $class = 'error';
         }
         else
-        {
+            $class = Config::$DEFULT_CONTROLLER;
 
-            $class = strtolower(Config::$DEFULT_CONTROLLER);
-            require_once strtolower(CLER . $class . EXT);
-            $default_class = CLER . ucwords($class);
-            $instance = new $default_class();
-            $instance->index();
-        }
+        require_once strtolower(CLER . $class . EXT);
+        $className = CLER . ucwords($class);
+        $instance = new $className();
+        (method_exists($instance, $method)) ? $instance->$method($param) : $instance->index();
     }
 
+    /**
+     * Find file by name
+     *
+     * @param string $class
+     * @return boolean
+     */
     public static function find_file($class)
     {
         $class = strtolower(CLER . $class . EXT);
-        $path = CPATH . $class;
+        $path  = CPATH . $class;
         if (is_file(CPATH . $class))
-        {
-            $found = CPATH . $class;
-            return $found;
-        }
-        else
-        {
-            return FALSE;
-        }
+            return TRUE;
+        return FALSE;
     }
+
+
+
 
     protected function view($name, $array)
     {
@@ -141,11 +135,11 @@ class Core //extends Db
 
         if ($id != NULL)
         {
-            $query = "SELECT * FROM items_menu WHERE menu_id = '{$id}'AND (" . $access.")";
+            $query = "SELECT * FROM items_menu WHERE menu_id = '{$id}'AND (" . $access . ")";
         }
         else
         {
-            $query = "SELECT * FROM items_menu WHERE " . $access;
+            $query  = "SELECT * FROM items_menu WHERE " . $access;
         }
         //$result = $this->select($where, 'items_menu');
         $result = $this->sql($query);
@@ -160,53 +154,53 @@ class Core //extends Db
             /**
              *  very very GAVNOKOD, but it works
              */
-            $data = $result;
-            $result = NULL;
+            $data      = $result;
+            $result    = NULL;
             $result[0] = $data;
         }
-        
+
         $result = $this->menu_tree($result);
         return $result;
     }
 
-    public function menu_tree($menu, $parent_id = 0, $count=0)
+    public function menu_tree($menu, $parent_id = 0, $count = 0)
     {
         $menu_tree = array();
-        $position = 1;
-        $child = FALSE;
-        $cycle = 0;
-        for ($cycle = 0; $cycle < count($menu); $cycle++)
-        {
-            if (($count < count($menu)) || ($cycle < count($menu)))
-            {
-                foreach ($menu as $item)
-                {
-                    if ($item['parent_id'] == $parent_id && $item['order_of'] == $position)
-                    { {
-                            $menu_tree[$item['id']]['id'] = $item['id'];
-                            $menu_tree[$item['id']]['title'] = $item['title'];
-                            $menu_tree[$item['id']]['path'] = $item['path'];
-                            $menu_tree[$item['id']]['status'] = $item['status'];
-
-                            $where = array(
-                                'id' => $item['access_id']
-                            );
-                            $access = $this->select($where, 'access');
-
-                            $menu_tree[$item['id']]['access_id'] = $access['description'];
-
-                            $menu_tree[$item['id']]['for_index'] = $item['for_index'];
-                            $menu_tree[$item['id']]['dash'] = $item['dash'];
-                            $count++;
-
-                            $menu_tree = array_merge($menu_tree, $this->menu_tree($menu, $item['id'], $count));
-                            $position = $position + 1;
-                            $cycle = 0;
-                        }
-                    }
-                }
-            }
-        }
+//        $position  = 1;
+//        $child     = FALSE;
+//        $cycle     = 0;
+//        for ($cycle = 0; $cycle < count($menu); $cycle++)
+//        {
+//            if (($count < count($menu)) || ($cycle < count($menu)))
+//            {
+//                foreach ($menu as $item)
+//                {
+//                    if ($item['parent_id'] == $parent_id && $item['order_of'] == $position)
+//                    { {
+//                            $menu_tree[$item['id']]['id']     = $item['id'];
+//                            $menu_tree[$item['id']]['title']  = $item['title'];
+//                            $menu_tree[$item['id']]['path']   = $item['path'];
+//                            $menu_tree[$item['id']]['status'] = $item['status'];
+//
+//                            $where  = array(
+//                                'id' => $item['access_id']
+//                            );
+//                            $access = $this->select($where, 'access');
+//
+//                            $menu_tree[$item['id']]['access_id'] = $access['description'];
+//
+//                            $menu_tree[$item['id']]['for_index'] = $item['for_index'];
+//                            $menu_tree[$item['id']]['dash']      = $item['dash'];
+//                            $count++;
+//
+//                            $menu_tree = array_merge($menu_tree, $this->menu_tree($menu, $item['id'], $count));
+//                            $position  = $position + 1;
+//                            $cycle     = 0;
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
 
         return $menu_tree;
@@ -214,63 +208,69 @@ class Core //extends Db
 
     function front_menu()
     {
-        $access = "access_id = 1";
-
-        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
-        {
-            $access_id = $_SESSION['user']['access_id'];
-
-            switch ($access_id)
-            {
-                case 1:
-                    $access = "access_id = 1";
-                    break;
-                case 2:
-                    $access = "access_id = 1 OR access_id = 2";
-                    break;
-                case 4:
-                    $access = "access_id = 1 OR access_id = 2 OR access_id = 4";
-                    break;
-                case 3:
-                    $access = "access_id = 1 OR access_id = 2 OR access_id = 3  OR access_id = 4";
-                    break;
-            }
-        }
-
-        $query = "SELECT * FROM menu WHERE trash=0 And status = 1 AND (" . $access.")";
-
-        //$result = $this->select($where, 'items_menu');
-        $menu = $this->sql($query);
-
-        if (!empty($menu))
-        {
-            if (isset($menu[0]) && is_array($menu[0]))
-            {
-                foreach ($menu as $value)
-                {
-                    $items_menu[$value['id']] = $this->load_items($value['id']);
-                    if ($value['show_title'] == 1)
-                    {
-                        $menu_name[$value['id']] = $value['title'];
-                    }
-                }
-            }
-            else
-            {
-                $items_menu[$menu['id']] = $this->load_items($menu['id']);
-                if ($menu['show_title'] == 1)
-                {
-                    $menu_name[$menu['id']] = $menu['title'];
-                }
-            }
-            if (!isset($menu_name) || empty($menu_name))
-            {
-                $menu_name = FALSE;
-            }
-            return array($menu_name, $items_menu);
-        }
+//        $access = "access_id = 1";
+//
+//        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
+//        {
+//            $access_id = $_SESSION['user']['access_id'];
+//
+//            switch ($access_id)
+//            {
+//                case 1:
+//                    $access = "access_id = 1";
+//                    break;
+//                case 2:
+//                    $access = "access_id = 1 OR access_id = 2";
+//                    break;
+//                case 4:
+//                    $access = "access_id = 1 OR access_id = 2 OR access_id = 4";
+//                    break;
+//                case 3:
+//                    $access = "access_id = 1 OR access_id = 2 OR access_id = 3  OR access_id = 4";
+//                    break;
+//            }
+//        }
+//
+//        $query = "SELECT * FROM menu WHERE trash=0 And status = 1 AND (" . $access . ")";
+//
+//        //$result = $this->select($where, 'items_menu');
+//        $menu = $this->sql($query);
+//
+//        if (!empty($menu))
+//        {
+//            if (isset($menu[0]) && is_array($menu[0]))
+//            {
+//                foreach ($menu as $value)
+//                {
+//                    $items_menu[$value['id']] = $this->load_items($value['id']);
+//                    if ($value['show_title'] == 1)
+//                    {
+//                        $menu_name[$value['id']] = $value['title'];
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                $items_menu[$menu['id']] = $this->load_items($menu['id']);
+//                if ($menu['show_title'] == 1)
+//                {
+//                    $menu_name[$menu['id']] = $menu['title'];
+//                }
+//            }
+//            if (!isset($menu_name) || empty($menu_name))
+//            {
+//                $menu_name = FALSE;
+//            }
+//            return array($menu_name, $items_menu);
+//        }
 
         return FALSE;
+    }
+
+    public static function getBaseUrl()
+    {
+        $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        return $protocol . self::$_config->BASE_URL;
     }
 
 }
