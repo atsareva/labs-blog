@@ -10,7 +10,7 @@ class Core
 
     static private $_path = array(CPATH, VPATH, MPATH);
     static private $_config;
-    static private $_db;
+    static public $_db;
 
     public static function run()
     {
@@ -28,15 +28,17 @@ class Core
 
     private static function autoLoad()
     {
-        $class  = NULL;
+        $class = Config::$DEFULT_CONTROLLER;
         $method = NULL;
         $param  = array();
 
         if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != '/')
         {
-            $requestedPathArray = explode('/', $_SERVER['REQUEST_URI']);
+            $requestUri = $_SERVER['REQUEST_URI'];
+            if ($strpos = strpos($requestUri, '?'))
+                    $requestUri = substr($requestUri, 0, $strpos);
 
-
+            $requestedPathArray = explode('/', $requestUri);
             foreach ($requestedPathArray as $key => $value)
             {
                 switch ($key)
@@ -58,8 +60,6 @@ class Core
             if (!self::find_file($class))
                 $class = 'error';
         }
-        else
-            $class = Config::$DEFULT_CONTROLLER;
 
         require_once strtolower(CLER . $class . EXT);
         $className = CLER . ucwords($class);
@@ -108,7 +108,7 @@ class Core
         exit;
     }
 
-    public function load_items($id = NULL)
+    public static function load_items($id = NULL)
     {
         $access = "access_id = 1";
 
@@ -142,7 +142,7 @@ class Core
             $query  = "SELECT * FROM items_menu WHERE " . $access;
         }
         //$result = $this->select($where, 'items_menu');
-        $result = $this->sql($query);
+        $result = self::$_db->sql($query);
 
         if (empty($result))
         {
@@ -159,11 +159,11 @@ class Core
             $result[0] = $data;
         }
 
-        $result = $this->menu_tree($result);
+        $result = self::menu_tree($result);
         return $result;
     }
 
-    public function menu_tree($menu, $parent_id = 0, $count = 0)
+    public static function menu_tree($menu, $parent_id = 0, $count = 0)
     {
         $menu_tree = array();
 //        $position  = 1;
@@ -206,63 +206,63 @@ class Core
         return $menu_tree;
     }
 
-    function front_menu()
+    static function front_menu()
     {
-//        $access = "access_id = 1";
-//
-//        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
-//        {
-//            $access_id = $_SESSION['user']['access_id'];
-//
-//            switch ($access_id)
-//            {
-//                case 1:
-//                    $access = "access_id = 1";
-//                    break;
-//                case 2:
-//                    $access = "access_id = 1 OR access_id = 2";
-//                    break;
-//                case 4:
-//                    $access = "access_id = 1 OR access_id = 2 OR access_id = 4";
-//                    break;
-//                case 3:
-//                    $access = "access_id = 1 OR access_id = 2 OR access_id = 3  OR access_id = 4";
-//                    break;
-//            }
-//        }
-//
-//        $query = "SELECT * FROM menu WHERE trash=0 And status = 1 AND (" . $access . ")";
-//
-//        //$result = $this->select($where, 'items_menu');
-//        $menu = $this->sql($query);
-//
-//        if (!empty($menu))
-//        {
-//            if (isset($menu[0]) && is_array($menu[0]))
-//            {
-//                foreach ($menu as $value)
-//                {
-//                    $items_menu[$value['id']] = $this->load_items($value['id']);
-//                    if ($value['show_title'] == 1)
-//                    {
-//                        $menu_name[$value['id']] = $value['title'];
-//                    }
-//                }
-//            }
-//            else
-//            {
-//                $items_menu[$menu['id']] = $this->load_items($menu['id']);
-//                if ($menu['show_title'] == 1)
-//                {
-//                    $menu_name[$menu['id']] = $menu['title'];
-//                }
-//            }
-//            if (!isset($menu_name) || empty($menu_name))
-//            {
-//                $menu_name = FALSE;
-//            }
-//            return array($menu_name, $items_menu);
-//        }
+        $access = "access_id = 1";
+
+        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
+        {
+            $access_id = $_SESSION['user']['access_id'];
+
+            switch ($access_id)
+            {
+                case 1:
+                    $access = "access_id = 1";
+                    break;
+                case 2:
+                    $access = "access_id = 1 OR access_id = 2";
+                    break;
+                case 4:
+                    $access = "access_id = 1 OR access_id = 2 OR access_id = 4";
+                    break;
+                case 3:
+                    $access = "access_id = 1 OR access_id = 2 OR access_id = 3  OR access_id = 4";
+                    break;
+            }
+        }
+
+        $query = "SELECT * FROM menu WHERE trash=0 And status = 1 AND (" . $access . ")";
+
+        //$result = $this->select($where, 'items_menu');
+        $menu = self::$_db->sql($query);
+
+        if (!empty($menu))
+        {
+            if (isset($menu[0]) && is_array($menu[0]))
+            {
+                foreach ($menu as $value)
+                {
+                    $items_menu[$value['id']] = self::load_items($value['id']);
+                    if ($value['show_title'] == 1)
+                    {
+                        $menu_name[$value['id']] = $value['title'];
+                    }
+                }
+            }
+            else
+            {
+                $items_menu[$menu['id']] = self::load_items($menu['id']);
+                if ($menu['show_title'] == 1)
+                {
+                    $menu_name[$menu['id']] = $menu['title'];
+                }
+            }
+            if (!isset($menu_name) || empty($menu_name))
+            {
+                $menu_name = FALSE;
+            }
+            return array($menu_name, $items_menu);
+        }
 
         return FALSE;
     }

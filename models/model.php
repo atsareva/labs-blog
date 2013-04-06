@@ -1,9 +1,8 @@
 <?php
 
-require_once 'core.php';
 require_once 'database.php';
 
-abstract class Model extends Core implements Database
+abstract class Model implements Database
 {
 
     public $CLASS_NAME;
@@ -50,7 +49,7 @@ abstract class Model extends Core implements Database
 
         $query = "SELECT * FROM {$table} WHERE {$aux_where}";
         //var_dump($query);
-        $result = $this->sql($query);
+        $result = Core::$_db->sql($query);
         return $result;
     }
 

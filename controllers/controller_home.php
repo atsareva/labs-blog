@@ -7,7 +7,6 @@ Class Controller_Home extends Model
 
     function index()
     {
-        var_dump(time()); die();
         if (isset($_GET['id']) && $_GET['id'] > 0)
         {
             if (isset($_GET['page']) && $_GET['page'] == 'material')
@@ -64,7 +63,7 @@ Class Controller_Home extends Model
 
             if (!empty($items_menu))
             {
-                $this->redirect($items_menu['path']);
+                Core::redirect($items_menu['path']);
             }
             else
             {
@@ -80,7 +79,7 @@ Class Controller_Home extends Model
                 }
             }
         }
-        $array = $this->front_menu();
+        $array = Core::front_menu();
         $menu_name = $array[0];
         $items_menu = $array[1];
 
