@@ -8,6 +8,7 @@ $core = 'core';
 $controllers = 'controllers';
 $views = 'views';
 $models = 'models';
+$helper = 'helper';
 $config = 'config';
 
 $install = 'install';
@@ -18,6 +19,7 @@ define('CORE_PATH', $path . DIRECTORY_SEPARATOR . $core . DIRECTORY_SEPARATOR);
 define('CPATH', $path . DIRECTORY_SEPARATOR . $controllers . DIRECTORY_SEPARATOR);
 define('VPATH', $path . DIRECTORY_SEPARATOR . $views . DIRECTORY_SEPARATOR);
 define('MPATH', $path . DIRECTORY_SEPARATOR . $models . DIRECTORY_SEPARATOR);
+define('HPATH', $path . DIRECTORY_SEPARATOR . $helper . DIRECTORY_SEPARATOR);
 define('CONFIG_PATH', $path . DIRECTORY_SEPARATOR . $config . DIRECTORY_SEPARATOR);
 
 define('IPATH', $path . DIRECTORY_SEPARATOR . $install . DIRECTORY_SEPARATOR);

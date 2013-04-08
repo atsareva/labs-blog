@@ -8,7 +8,7 @@ define('CLER', 'Controller_');
 class Core
 {
 
-    static private $_path = array(CPATH, VPATH, MPATH);
+    static private $_path = array(CPATH, VPATH, HPATH);
     static private $_config;
     static public $_db;
 
