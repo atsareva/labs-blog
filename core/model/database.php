@@ -3,15 +3,15 @@
 interface Database
 {
 
-    public function load_collection($table);
+    public function getCollection();
     
-    public function select($where, $table);
+    public function select($where);
 
-    public function insert($data, $table);
+    public function insert($data);
 
-    public function update($data, $table);
+    public function update($data);
 
-    public function delete($where, $table);
+    public function delete($where);
 
 }
 

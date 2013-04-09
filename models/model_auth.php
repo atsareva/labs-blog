@@ -3,9 +3,9 @@ require CORE_PATH . 'model/model' . EXT;
 
 class Model_Auth extends Model
 {
-    public static function table_name()
+    public function __construct()
     {
-        return 'users';
+        $this->_tableName = 'users';
     }
 }
 ?>
