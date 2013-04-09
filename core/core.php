@@ -1,6 +1,5 @@
 <?php
 
-require_once CORE_PATH . 'db/db' . EXT;
 require_once CONFIG_PATH . 'config' . EXT;
 
 define('CLER', 'Controller_');
@@ -15,21 +14,14 @@ class Core
         ML   => MPATH,
         HR   => HPATH
     );
-    static private $_config;
-    static public $_db;
+    static public $_config;
 
     public static function run()
     {
         self::$_config = new Config();
-        self::setDataBaseConnection();
 
         // create object by requested uri
         self::autoLoad();
-    }
-
-    private static function setDataBaseConnection()
-    {
-        self::$_db = new Db(self::$_config->DB_HOST, self::$_config->DB_USER, self::$_config->DB_PASS, self::$_config->DB_NAME);
     }
 
     private static function autoLoad()
@@ -109,7 +101,7 @@ class Core
     private static function getClassObject($className, $type)
     {
         require_once strtolower(self::$_path[$type] . $type . $className . EXT);
-        $className = $type . ucwords($class);
+        $className = $type . ucwords($className);
         return new $className();
     }
 

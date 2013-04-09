@@ -9,19 +9,18 @@ class Db extends Config
     private $_user;
     private $_pass;
     private $_name;
-
     private $connection;
 
-    function __construct($host, $user, $pass, $name)
+    function __construct()
     {
         // set parameter for connect with database
-        $this->_host = $host;
-        $this->_user = $user;
-        $this->_pass = $pass;
-        $this->_name = $name;
+        $this->_host = Core::$_config->DB_HOST;
+        $this->_user = Core::$_config->DB_USER;
+        $this->_pass = Core::$_config->DB_PASS;
+        $this->_name = Core::$_config->DB_NAME;
     }
 
-    private function open_connection()
+    private function openConnection()
     {
         $this->connection = mysql_connect($this->DB_HOST, $this->DB_USER, $this->DB_PASS);
         if (!$this->connection)
@@ -70,7 +69,7 @@ class Db extends Config
     public function sql($query)
     {
 
-        $this->open_connection();
+        $this->openConnection();
         $result = mysql_query($query, $this->connection);
         if (!$result)
         {

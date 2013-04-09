@@ -4,7 +4,9 @@ class Controller_Error
 
     public function index()
     {
-        echo "error";
+        $model = Core::getModel('auth');
+        $a = $model->select(1, 'users');
+        $b = $a->user_name;
     }
             
 }
