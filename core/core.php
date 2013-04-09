@@ -4,11 +4,17 @@ require_once CORE_PATH . 'db/db' . EXT;
 require_once CONFIG_PATH . 'config' . EXT;
 
 define('CLER', 'Controller_');
+define('ML', 'Model_');
+define('HR', 'Helper_');
 
 class Core
 {
 
-    static private $_path = array(CPATH, VPATH, HPATH);
+    static private $_path = array(
+        CLER => CPATH,
+        ML   => MPATH,
+        HR   => HPATH
+    );
     static private $_config;
     static public $_db;
 
@@ -28,15 +34,15 @@ class Core
 
     private static function autoLoad()
     {
-        $class = Config::$DEFULT_CONTROLLER;
+        $class  = Config::$DEFULT_CONTROLLER;
         $method = NULL;
         $param  = array();
 
         if (isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != '/')
         {
             $requestUri = $_SERVER['REQUEST_URI'];
-            if ($strpos = strpos($requestUri, '?'))
-                    $requestUri = substr($requestUri, 0, $strpos);
+            if ($strpos     = strpos($requestUri, '?'))
+                $requestUri = substr($requestUri, 0, $strpos);
 
             $requestedPathArray = explode('/', $requestUri);
             foreach ($requestedPathArray as $key => $value)
@@ -57,14 +63,54 @@ class Core
                 }
             }
 
-            if (!self::find_file($class))
+            if (!self::findFile($class, CLER))
                 $class = 'error';
         }
 
-        require_once strtolower(CLER . $class . EXT);
+        require_once strtolower(CPATH . CLER . $class . EXT);
         $className = CLER . ucwords($class);
-        $instance = new $className();
+        $instance  = new $className();
         (method_exists($instance, $method)) ? $instance->$method($param) : $instance->index();
+    }
+
+    /**
+     * Retrieve model object by it name
+     *
+     * @param string $className
+     * @return object|boolean
+     */
+    public static function getModel($className)
+    {
+        if (self::findFile($className, ML))
+            return self::getClassObject($className, ML);
+        return FALSE;
+    }
+
+    /**
+     * Retrieve helper object by it name
+     *
+     * @param type $className
+     * @return object|boolean
+     */
+    public static function getHelper($className)
+    {
+        if (self::findFile($className, HR))
+            return self::getClassObject($className, HR);
+        return FALSE;
+    }
+
+    /**
+     * Include request class and retrieve it object
+     *
+     * @param string $className
+     * @param string $type
+     * @return object
+     */
+    private static function getClassObject($className, $type)
+    {
+        require_once strtolower(self::$_path[$type] . $type . $className . EXT);
+        $className = $type . ucwords($class);
+        return new $className();
     }
 
     /**
@@ -73,18 +119,17 @@ class Core
      * @param string $class
      * @return boolean
      */
-    public static function find_file($class)
+    private static function findFile($class, $type)
     {
-        $class = strtolower(CLER . $class . EXT);
-        $path  = CPATH . $class;
-        if (is_file(CPATH . $class))
+        $class = strtolower($type . $class . EXT);
+        if (is_file(self::$_path[$type] . $class))
             return TRUE;
         return FALSE;
     }
 
 
 
-
+    
     protected function view($name, $array)
     {
         include_once $name . EXT;
