@@ -5,7 +5,7 @@ interface Database
 
     public function getCollection();
     
-    public function select($where);
+    public function load($id);
 
     public function insert($data);
 

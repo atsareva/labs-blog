@@ -3,6 +3,10 @@
 $path = dirname(__FILE__);
 define('EXT', '.php');
 
+define('CLER', 'Controller_');
+define('ML', 'Model_');
+define('HR', 'Helper_');
+
 $core = 'core';
 
 $controllers = 'controllers';

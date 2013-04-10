@@ -2,10 +2,6 @@
 
 require_once CONFIG_PATH . 'config' . EXT;
 
-define('CLER', 'Controller_');
-define('ML', 'Model_');
-define('HR', 'Helper_');
-
 class Core
 {
 

@@ -6,10 +6,45 @@ require_once 'db/db' . EXT;
 abstract class Model extends Db implements Database
 {
 
+    /**
+     * Items data
+     *
+     * @var array
+     */
     public $_data        = array();
+
+    /**
+     * Table name
+     *
+     * @var string
+     */
     protected $_tableName;
-    private $_filterField = NULL;
-    private $_filterQuery = NULL;
+
+    /**
+     * Fields that will be added to the filtering
+     *
+     * @var string
+     */
+    private $_filterField = '';
+
+    /**
+     * String that will be added to query
+     *
+     * @var string
+     */
+    private $_filterQuery = '';
+
+    /**
+     * Retreive select query result
+     *
+     * @param int $id
+     * @return object
+     */
+    public function load($id)
+    {
+        $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}";
+        $this->_data = (object) $this->sql($query);
+    }
 
     /**
      * Retreive all data
@@ -67,7 +102,6 @@ abstract class Model extends Db implements Database
      *
      * @param string $field
      * @param array $optionArray
-     * @param string $condition
      * @return string
      */
     private function _buildQuery($field, $optionArray)
@@ -79,30 +113,9 @@ abstract class Model extends Db implements Database
         return $buildQuery;
     }
 
-    /**
-     * Retreive select query result
-     *
-     * @param array|int $where
-     * @return object
-     */
-    public function select($where)
+    public function setData($data)
     {
-        if (is_array($where))
-        {
-            $max_count = count($where) - 1;
-            $count     = 0;
-            $aux_where = NULL;
-            foreach ($where as $key => $value)
-            {
-                ($count == $max_count) ? $aux_where.= "{$key} = '{$value}'" : $aux_where.= "{$key} = '{$value}' AND ";
-                $count++;
-            }
-        }
-        else
-            $aux_where = "id = '{$where}'";
 
-        $query = "SELECT * FROM {$this->_tableName} WHERE {$aux_where}";
-        return (object) $this->sql($query);
     }
 
     public function save()
@@ -212,7 +225,7 @@ _EXC_MESSAGE;
         }
     }
 
-    /**
+     /**
      * Set/Get attribute wrapper
      *
      * @param   string $method
@@ -225,33 +238,34 @@ _EXC_MESSAGE;
         {
             case 'get' :
                 //Varien_Profiler::start('GETTER: '.get_class($this).'::'.$method);
-                $key  = $this->_underscore(substr($method, 3));
-                $data = $this->getData($key, isset($args[0]) ? $args[0] : null);
+                $key  = $this > _underscore(substr($method, 3));
+                $data = $this > getData($key, isset($args[0]) ? $args[0] : null);
                 //Varien_Profiler::stop('GETTER: '.get_class($this).'::'.$method);
                 return $data;
 
             case 'set' :
                 //Varien_Profiler::start('SETTER: '.get_class($this).'::'.$method);
-                $key    = $this->_underscore(substr($method, 3));
-                $result = $this->setData($key, isset($args[0]) ? $args[0] : null);
+                $key    = $this > _underscore(substr($method, 3));
+                $result = $this > setData($key, isset($args[0]) ? $args[0] : null);
                 //Varien_Profiler::stop('SETTER: '.get_class($this).'::'.$method);
                 return $result;
 
             case 'uns' :
                 //Varien_Profiler::start('UNS: '.get_class($this).'::'.$method);
-                $key    = $this->_underscore(substr($method, 3));
-                $result = $this->unsetData($key);
+                $key    = $this > _underscore(substr($method, 3));
+                $result = $this > unsetData($key);
                 //Varien_Profiler::stop('UNS: '.get_class($this).'::'.$method);
                 return $result;
 
             case 'has' :
                 //Varien_Profiler::start('HAS: '.get_class($this).'::'.$method);
-                $key = $this->_underscore(substr($method, 3));
+                $key = $this > _underscore(substr($method, 3));
                 //Varien_Profiler::stop('HAS: '.get_class($this).'::'.$method);
                 return isset($this->_data[$key]);
         }
         throw new Varien_Exception("Invalid method " . get_class($this) . "::" . $method . "(" . print_r($args, 1) . ")");
     }
+
 
 }
 

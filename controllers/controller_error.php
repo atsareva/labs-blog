@@ -1,17 +1,15 @@
 <?php
 
-class Controller_Error
+require_once CORE_PATH . 'controller/controller' . EXT;
+
+class Controller_Error extends Controller
 {
 
     public function index()
     {
         $model = Core::getModel('auth');
-        $a     = $model
-                ->addFieldToFilter('user_name', array(
-                    array('=' => 'user'),
-                    array('=' => 'admin'))
-                )
-                ->getCollection();
+        $a     = $model->load(1);
+        $model->ololo('aaaaaaaa');
         //echo $a->user_name;
     }
 
