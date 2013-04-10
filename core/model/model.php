@@ -6,7 +6,7 @@ require_once 'db/db' . EXT;
 abstract class Model extends Db implements Database
 {
 
-    public $_data = array();
+    public $_data        = array();
     protected $_tableName;
     private $_filterField = NULL;
     private $_filterQuery = NULL;
@@ -20,10 +20,10 @@ abstract class Model extends Db implements Database
     {
         (empty($this->_filterField)) ? $filterField = '*' : $filterField = $this->_filterField;
         (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'WHERE ' . $this->_filterQuery;
-        $query = "SELECT {$filterField} FROM {$this->_tableName} {$filterQuery}";
+        $query       = "SELECT {$filterField} FROM {$this->_tableName} {$filterQuery}";
 
-        $result = $this->sql($query);
-        if (count($result) > 1)
+        $result        = $this->sql($query);
+        if (isset($result[0]) && is_array($result[0]))
             foreach ($result as $value)
                 $this->_data[] = (object) $value;
         else
@@ -42,11 +42,22 @@ abstract class Model extends Db implements Database
             (!empty($this->_filterField)) ? $this->_filterField = $this->_filterField . ', ' . $field : $this->_filterField = $field;
         else
         {
+            // build terms for AND
             if (count($options) == 1)
                 (empty($this->_filterQuery)) ? $this->_filterQuery .= $this->_buildQuery($field, $options) : $this->_filterQuery .= ' AND ' . $this->_buildQuery($field, $options);
             else
-                $this->_filterQuery .= ' ( ' . $this->_buildQuery($field, $option, 'OR') . ' )';
+            {
+                // build terms for OR
+                $count    = 0;
+                $maxCount = count($options) - 1;
+                $this->_filterQuery .= ' (';
 
+                foreach ($options as $value)
+                {
+                    ($count == $maxCount) ? $this->_filterQuery .= $this->_buildQuery($field, $value) . ' )' : $this->_filterQuery .= $this->_buildQuery($field, $value) . ' OR ';
+                    $count++;
+                }
+            }
         }
         return $this;
     }
@@ -59,16 +70,12 @@ abstract class Model extends Db implements Database
      * @param string $condition
      * @return string
      */
-    private function _buildQuery($field, $optionArray, $condition = '')
+    private function _buildQuery($field, $optionArray)
     {
-        $count      = 0;
-        $maxCount   = count($optionArray) - 1;
         $buildQuery = NULL;
         foreach ($optionArray as $key => $value)
-        {
-            ($count == $maxCount) ? $buildQuery.= "{$field} {$key} '{$value}'" : $buildQuery.= "{$field} {$key} '{$value}' {$condition} ";
-            $count++;
-        }
+            $buildQuery.= "( {$field} {$key} '{$value}' )";
+
         return $buildQuery;
     }
 
