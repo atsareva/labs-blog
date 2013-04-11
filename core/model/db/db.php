@@ -68,7 +68,6 @@ class Db extends Config
 
     public function sql($query)
     {
-
         $this->openConnection();
         $result = mysql_query($query, $this->connection);
         if (!$result)

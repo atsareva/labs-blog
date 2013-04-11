@@ -11,7 +11,14 @@ abstract class Model extends Db implements Database
      *
      * @var array
      */
-    public $_data        = array();
+    public $_data = array();
+
+    /**
+     * Last insert id to database
+     * 
+     * @var int 
+     */
+    public $_lastInsertId = NULL;
 
     /**
      * Table name
@@ -44,6 +51,7 @@ abstract class Model extends Db implements Database
     {
         $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}";
         $this->_data = (object) $this->sql($query);
+        return $this;
     }
 
     /**
@@ -63,6 +71,7 @@ abstract class Model extends Db implements Database
                 $this->_data[] = (object) $value;
         else
             $this->_data[] = (object) $result;
+        return $this;
     }
 
     /**
@@ -113,93 +122,108 @@ abstract class Model extends Db implements Database
         return $buildQuery;
     }
 
-    public function setData($data)
+    /**
+     * Overwrite data in the object.
+     *
+     * @param string|array $key
+     * @param mixed $value
+     * @return object
+     */
+    public function setData($key, $value = null)
     {
+        if (is_array($key))
+            $this->_data       = $key;
+        else
+            $this->_data->$key = $value;
 
+        return $this;
+    }
+
+    /**
+     * Unset data from the object.
+     *
+     * @param string|array $key
+     * @return object
+     */
+    public function unsetData($key = NULL)
+    {
+        if (is_null($key))
+            $this->_data = $array();
+        else
+            unset($this->_data->$key);
+
+        return $this;
     }
 
     public function save()
     {
-        
-    }
-
-    public function insert($data)
-    {
-        if (is_array($data))
+        if ($this->getId())
         {
-            $max_count   = count($data) - 1;
-            $count       = 0;
-            $key_data    = NULL;
-            $values_data = NULL;
-            foreach ($data as $key => $value)
-            {
-                if ($max_count != $count)
-                {
-                    $key_data.= $key . ', ';
-                    $values_data.= '\'' . $value . '\'' . ', ';
-                }
-                else
-                {
-                    $key_data.=$key;
-                    $values_data.='\'' . $value . '\'';
-                }
-                $count++;
-            }
-            $query  = "INSERT INTO {$table} ({$key_data}) VALUES ({$values_data})";
-            //  var_dump($query);die();
-            $result = $this->sql($query);
-            $query  = "SELECT MAX(LAST_INSERT_ID( id )) FROM {$table} LIMIT 1";
-            $result = $this->sql($query);
-            return $result["MAX(LAST_INSERT_ID( id ))"];
+            //get id from data
+            $id = $this->getId();
+            $this->unsId();
+
+            //update data
+            $this->_update($id, (array) $this->getData());
         }
         else
         {
-            $message = <<<_EXC_MESSAGE
-Check sending params. You must give only array to function insert(array).
-_EXC_MESSAGE;
-            throw new Exception($message);
+            $id = $this->_insert((array) $this->getData());
+            $this->_lastInsertId = $id;
         }
+        return $this->load($id);
     }
 
-    public function update($data)
+    private function _insert($data)
     {
-        //$class_name = get_called_class();
-        //$table = $class_name::table_name();
-
-        if (is_array($data) && array_key_exists('id', $data))
+        $maxCount   = count($data) - 1;
+        $count       = 0;
+        $keyData    = NULL;
+        $valuesData = NULL;
+        foreach ($data as $key => $value)
         {
-            $max_count  = count($data) - 1;
-            $count      = 0;
-            $aux_update = NULL;
-            foreach ($data as $key => $value)
+            if ($maxCount != $count)
             {
-                if ($key != 'id')
-                {
-                    ($count == $max_count) ? $aux_update.=$key . '=' . "'{$value}'" : $aux_update.=$key . '=' . "'{$value}', ";
-                }
-                else
-                {
-                    $id     = $value;
-                }
-                $count++;
+                $keyData .= $key . ', ';
+                $valuesData .= "'{$value}', ";
             }
-            $query  = "UPDATE {$table} SET {$aux_update} WHERE id='{$id}'";
-            $result = $this->sql($query);
-            return $result;
+            else
+            {
+                $keyData .= $key;
+                $valuesData .= "'{$value}'";
+            }
+            $count++;
         }
-        else
+        $this->sql("INSERT INTO {$this->_tableName} ({$keyData}) VALUES ({$valuesData})");
+        $result = $this->sql("SELECT MAX(LAST_INSERT_ID( id )) FROM {$this->_tableName} LIMIT 1");
+        return $result["MAX(LAST_INSERT_ID( id ))"];
+    }
+
+    /**
+     * Update data in database by id
+     *
+     * @param int $id
+     * @param array $data
+     * @return type
+     */
+    private function _update($id, $data)
+    {
+        $count      = 0;
+        $maxCount   = count($data) - 1;
+        $queryBuild = NULL;
+        foreach ($data as $key => $value)
         {
-            $message = <<<_EXC_MESSAGE
-Check sending params. You must give only array to function update(array) and your request must contains ID field.
-_EXC_MESSAGE;
-            throw new Exception($message);
+            ($count == $maxCount) ? $queryBuild .= $key . '=' . "'{$value}'" : $queryBuild .= $key . '=' . "'{$value}', ";
+            $count++;
         }
+        $query = "UPDATE {$this->_tableName} SET {$queryBuild} WHERE id='{$id}'";
+        return $this->sql($query);
     }
 
     public function delete($where)
     {
-        //$class_name = get_called_class();
-        //$table = $class_name::table_name();
+//$class_name = get_called_class();
+//$table = $class_name::table_name();
 
         if (is_array($where))
         {
@@ -225,7 +249,33 @@ _EXC_MESSAGE;
         }
     }
 
-     /**
+    /**
+     * Retrieves data from the object
+     *
+     * @param string $key
+     * @param string $index
+     * @return null
+     */
+    public function getData($key = '', $index = NULL)
+    {
+        if ($key === '')
+            return $this->_data;
+        if (isset($this->_data->$key))
+        {
+            if (is_null($index))
+                return $this->_data->$key;
+            $value = $this->_data->$key;
+            if (is_array($value))
+            {
+                if (isset($value[$index]))
+                    return $value[$index];
+                return NULL;
+            }
+        }
+        return NULL;
+    }
+
+    /**
      * Set/Get attribute wrapper
      *
      * @param   string $method
@@ -237,36 +287,26 @@ _EXC_MESSAGE;
         switch (substr($method, 0, 3))
         {
             case 'get' :
-                //Varien_Profiler::start('GETTER: '.get_class($this).'::'.$method);
-                $key  = $this > _underscore(substr($method, 3));
-                $data = $this > getData($key, isset($args[0]) ? $args[0] : null);
-                //Varien_Profiler::stop('GETTER: '.get_class($this).'::'.$method);
+                $key  = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method, 3)));
+                $data = $this->getData($key, isset($args[0]) ? $args[0] : null);
                 return $data;
 
             case 'set' :
-                //Varien_Profiler::start('SETTER: '.get_class($this).'::'.$method);
-                $key    = $this > _underscore(substr($method, 3));
-                $result = $this > setData($key, isset($args[0]) ? $args[0] : null);
-                //Varien_Profiler::stop('SETTER: '.get_class($this).'::'.$method);
+                $key    = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method, 3)));
+                $result = $this->setData($key, isset($args[0]) ? $args[0] : null);
                 return $result;
 
             case 'uns' :
-                //Varien_Profiler::start('UNS: '.get_class($this).'::'.$method);
-                $key    = $this > _underscore(substr($method, 3));
-                $result = $this > unsetData($key);
-                //Varien_Profiler::stop('UNS: '.get_class($this).'::'.$method);
+                $key    = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method, 3)));
+                $result = $this->unsetData($key);
                 return $result;
 
             case 'has' :
-                //Varien_Profiler::start('HAS: '.get_class($this).'::'.$method);
-                $key = $this > _underscore(substr($method, 3));
-                //Varien_Profiler::stop('HAS: '.get_class($this).'::'.$method);
-                return isset($this->_data[$key]);
+                $key = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method, 3)));
+                return isset($this->_data->$key);
         }
-        throw new Varien_Exception("Invalid method " . get_class($this) . "::" . $method . "(" . print_r($args, 1) . ")");
+        throw new Exception("Invalid method " . get_class($this) . "::" . $method . "(" . print_r($args, 1) . ")");
     }
 
-
 }
-
 ?>
