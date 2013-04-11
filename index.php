@@ -47,7 +47,6 @@ session_start();
 
 require_once CORE_PATH . 'core' . EXT;
 Core::run();
-mysql_close();
 
 function RemoveDir($path)
 {

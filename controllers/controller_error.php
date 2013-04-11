@@ -8,17 +8,13 @@ class Controller_Error extends Controller
     public function index()
     {
         $model = Core::getModel('auth');
-        $model->setData(array('user_name' => 'OLO', 'email' => 'ololo', 'pass' => '1234'))
+        $model->setData(array('user_name' => 'test', 'email' => time()), 'users')
                 ->save();
-        echo $model->_lastInsertId;
 
-//        $model->load(1)
-//                ->setUserName('admin')
-//                ->save();
-        //echo $a->user_name;
-//        $_SESSION['"' . time() . '"'] = time();
-        var_dump($_SESSION);
-//        unset($_SESSION);
+        $model->load(1)
+                ->setUserName('admin')
+                ->save();
+        echo $model->getUserName();
     }
 
 }
