@@ -115,9 +115,60 @@ class Core
         return FALSE;
     }
 
+    /**
+     * Write message to system.log
+     *
+     * @param mix $message
+     * @param string $path
+     */
+    public static function log($message, $path = NULL)
+    {
+        $typeMessage = gettype($message);
+        if (is_object($message))
+        {
+            $olo = (array)$message;
+            $message = (array)$message;
+        }
+        if (is_array($message))
+        {
+            $typeMessage .= '(' . count($message) . ')';
+            $message = PHP_EOL . self::_logVarDump((array) $message, '', 0);
+        }
+        $logDir  = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'var';
+        $logFile = $logDir . DIRECTORY_SEPARATOR . 'system.log';
+        if (!file_exists($logFile))
+        {
+            file_put_contents($logFile, '');
+            chmod($logFile, 0777);
+        }
+        $message = '[ ' . date("Y-m-d H:i:s") . ' ] ' . $typeMessage . ' ' . $message;
+        ($path) ? $message .= ' in ' . $path . PHP_EOL : $message .= PHP_EOL;
+        file_put_contents($logFile, $message, FILE_APPEND | LOCK_EX);
+    }
 
+    /**
+     * Retrieve array as string
+     *
+     * @param array $array
+     * @param string $message
+     * @param int $level
+     * @return string
+     */
+    private static function _logVarDump($array, $message, $level)
+    {
+        if (is_array($array))
+        {
+            foreach ($array as $key => $value)
+            {
+                (is_array($array[$key])) ? $recursive = PHP_EOL . self::_logVarDump((array) $array[$key], $message, ($level + 1)) : $recursive = $array[$key];
+                for ($i = 0; $i <= ($level); $i++)
+                    $message .= "\t";
+                $message .= "[" . (string) $key . "]" . ' => ' . (string) $recursive . PHP_EOL;
+            }
+        }
+        return $message;
+    }
 
-    
     protected function view($name, $array)
     {
         include_once $name . EXT;

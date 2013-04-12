@@ -8,7 +8,7 @@ interface Database
     public function load($id);
 
 
-    public function delete($where);
+//    public function delete();
 
 }
 

@@ -18,7 +18,7 @@ abstract class Model extends Db implements Database
      * 
      * @var int 
      */
-    public $_lastInsertId = NULL;
+    public $_lastInsertId;
 
     /**
      * Table name
@@ -42,6 +42,13 @@ abstract class Model extends Db implements Database
     private $_filterQuery = '';
 
     /**
+     * Set data object id if its will deleted
+     * 
+     * @var boolean | int
+     */
+    private $_unsetDataFlag = FALSE;
+
+    /**
      * Retreive select query result
      *
      * @param int $id
@@ -51,6 +58,8 @@ abstract class Model extends Db implements Database
     {
         $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}";
         $this->_data = (object) $this->sql($query);
+        if (!$this->getId())
+            $this->setId($id);
         return $this;
     }
 
@@ -148,16 +157,35 @@ abstract class Model extends Db implements Database
     public function unsetData($key = NULL)
     {
         if (is_null($key))
-            $this->_data = $array();
+        {
+            $this->_unsetDataFlag = $this->getId();
+            $this->_data          = array();
+        }
         else
             unset($this->_data->$key);
 
         return $this;
     }
 
+    /**
+     * Save data object
+     *
+     * @return object
+     */
     public function save()
     {
-        if ($this->getId())
+        if (!$this->getData() && !$this->_unsetDataFlag)
+        {
+            return $this;
+        }
+        // delete record by id
+        elseif ($this->_unsetDataFlag)
+        {
+            $this->_delete($this->_unsetDataFlag);
+            return $this;
+        }
+        // update record by id
+        elseif ($this->getId())
         {
             //get id from data
             $id = $this->getId();
@@ -166,9 +194,10 @@ abstract class Model extends Db implements Database
             //update data
             $this->_update($id, (array) $this->getData());
         }
+        // insert new record
         else
         {
-            $id = $this->_insert((array) $this->getData());
+            $id                  = $this->_insert((array) $this->getData());
             $this->_lastInsertId = $id;
         }
         return $this->load($id);
@@ -177,7 +206,7 @@ abstract class Model extends Db implements Database
     private function _insert($data)
     {
         $maxCount   = count($data) - 1;
-        $count       = 0;
+        $count      = 0;
         $keyData    = NULL;
         $valuesData = NULL;
         foreach ($data as $key => $value)
@@ -220,33 +249,14 @@ abstract class Model extends Db implements Database
         return $this->sql($query);
     }
 
-    public function delete($where)
+    /**
+     * Execute query for deliting record by id
+     *
+     * @param int $id
+     */
+    private function _delete($id)
     {
-//$class_name = get_called_class();
-//$table = $class_name::table_name();
-
-        if (is_array($where))
-        {
-            $max_count = count($where) - 1;
-            $count     = 0;
-            $aux_del   = NULL;
-            foreach ($where as $key => $value)
-            {
-                ($count == $max_count) ? $aux_del.=$key . '=' . "'{$value}'" : $aux_del.=$key . '=' . "'{$value}' AND ";
-
-                $count++;
-            }
-
-            $query  = "DELETE FROM {$table} WHERE {$aux_del}";
-            $result = $this->sql($query);
-        }
-        else
-        {
-            $message = <<<_EXC_MESSAGE
-Check sending params. You must give only array to function delete(array).
-_EXC_MESSAGE;
-            throw new Exception($message);
-        }
+        $this->sql("DELETE FROM {$this->_tableName} WHERE id = {$id}");
     }
 
     /**
@@ -309,4 +319,5 @@ _EXC_MESSAGE;
     }
 
 }
+
 ?>
