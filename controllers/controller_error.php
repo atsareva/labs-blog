@@ -11,15 +11,16 @@ class Controller_Error extends Controller
         if ($_SERVER['REQUEST_URI'] != '/favicon.ico')
         {
         $model = Core::getModel('auth');
-        $model->setData(array('user_name' => 'test', 'email' => time(), 'olo' => 'olo'))
-                ->save();
+//        $model->setData(array('user_name' => 'test', 'email' => time(), 'olo' => 'olo'))
+//                ->save();
 //        $model->load(190)
 //                ->setUserName('oloo')
 //                ->save();
         }
-//        $model->load(1)
+        $model->load(1);
 //                ->setUserName('admin')
 //                ->save();
+        Core::log($model->getData());
         echo $model->getUserName();
     }
 

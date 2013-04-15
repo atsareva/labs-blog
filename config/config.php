@@ -1,16 +1,16 @@
 <?php
-    class Config
-    {
- 
-        public $BASE_URL = 'patent.loc';
- 
-        public static $DEFULT_CONTROLLER = 'home';
- 
-        public $DB_HOST = 'localhost';
-        public $DB_USER = 'root';
-        public $DB_PASS = 'root';
-        public $DB_NAME = 'simplecms_db';
- 
-    }
- 
+
+class Config
+{
+
+    protected static $_dbHost = 'localhost';
+    protected static $_dbUser = 'root';
+    protected static $_dbPass = 'root';
+    protected static $_dbName = 'simplecms_db';
+
+    public static $_baseUrl = 'patent.loc';
+    public static $_defaultController = 'home';
+
+}
+
 ?>

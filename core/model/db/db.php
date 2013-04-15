@@ -1,47 +1,47 @@
 <?php
 
-require_once 'config.php';
+require_once CONFIG_PATH . 'config' . EXT;
 
-class Db extends Config
+abstract class Db extends Config
 {
 
-    private $_host;
-    private $_user;
-    private $_pass;
-    private $_name;
-    private $connection;
+    private $_connection;
+    private $_config = array();
 
-    function __construct()
+    public function __construct()
     {
         // set parameter for connect with database
-        $this->_host = Core::$_config->DB_HOST;
-        $this->_user = Core::$_config->DB_USER;
-        $this->_pass = Core::$_config->DB_PASS;
-        $this->_name = Core::$_config->DB_NAME;
+    }
+
+    private function _setConfig()
+    {
+         $this->_config = array(
+            'dbHost' => self::$_dbHost,
+            'dbUser' => self::$_dbUser,
+            'dbPass' => self::$_dbPass,
+            'dbName' => self::$_dbName,
+        );
     }
 
     private function openConnection()
     {
-        $this->connection = mysql_connect($this->DB_HOST, $this->DB_USER, $this->DB_PASS);
-        if (!$this->connection)
-        {
+        if (empty ($this->_config))
+            $this->_setConfig ();
+        $this->_connection = mysql_connect($this->_config['dbHost'], $this->_config['dbUser'], $this->_config['dbPass']);
+        if (!$this->_connection)
             die('Database connection failed: ' . mysql_error());
-        }
         else
         {
-            $db_select = mysql_select_db($this->DB_NAME);
-            if (!$db_select)
-            {
+            if (!mysql_select_db($this->_config['dbName']))
                 die('Database selection failed: ' . mysql_error());
-            }
         }
         mysql_query('set names utf8') or die('set names utf8 failed');
     }
 
     private function handing($query)
     {
-        $return_data = array();
-        $count       = 0;
+        $returnData = array();
+        $count      = 0;
 
         while ($row = mysql_fetch_array($query))
         {
@@ -50,7 +50,7 @@ class Db extends Config
                 foreach ($row as $key => $value)
                 {
                     if (is_string($key))
-                        $return_data[$count][$key] = $value;
+                        $returnData[$count][$key] = $value;
                 }
                 $count++;
             }
@@ -59,21 +59,19 @@ class Db extends Config
                 foreach ($row as $key => $value)
                 {
                     if (is_string($key))
-                        $return_data[$key] = $value;
+                        $returnData[$key] = $value;
                 }
             }
         }
-        return $return_data;
+        return $returnData;
     }
 
     public function sql($query)
     {
         $this->openConnection();
-        $result = mysql_query($query, $this->connection);
+        $result = mysql_query($query, $this->_connection);
         if (!$result)
-        {
             die('Database query failed: ' . mysql_error());
-        }
         if (!is_bool($result))
             $result = $this->handing($result);
         return $result;

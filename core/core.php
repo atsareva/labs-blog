@@ -22,7 +22,7 @@ class Core
 
     private static function autoLoad()
     {
-        $class  = Config::$DEFULT_CONTROLLER;
+        $class  = Config::$_defaultController;
         $method = NULL;
         $param  = array();
 
@@ -126,8 +126,8 @@ class Core
         $typeMessage = gettype($message);
         if (is_object($message))
         {
-            $olo = (array)$message;
-            $message = (array)$message;
+            $olo     = (array) $message;
+            $message = (array) $message;
         }
         if (is_array($message))
         {
@@ -169,87 +169,77 @@ class Core
         return $message;
     }
 
-    protected function view($name, $array)
+    /**
+     * Include View by name
+     *
+     * @param srting $name
+     * @param array $array
+     * @return array
+     */
+    public static function getView($name, $array)
     {
         include_once $name . EXT;
         return $array;
     }
 
-    public static function redirect($uri = '', $method = 'location', $http_response_code = 302)
-    {
-        if (!preg_match('#^https?://#i', $uri))
-        {
-            //$uri = site_url($uri);
-        }
+//    public static function load_items($id = NULL)
+//    {
+//        $access = "access_id = 1";
+//
+//        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
+//        {
+//            $access_id = $_SESSION['user']['access_id'];
+//
+//            switch ($access_id)
+//            {
+//                case 1:
+//                    $access = "access_id = 1";
+//                    break;
+//                case 2:
+//                    $access = "access_id = 1 OR access_id = 2";
+//                    break;
+//                case 4:
+//                    $access = "access_id = 1 OR access_id = 2 OR access_id = 4";
+//                    break;
+//                case 3:
+//                    $access = "access_id = 1 OR access_id = 2 OR access_id = 3  OR access_id = 4";
+//                    break;
+//            }
+//        }
+//
+//        if ($id != NULL)
+//        {
+//            $query = "SELECT * FROM items_menu WHERE menu_id = '{$id}'AND (" . $access . ")";
+//        }
+//        else
+//        {
+//            $query  = "SELECT * FROM items_menu WHERE " . $access;
+//        }
+//        //$result = $this->select($where, 'items_menu');
+//        $result = self::$_db->sql($query);
+//
+//        if (empty($result))
+//        {
+//            return $result;
+//        }
+//        if (!isset($result[0]) || !is_array($result[0]))
+//        {
+//
+//            /**
+//             *  very very GAVNOKOD, but it works
+//             */
+//            $data      = $result;
+//            $result    = NULL;
+//            $result[0] = $data;
+//        }
+//
+//        $result = self::menu_tree($result);
+//        return $result;
+//    }
 
-        switch ($method)
-        {
-            case 'refresh' : header("Refresh:0;url=" . $uri);
-                break;
-            default : header("Location: " . $uri, TRUE, $http_response_code);
-                break;
-        }
-        exit;
-    }
-
-    public static function load_items($id = NULL)
-    {
-        $access = "access_id = 1";
-
-        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
-        {
-            $access_id = $_SESSION['user']['access_id'];
-
-            switch ($access_id)
-            {
-                case 1:
-                    $access = "access_id = 1";
-                    break;
-                case 2:
-                    $access = "access_id = 1 OR access_id = 2";
-                    break;
-                case 4:
-                    $access = "access_id = 1 OR access_id = 2 OR access_id = 4";
-                    break;
-                case 3:
-                    $access = "access_id = 1 OR access_id = 2 OR access_id = 3  OR access_id = 4";
-                    break;
-            }
-        }
-
-        if ($id != NULL)
-        {
-            $query = "SELECT * FROM items_menu WHERE menu_id = '{$id}'AND (" . $access . ")";
-        }
-        else
-        {
-            $query  = "SELECT * FROM items_menu WHERE " . $access;
-        }
-        //$result = $this->select($where, 'items_menu');
-        $result = self::$_db->sql($query);
-
-        if (empty($result))
-        {
-            return $result;
-        }
-        if (!isset($result[0]) || !is_array($result[0]))
-        {
-
-            /**
-             *  very very GAVNOKOD, but it works
-             */
-            $data      = $result;
-            $result    = NULL;
-            $result[0] = $data;
-        }
-
-        $result = self::menu_tree($result);
-        return $result;
-    }
-
-    public static function menu_tree($menu, $parent_id = 0, $count = 0)
-    {
-        $menu_tree = array();
+//    public static function menu_tree($menu, $parent_id = 0, $count = 0)
+//    {
+//        $menu_tree = array();
 //        $position  = 1;
 //        $child     = FALSE;
 //        $cycle     = 0;
@@ -285,76 +275,76 @@ class Core
 //                }
 //            }
 //        }
+//
+//
+//        return $menu_tree;
+//    }
 
-
-        return $menu_tree;
-    }
-
-    static function front_menu()
-    {
-        $access = "access_id = 1";
-
-        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
-        {
-            $access_id = $_SESSION['user']['access_id'];
-
-            switch ($access_id)
-            {
-                case 1:
-                    $access = "access_id = 1";
-                    break;
-                case 2:
-                    $access = "access_id = 1 OR access_id = 2";
-                    break;
-                case 4:
-                    $access = "access_id = 1 OR access_id = 2 OR access_id = 4";
-                    break;
-                case 3:
-                    $access = "access_id = 1 OR access_id = 2 OR access_id = 3  OR access_id = 4";
-                    break;
-            }
-        }
-
-        $query = "SELECT * FROM menu WHERE trash=0 And status = 1 AND (" . $access . ")";
-
-        //$result = $this->select($where, 'items_menu');
-        $menu = self::$_db->sql($query);
-
-        if (!empty($menu))
-        {
-            if (isset($menu[0]) && is_array($menu[0]))
-            {
-                foreach ($menu as $value)
-                {
-                    $items_menu[$value['id']] = self::load_items($value['id']);
-                    if ($value['show_title'] == 1)
-                    {
-                        $menu_name[$value['id']] = $value['title'];
-                    }
-                }
-            }
-            else
-            {
-                $items_menu[$menu['id']] = self::load_items($menu['id']);
-                if ($menu['show_title'] == 1)
-                {
-                    $menu_name[$menu['id']] = $menu['title'];
-                }
-            }
-            if (!isset($menu_name) || empty($menu_name))
-            {
-                $menu_name = FALSE;
-            }
-            return array($menu_name, $items_menu);
-        }
-
-        return FALSE;
-    }
+//    static function front_menu()
+//    {
+//        $access = "access_id = 1";
+//
+//        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
+//        {
+//            $access_id = $_SESSION['user']['access_id'];
+//
+//            switch ($access_id)
+//            {
+//                case 1:
+//                    $access = "access_id = 1";
+//                    break;
+//                case 2:
+//                    $access = "access_id = 1 OR access_id = 2";
+//                    break;
+//                case 4:
+//                    $access = "access_id = 1 OR access_id = 2 OR access_id = 4";
+//                    break;
+//                case 3:
+//                    $access = "access_id = 1 OR access_id = 2 OR access_id = 3  OR access_id = 4";
+//                    break;
+//            }
+//        }
+//
+//        $query = "SELECT * FROM menu WHERE trash=0 And status = 1 AND (" . $access . ")";
+//
+//        //$result = $this->select($where, 'items_menu');
+//        $menu = self::$_db->sql($query);
+//
+//        if (!empty($menu))
+//        {
+//            if (isset($menu[0]) && is_array($menu[0]))
+//            {
+//                foreach ($menu as $value)
+//                {
+//                    $items_menu[$value['id']] = self::load_items($value['id']);
+//                    if ($value['show_title'] == 1)
+//                    {
+//                        $menu_name[$value['id']] = $value['title'];
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                $items_menu[$menu['id']] = self::load_items($menu['id']);
+//                if ($menu['show_title'] == 1)
+//                {
+//                    $menu_name[$menu['id']] = $menu['title'];
+//                }
+//            }
+//            if (!isset($menu_name) || empty($menu_name))
+//            {
+//                $menu_name = FALSE;
+//            }
+//            return array($menu_name, $items_menu);
+//        }
+//
+//        return FALSE;
+//    }
 
     public static function getBaseUrl()
     {
         $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-        return $protocol . self::$_config->BASE_URL;
+        return $protocol . self::$_config->_baseUrl;
     }
 
 }
