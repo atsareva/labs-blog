@@ -48,12 +48,20 @@ abstract class Model extends Db implements Database
      */
     private $_unsetDataFlag = FALSE;
 
+    public function __construct()
+    {
+        //set table
+        $this->setTable();
+        parent::__construct();
+    }
     /**
      * Retreive select query result
      *
      * @param int $id
      * @return object
      */
+
+
     public function load($id)
     {
         $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}";

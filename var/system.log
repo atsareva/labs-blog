@@ -13,3 +13,18 @@
 	[access_id] => 5
 	[block] => 0
 
+[ 2013-04-16 09:21:19 ] object(13) 
+	[id] => 1
+	[user_name] => admin
+	[email] => tsareva.as@gmail.com
+	[pass] => 21232f297a57a5a743894a0e4a801fc3
+	[register_date] => 1336590434
+	[last_login] => 1366011488
+	[photo] => /upload/1336590530_640.jpeg
+	[full_name] => Царёва Алёна Сергеевна
+	[faculty_id] => 9
+	[department_id] => 28
+	[status_id] => 2
+	[access_id] => 5
+	[block] => 0
+
