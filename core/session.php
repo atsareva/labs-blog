@@ -8,7 +8,7 @@ class Session
      *
      * @var array
      */
-    public $_session = array();
+    public $_session = array(1);
 
     public function __construct()
     {
@@ -29,7 +29,7 @@ class Session
             $this->_session = (object) $key;
             $_SESSION       = $key;
         }
-        else
+        elseif($value)
         {
             $this->_session->$key = $value;
             $_SESSION[$key]       = $value;
@@ -84,6 +84,39 @@ class Session
             }
         }
         return NULL;
+    }
+
+    /**
+     * Set/Get attribute wrapper
+     *
+     * @param   string $method
+     * @param   array $args
+     * @return  mixed
+     */
+    public function __call($method, $args)
+    {
+        switch (substr($method, 0, 3))
+        {
+            case 'get' :
+                $key  = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method, 3)));
+                $data = $this->getData($key, isset($args[0]) ? $args[0] : null);
+                return $data;
+
+            case 'set' :
+                $key    = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method, 3)));
+                $result = $this->setData($key, isset($args[0]) ? $args[0] : null);
+                return $result;
+
+            case 'uns' :
+                $key    = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method, 3)));
+                $result = $this->unsetData($key);
+                return $result;
+
+            case 'has' :
+                $key = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", substr($method, 3)));
+                return isset($this->_session->$key);
+        }
+        throw new Exception("Invalid method " . get_class($this) . "::" . $method . "(" . print_r($args, 1) . ")");
     }
 
 }

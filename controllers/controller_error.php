@@ -11,6 +11,10 @@ class Controller_Error extends Controller
         $view->setTemplate('page/one-column')
                 ->setTitle('404')
                 ->setChild('content', 'page/html/404');
+        Core::getModel('menu_items')
+                ->getMainNav();
+//        Core::getModel('menu')
+//                ->getMenu();
     }
 
 }

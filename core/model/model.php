@@ -1,9 +1,8 @@
 <?php
 
-require_once 'database' . EXT;
 require_once 'db/db' . EXT;
 
-abstract class Model extends Db implements Database
+abstract class Model// extends Db
 {
 
     /**
@@ -47,24 +46,26 @@ abstract class Model extends Db implements Database
      * @var boolean | int
      */
     private $_unsetDataFlag = FALSE;
+    
+    private $_db;
 
     public function __construct()
     {
+        $this->_db = Db::getInstance();
         //set table
         $this->setTable();
     }
+
     /**
      * Retreive select query result
      *
      * @param int $id
      * @return object
      */
-
-
     public function load($id)
     {
         $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}";
-        $this->_data = (object) $this->sql($query);
+        $this->_data = (object) $this->_db->sql($query);
         if (!$this->getId())
             $this->setId($id);
         return $this;
@@ -81,7 +82,7 @@ abstract class Model extends Db implements Database
         (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'WHERE ' . $this->_filterQuery;
         $query       = "SELECT {$filterField} FROM {$this->_tableName} {$filterQuery}";
 
-        $result        = $this->sql($query);
+        $result        = $this->_db->sql($query);
         if (isset($result[0]) && is_array($result[0]))
             foreach ($result as $value)
                 $this->_data[] = (object) $value;
@@ -230,8 +231,8 @@ abstract class Model extends Db implements Database
             }
             $count++;
         }
-        $this->sql("INSERT INTO {$this->_tableName} ({$keyData}) VALUES ({$valuesData})");
-        $result = $this->sql("SELECT MAX(LAST_INSERT_ID( id )) FROM {$this->_tableName} LIMIT 1");
+        $this->_db->sql("INSERT INTO {$this->_tableName} ({$keyData}) VALUES ({$valuesData})");
+        $result = $this->_db->sql("SELECT MAX(LAST_INSERT_ID( id )) FROM {$this->_tableName} LIMIT 1");
         return $result["MAX(LAST_INSERT_ID( id ))"];
     }
 
@@ -253,7 +254,7 @@ abstract class Model extends Db implements Database
             $count++;
         }
         $query = "UPDATE {$this->_tableName} SET {$queryBuild} WHERE id='{$id}'";
-        return $this->sql($query);
+        return $this->_db->sql($query);
     }
 
     /**
@@ -263,7 +264,7 @@ abstract class Model extends Db implements Database
      */
     private function _delete($id)
     {
-        $this->sql("DELETE FROM {$this->_tableName} WHERE id = {$id}");
+        $this->_db->sql("DELETE FROM {$this->_tableName} WHERE id = {$id}");
     }
 
     /**
@@ -323,6 +324,11 @@ abstract class Model extends Db implements Database
                 return isset($this->_data->$key);
         }
         throw new Exception("Invalid method " . get_class($this) . "::" . $method . "(" . print_r($args, 1) . ")");
+    }
+
+    public function getTable()
+    {
+        
     }
 
 }

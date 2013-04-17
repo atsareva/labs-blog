@@ -2,16 +2,17 @@
 
 require_once CONFIG_PATH . 'config' . EXT;
 
-abstract class Db extends Config
+class Db extends Config
 {
 
+    private static $_instance;
     private $_connection;
     private $_config = array();
 
     private function _setConfig()
     {
         // set parameter for connect with database
-         $this->_config = array(
+        $this->_config = array(
             'dbHost' => self::$_dbHost,
             'dbUser' => self::$_dbUser,
             'dbPass' => self::$_dbPass,
@@ -21,8 +22,8 @@ abstract class Db extends Config
 
     private function openConnection()
     {
-        if (empty ($this->_config))
-            $this->_setConfig ();
+        if (empty($this->_config))
+            $this->_setConfig();
         $this->_connection = mysql_connect($this->_config['dbHost'], $this->_config['dbUser'], $this->_config['dbPass']);
         if (!$this->_connection)
             die('Database connection failed: ' . mysql_error());
@@ -71,6 +72,15 @@ abstract class Db extends Config
         if (!is_bool($result))
             $result = $this->handing($result);
         return $result;
+    }
+
+    public static function getInstance()
+    {
+        if (null === self::$_instance)
+        {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
     }
 
 }
