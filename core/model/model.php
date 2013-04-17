@@ -52,7 +52,6 @@ abstract class Model extends Db implements Database
     {
         //set table
         $this->setTable();
-        parent::__construct();
     }
     /**
      * Retreive select query result

@@ -8,13 +8,9 @@ abstract class Db extends Config
     private $_connection;
     private $_config = array();
 
-    public function __construct()
-    {
-        // set parameter for connect with database
-    }
-
     private function _setConfig()
     {
+        // set parameter for connect with database
          $this->_config = array(
             'dbHost' => self::$_dbHost,
             'dbUser' => self::$_dbUser,

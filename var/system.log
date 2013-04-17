@@ -1,58 +1,42 @@
-[ 2013-04-16 15:01:40 ] string <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
-        <body class="">
+[ 2013-04-17 13:24:12 ] array(1) 
+	[user] => 2
 
-        
-    <header class="header">
-            </header>
+[ 2013-04-17 13:24:19 ] array(1) 
+	[user] => 2
 
-    <div class="clearfix"></div>
+[ 2013-04-17 13:25:03 ] array(1) 
+	[user] => 2
 
-    <div class="container">
-        <div class="container-shadow">
-            <div class="row-fluid">
-                            </div>
-        </div>
-    </div>
+[ 2013-04-17 13:25:03 ] array(1) 
+	[user] => 2
 
-    <footer class="footer">
-            </footer>
+[ 2013-04-17 13:25:06 ] array(1) 
+	[user] => 2
 
-    <script type="text/javascript">
-        $(function() {
-            $(".nav.nav-list .parent").append("<i class='icon-chevron-right'></i>");
-        })
-    </script>
-</body>
-</html>
+[ 2013-04-17 13:25:06 ] array(1) 
+	[user] => 2
 
-[ 2013-04-16 15:01:40 ] string <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
-        <body class="">
+[ 2013-04-17 13:25:07 ] array(1) 
+	[user] => 2
 
-        
-    <header class="header">
-            </header>
+[ 2013-04-17 13:25:07 ] array(1) 
+	[user] => 2
 
-    <div class="clearfix"></div>
+[ 2013-04-17 13:25:07 ] array(1) 
+	[user] => 2
 
-    <div class="container">
-        <div class="container-shadow">
-            <div class="row-fluid">
-                            </div>
-        </div>
-    </div>
+[ 2013-04-17 13:25:08 ] array(1) 
+	[user] => 2
 
-    <footer class="footer">
-            </footer>
+[ 2013-04-17 13:27:18 ] array(1) 
+	[user] => 2
 
-    <script type="text/javascript">
-        $(function() {
-            $(".nav.nav-list .parent").append("<i class='icon-chevron-right'></i>");
-        })
-    </script>
-</body>
-</html>
+[ 2013-04-17 13:27:19 ] array(1) 
+	[user] => 2
+
+[ 2013-04-17 13:31:06 ] array(1) 
+	[user] => 2
+
+[ 2013-04-17 13:31:06 ] array(1) 
+	[user] => 2
 
