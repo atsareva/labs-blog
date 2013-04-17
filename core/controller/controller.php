@@ -1,5 +1,7 @@
 <?php
 
+require_once CORE_PATH . 'view/view' . EXT;
+
 abstract class Controller
 {
 

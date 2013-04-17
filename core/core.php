@@ -10,12 +10,9 @@ class Core
         ML   => MPATH,
         HR   => HPATH
     );
-    static public $_config;
 
     public static function run()
     {
-        self::$_config = new Config();
-
         // create object by requested uri
         self::autoLoad();
     }
@@ -170,16 +167,14 @@ class Core
     }
 
     /**
-     * Include View by name
+     * Get site base url
      *
-     * @param srting $name
-     * @param array $array
-     * @return array
+     * @return string
      */
-    public static function getView($name, $array)
+    public static function getBaseUrl()
     {
-        include_once $name . EXT;
-        return $array;
+        $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        return $protocol . Config::$_baseUrl;
     }
 
 //    public static function load_items($id = NULL)
@@ -236,7 +231,6 @@ class Core
 //        $result = self::menu_tree($result);
 //        return $result;
 //    }
-
 //    public static function menu_tree($menu, $parent_id = 0, $count = 0)
 //    {
 //        $menu_tree = array();
@@ -279,7 +273,6 @@ class Core
 //
 //        return $menu_tree;
 //    }
-
 //    static function front_menu()
 //    {
 //        $access = "access_id = 1";
@@ -340,13 +333,6 @@ class Core
 //
 //        return FALSE;
 //    }
-
-    public static function getBaseUrl()
-    {
-        $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-        return $protocol . self::$_config->_baseUrl;
-    }
-
 }
 
 ?>

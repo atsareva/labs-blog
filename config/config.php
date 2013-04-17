@@ -8,7 +8,7 @@ class Config
     protected static $_dbPass = 'root';
     protected static $_dbName = 'simplecms_db';
 
-    public static $_baseUrl = 'patent.loc';
+    public static $_baseUrl = 'labs-blog.com/';
     public static $_defaultController = 'home';
 
 }
