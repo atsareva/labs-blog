@@ -4,7 +4,7 @@
 <html lang="en">
     <?php echo $this->getChild($this->_head); ?>
 
-    <body class="<?php //echo $this->getBaseClass() ?>">
+    <body class="<?php echo $this->getBaseClass() ?>">
 
         <?php echo $this->getChild($this->_navBar); ?>
 

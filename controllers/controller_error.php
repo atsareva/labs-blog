@@ -9,6 +9,7 @@ class Controller_Error extends Controller
     {
         $view = new View();
         $view->setTemplate('page/one-column')
+                ->setTitle('404')
                 ->setChild('content', 'page/html/404');
     }
 

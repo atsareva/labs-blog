@@ -40,7 +40,7 @@ td.label{padding: 5px 10px;}
 .login a{color: #74bdd8;}
 
 .brand{margin: 0;}
-.brand h1{font-weight: normal;}
+.brand h1{font-weight: normal;width: 25%;}
 .brand h1 span{color: #333;font-size: 30px;}
 .brand a:hover{text-decoration: none; color: #0088cc;}
 
