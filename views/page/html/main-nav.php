@@ -6,7 +6,7 @@
         <?php foreach ($menuItems[$menuId] as $key => $value): ?>
             <li>
                 <?php if ($value['path']): ?>
-                    <a href="<?php echo $value['path'] ?>">
+                    <a href="<?php echo Core::getBaseUrl() . $value['path'] ?>">
                     <?php else: ?>
                         <a href="" onclick="return false;">
                         <?php endif; ?>

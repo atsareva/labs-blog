@@ -10,7 +10,7 @@
     <header class="header">
         <?php echo $this->getChild($this->_header); ?>
     </header>
-    
+
     <div class="clearfix"></div>
 
     <div class="container">
