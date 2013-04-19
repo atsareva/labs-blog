@@ -6,6 +6,18 @@ abstract class Controller
 {
 
     /**
+     * View instance
+     *
+     * @var object
+     */
+    public $_view;
+
+    public function __construct()
+    {
+        $this->_view = new View();
+    }
+
+    /**
      * Redirecting to location
      *
      * @param string $uri

@@ -1,32 +1,27 @@
-<ul class="nav nav-list bs-docs-sidenav affix-top">
-    <li>
-        <a href="#">
-            <span class="parent">Математическая статистика</span>
-        </a>
-    </li>
-    <li class="active">
-        <a href="#">
-            &emsp;Модуль 1
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            &emsp;&emsp;&emsp;Практическое задание №1
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            &emsp;&emsp;Модуль 2
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            <span class="parent">Математический анализ</span>
-        </a>
-    </li>
-    <li>
-        <a href="#">
-            &emsp;&emsp;Модуль 1
-        </a>
-    </li>
-</ul>
+<?php $menuItemsModel = Core::getModel('menu_items') ?>
+<?php $menuItems      = $menuItemsModel->getMainNavItems() ?>
+
+<?php foreach ($menuItemsModel->getMenus() as $menuId => $menuName): ?>
+    <ul class="nav nav-list bs-docs-sidenav affix-top">
+        <?php foreach ($menuItems[$menuId] as $key => $value): ?>
+            <li>
+                <?php if ($value['path']): ?>
+                    <a href="<?php echo $value['path'] ?>">
+                    <?php else: ?>
+                        <a href="" onclick="return false;">
+                        <?php endif; ?>
+                        <?php for ($i = 0; $i < ($value['dash'] - 1); $i++): ?>
+                            &emsp;
+                        <?php endfor; ?>
+                        <?php if ($value['dash'] == 1): ?>
+                            <span class="parent">
+                            <?php endif; ?>
+                            <?php echo $value['title'] ?>
+                            <?php if ($value['dash'] == 1): ?>
+                            </span>
+                        <?php endif; ?>
+                    </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endforeach; ?>

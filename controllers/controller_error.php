@@ -7,14 +7,9 @@ class Controller_Error extends Controller
 
     public function index()
     {
-        $view = new View();
-        $view->setTemplate('page/one-column')
+        $this->_view->setTemplate('page/one-column')
                 ->setTitle('404')
                 ->setChild('content', 'page/html/404');
-        Core::getModel('menu_items')
-                ->getMainNav();
-//        Core::getModel('menu')
-//                ->getMenu();
     }
 
 }

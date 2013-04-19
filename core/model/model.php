@@ -41,12 +41,18 @@ abstract class Model// extends Db
     private $_filterQuery = '';
 
     /**
+     * Order By string that will be added to query
+     * 
+     * @var string
+     */
+    private $_orderBy       = '';
+
+    /**
      * Set data object id if its will deleted
      * 
      * @var boolean | int
      */
     private $_unsetDataFlag = FALSE;
-    
     private $_db;
 
     public function __construct()
@@ -64,7 +70,8 @@ abstract class Model// extends Db
      */
     public function load($id)
     {
-        $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}";
+        ($this->_orderBy) ? $orderBy = ' ORDER BY ' . $this->_orderBy : $orderBy = '';
+        $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}{$orderBy}";
         $this->_data = (object) $this->_db->sql($query);
         if (!$this->getId())
             $this->setId($id);
@@ -80,7 +87,8 @@ abstract class Model// extends Db
     {
         (empty($this->_filterField)) ? $filterField = '*' : $filterField = $this->_filterField;
         (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'WHERE ' . $this->_filterQuery;
-        $query       = "SELECT {$filterField} FROM {$this->_tableName} {$filterQuery}";
+        (empty($this->_orderBy)) ? $orderBy = '' : $orderBy = ' ORDER BY ' . $this->_orderBy;
+        $query       = "SELECT {$filterField} FROM {$this->_tableName} {$filterQuery}{$orderBy}";
 
         $result        = $this->_db->sql($query);
         if (isset($result[0]) && is_array($result[0]))
@@ -120,6 +128,23 @@ abstract class Model// extends Db
                 }
             }
         }
+        return $this;
+    }
+
+    public function orderBy($field)
+    {
+        if (is_array($field))
+        {
+            $count    = 0;
+            $countMax = (count($field) - 1);
+            foreach ($field as $key => $value)
+            {
+                ($count == $countMax) ? $this->_orderBy .= $key . ' ' . $value : $this->_orderBy .= $key . ' ' . $value . ', ';
+                $count++;
+            }
+        }
+        else
+            $this->_orderBy .= $field;
         return $this;
     }
 
