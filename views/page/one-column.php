@@ -10,10 +10,7 @@
     <header class="header">
         <?php echo $this->getChild($this->_header); ?>
     </header>
-        <?php       echo '<pre>';
-        print_r(Core::getModel('menu_items')
-                ->getMainNav());
-        echo '</pre>'; ?>
+    
     <div class="clearfix"></div>
 
     <div class="container">
