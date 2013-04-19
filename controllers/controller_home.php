@@ -8,7 +8,8 @@ Class Controller_Home extends Controller
     function index()
     {
         $data     = array();
-        $viewPath = 'front/content';
+        $viewPath = 'front/materials/content';
+        $title    = '';
 
         if (isset($_GET['id']) && (int) $_GET['id'] > 0)
         {
@@ -17,14 +18,14 @@ Class Controller_Home extends Controller
             {
                 $data     = $this->_getMaterial();
                 if (!empty($data))
-                    $viewPath = 'front/material';
+                    $viewPath = 'front/materials/material';
             }
             //getting category
             if (isset($_GET['page']) && $_GET['page'] === 'category')
             {
                 $data     = $this->_getCategory();
                 if (!empty($data))
-                    $viewPath = 'front/category';
+                    $viewPath = 'front/materials/category';
             }
         }
         else
@@ -40,8 +41,7 @@ Class Controller_Home extends Controller
                 $this->redirect($menuItems[0]->path);
         }
 
-        $this->_view->setTitle('Главная')
-                ->setChild('content', $viewPath, $data);
+        $this->_view->setChild('content', $viewPath, $data);
     }
 
     private function _getMaterial()
@@ -54,6 +54,7 @@ Class Controller_Home extends Controller
                     ->load($material->getCategoryId());
             $user     = Core::getModel('user')->load($material->getAuthorId());
 
+            $this->_view->setTitle($material->getTitle());
             return array(
                 'category' => $category,
                 'material' => $material,
@@ -80,6 +81,7 @@ Class Controller_Home extends Controller
                     ->addFieldToFilter('end_publication', array(array('>' => time()), array('=' => 0)))
                     ->getCollection();
 
+            $this->_view->setTitle($category->getTitle());
             return array(
                 'category'     => $category,
                 'materialList' => $materialList,

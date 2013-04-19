@@ -9,7 +9,7 @@ class View
      * @var array
      */
     public $_template = array(
-        'path' => "page/two-column",
+        'path' => "front/page/two-column",
         'data' => array());
 
     /**
@@ -25,7 +25,7 @@ class View
      * @var array
      */
     public $_head = array(
-        'path' => 'page/html/head',
+        'path' => 'front/page/html/head',
         'data' => array());
 
     /**
@@ -34,7 +34,7 @@ class View
      * @var array
      */
     public $_header = array(
-        'path' => 'page/html/header',
+        'path' => 'front/page/html/header',
         'data' => array());
 
     /**
@@ -43,7 +43,7 @@ class View
      * @var array
      */
     public $_footer = array(
-        'path' => 'page/html/footer',
+        'path' => 'front/page/html/footer',
         'data' => array());
 
     /**
@@ -52,7 +52,7 @@ class View
      * @var array
      */
     public $_navBar = array(
-        'path' => 'page/html/navbar',
+        'path' => 'front/page/html/navbar',
         'data' => array());
 
     /**
@@ -61,7 +61,7 @@ class View
      * @var array
      */
     public $_mainNav = array(
-        'path' => 'page/html/main-nav',
+        'path' => 'front/page/html/main-nav',
         'data' => array());
 
     /**

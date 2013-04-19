@@ -66,6 +66,8 @@ ul.list-article > li > a{color: #3f7e3f;}
 .author-info-small p{margin: 0 10px 0 0;padding-left: 10px;display: inline-block;border-left: 1px solid #ccc;}
 .author-info-small p:first-child{pading-left: 0;border: none;}
 
+.material-notfound{text-align: center; margin: 30px 0;}
+
 p.contacts{color: #005985;font-size: 18px;margin-top: 20px;margin-bottom: -10px;}
 
 /* 404 page*/

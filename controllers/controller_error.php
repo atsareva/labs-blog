@@ -7,9 +7,9 @@ class Controller_Error extends Controller
 
     public function index()
     {
-        $this->_view->setTemplate('page/one-column')
+        $this->_view->setTemplate('front/page/one-column')
                 ->setTitle('404')
-                ->setChild('content', 'page/html/404');
+                ->setChild('content', 'front/page/html/404');
     }
 
 }
