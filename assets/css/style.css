@@ -58,6 +58,15 @@ td.label{padding: 5px 10px;}
 .alignCenter{text-align: center;}
 
 
+
+
+p.contacts{color: #005985;font-size: 18px;margin-top: 20px;margin-bottom: -10px;}
+
+/* 404 page*/
+.found404{font-size: 16px;}
+.found404-content div:first-child{font-size: 100px;margin: 100px 0 50px;}
+
+/* Ctegory and Materials*/
 .post-date{color: #b5b5b5;}
 
 ul.list-article > li > a{color: #3f7e3f;}
@@ -67,9 +76,4 @@ ul.list-article > li > a{color: #3f7e3f;}
 .author-info-small p:first-child{pading-left: 0;border: none;}
 
 .material-notfound{text-align: center; margin: 30px 0;}
-
-p.contacts{color: #005985;font-size: 18px;margin-top: 20px;margin-bottom: -10px;}
-
-/* 404 page*/
-.found404{font-size: 16px;}
-.found404-content div:first-child{font-size: 100px;margin: 100px 0 50px;}
+.description h4{text-align: center;}
