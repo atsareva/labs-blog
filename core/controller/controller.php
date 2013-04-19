@@ -26,6 +26,7 @@ abstract class Controller
      */
     public function redirect($uri = '', $method = 'location', $httpResponseCode = 302)
     {
+        $uri = Core::getBaseUrl() . $uri;
         if (!preg_match('#^https?://#i', $uri))
         {
             //$uri = site_url($uri);

@@ -1,112 +1,91 @@
 <?php
 
-require_once 'model.php';
+require_once CORE_PATH . 'controller/controller' . EXT;
 
-Class Controller_Home extends Model
+Class Controller_Home extends Controller
 {
 
     function index()
     {
-        if (isset($_GET['id']) && $_GET['id'] > 0)
-        {
-            if (isset($_GET['page']) && $_GET['page'] == 'material')
-            {
-                $where = array(
-                    'id' => $_GET['id']
-                );
-                $material = $this->select($where, 'materials');
-                if (!empty($material))
-                {
-                    $where = array(
-                        'id' => $material['author_id']
-                    );
-                    $user = $this->select($where, 'users');
-                    
-                    $where = array(
-                        'id' => $material['modified_by']
-                    );
-                    $mod_user = $this->select($where, 'users');
-                }
-            }
-            if (isset($_GET['page']) && $_GET['page'] == 'category')
-            {
-                $where = array(
-                    'id' => $_GET['id'],
-                    'status' => 1,
-                    'trash' => 0
-                );
-                $category = $this->select($where, 'categories');
-                if (!empty($category))
-                {
-                    $where = array(
-                        'id' => $category['author_id']
-                    );
-                    $user = $this->select($where, 'users');
+        $data     = array();
+        $viewPath = 'front/content';
 
-                    $where = array(
-                        'category_id' => $_GET['id'],
-                        'status' => 1,
-                        'trash' => 0 . ' "AND start_publication <='.time().' AND end_publication >'.time(),
-                    );
-                    $material_list = $this->select($where, 'materials');
-                }
+        if (isset($_GET['id']) && (int) $_GET['id'] > 0)
+        {
+            //getting material
+            if (isset($_GET['page']) && $_GET['page'] === 'material')
+            {
+                $data     = $this->_getMaterial();
+                if (!empty($data))
+                    $viewPath = 'front/material';
+            }
+            //getting category
+            if (isset($_GET['page']) && $_GET['page'] === 'category')
+            {
+                $data     = $this->_getCategory();
+                if (!empty($data))
+                    $viewPath = 'front/category';
             }
         }
         else
         {
-            $where = array(
-                'status' => 1,
-                'trash' => 0,
-                'for_index' => '1 AND start_publication <='.time().' AND end_publication >'.time(),
-            );
-            $items_menu = $this->select($where, 'items_menu');
-
-            if (!empty($items_menu))
-            {
-                Core::redirect($items_menu['path']);
-            }
-            else
-            {
-                $where = array(
-                    'status' => 1,
-                    'trash' => 0,
-                    'favorite' => '1 AND start_publication <='.time().' AND end_publication >'.time(),
-                );
-                $material_list = $this->select($where, 'materials');
-                if (!empty($material_list))
-                {
-                    $category = TRUE;
-                }
-            }
+            $menuItems = Core::getModel('menu_items')
+                    ->addFieldToFilter('path')
+                    ->addFieldToFilter('status', array('=' => 1))
+                    ->addFieldToFilter('trash', array('=' => 0))
+                    ->addFieldToFilter('for_index', array('=' => 1))
+                    ->getCollection()
+                    ->getData();
+            if (!count($menuItems) == 0)
+                $this->redirect($menuItems[0]->path);
         }
-        $array = Core::front_menu();
-        $menu_name = $array[0];
-        $items_menu = $array[1];
 
-        $title = 'Главная';
-        require 'front/header.php';
-        require 'front/left.php';
-        require 'front/content.php';
-        require 'front/footer.php';
+        $this->_view->setTitle('Главная')
+                ->setChild('content', $viewPath, $data);
     }
 
-    function front()
+    private function _getMaterial()
     {
-        $where = array(
-            'trash' => 0,
-            'status' => 1
-        );
-        $materials = $this->select($where, 'materials');
+        $material = Core::getModel('material')->load((int) $_GET['id']);
+        if ($material->getId())
+        {
+            $category = Core::getModel('category')
+                    ->addFieldToFilter('title')
+                    ->load($material->getCategoryId());
+            $user     = Core::getModel('user')->load($material->getAuthorId());
 
-        $array = $this->front_menu();
-        $menu_name = $array[0];
-        $items_menu = $array[1];
+            return array(
+                'category' => $category,
+                'material' => $material,
+                'user'     => $user);
+        }
+        return array();
+    }
 
-        $title = 'Главная';
-        require 'front/header.php';
-        require 'front/left.php';
-        require 'front/index.php';
-        require 'front/footer.php';
+    private function _getCategory()
+    {
+        $category = Core::getModel('category')
+                ->addFieldToFilter('status', array('=' => 1))
+                ->addFieldToFilter('trash', array('=' => 0))
+                ->load((int) $_GET['id']);
+        if ($category->getId())
+        {
+            $user         = Core::getModel('user')->load($category->getAuthorId());
+            $materialList = Core::getModel('material')
+                    ->addFieldToFilter(array('id', 'title'))
+                    ->addFieldToFilter('category_id', array('=' => (int) $_GET['id']))
+                    ->addFieldToFilter('status', array('=' => 1))
+                    ->addFieldToFilter('trash', array('=' => 0))
+                    ->addFieldToFilter('start_publication', array('<=' => time()))
+                    ->addFieldToFilter('end_publication', array(array('>' => time()), array('=' => 0)))
+                    ->getCollection();
+
+            return array(
+                'category'     => $category,
+                'materialList' => $materialList,
+                'user'         => $user);
+        }
+        return array();
     }
 
 }

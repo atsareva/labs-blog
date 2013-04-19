@@ -63,7 +63,8 @@ td.label{padding: 5px 10px;}
 ul.list-article > li > a{color: #3f7e3f;}
 .author-info-small {background: #e0e0e0;padding: 5px 10px;border-radius: 5px;-webkit-border-radius: 5px;-moz-border-radius: 5px;}
 .author-info-small a{color: #333;text-decoration: none;}
-
+.author-info-small p{margin: 0 10px 0 0;padding-left: 10px;display: inline-block;border-left: 1px solid #ccc;}
+.author-info-small p:first-child{pading-left: 0;border: none;}
 
 p.contacts{color: #005985;font-size: 18px;margin-top: 20px;margin-bottom: -10px;}
 

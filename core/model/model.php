@@ -45,7 +45,7 @@ abstract class Model// extends Db
      * 
      * @var string
      */
-    private $_orderBy       = '';
+    private $_orderBy = '';
 
     /**
      * Set data object id if its will deleted
@@ -70,11 +70,10 @@ abstract class Model// extends Db
      */
     public function load($id)
     {
-        ($this->_orderBy) ? $orderBy = ' ORDER BY ' . $this->_orderBy : $orderBy = '';
-        $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}{$orderBy}";
+        (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'AND ' . $this->_filterQuery;
+        ($this->_orderBy) ? $orderBy     = ' ORDER BY ' . $this->_orderBy : $orderBy     = '';
+        $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}{$orderBy} {$filterQuery}";
         $this->_data = (object) $this->_db->sql($query);
-        if (!$this->getId())
-            $this->setId($id);
         return $this;
     }
 
@@ -87,7 +86,7 @@ abstract class Model// extends Db
     {
         (empty($this->_filterField)) ? $filterField = '*' : $filterField = $this->_filterField;
         (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'WHERE ' . $this->_filterQuery;
-        (empty($this->_orderBy)) ? $orderBy = '' : $orderBy = ' ORDER BY ' . $this->_orderBy;
+        (empty($this->_orderBy)) ? $orderBy     = '' : $orderBy     = ' ORDER BY ' . $this->_orderBy;
         $query       = "SELECT {$filterField} FROM {$this->_tableName} {$filterQuery}{$orderBy}";
 
         $result        = $this->_db->sql($query);
@@ -108,7 +107,13 @@ abstract class Model// extends Db
     public function addFieldToFilter($field, $options = array())
     {
         if (count($options) == 0)
-            (!empty($this->_filterField)) ? $this->_filterField = $this->_filterField . ', ' . $field : $this->_filterField = $field;
+        {
+            if (is_array($field))
+                foreach ($field as $value)
+                    (!empty($this->_filterField)) ? $this->_filterField = $this->_filterField . ', ' . $value : $this->_filterField = $value;
+            else
+                (!empty($this->_filterField)) ? $this->_filterField = $this->_filterField . ', ' . $field : $this->_filterField = $field;
+        }
         else
         {
             // build terms for AND
@@ -119,7 +124,7 @@ abstract class Model// extends Db
                 // build terms for OR
                 $count    = 0;
                 $maxCount = count($options) - 1;
-                $this->_filterQuery .= ' (';
+                (empty($this->_filterQuery)) ? $this->_filterQuery .= ' (' : $this->_filterQuery .= ' AND (';
 
                 foreach ($options as $value)
                 {

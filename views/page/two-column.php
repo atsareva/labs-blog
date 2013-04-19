@@ -16,11 +16,13 @@
 
     <div class="container">
         <div class="container-shadow">
-            <div class="span4 bs-docs-sidebar">
-                <?php echo $this->getChild($this->_mainNav) ?>
-            </div>
-            <div class="span8">
-                <?php echo $this->getChild($this->_content) ?>
+            <div class="row-fluid">
+                <div class="span4 bs-docs-sidebar">
+                    <?php echo $this->getChild($this->_mainNav) ?>
+                </div>
+                <div class="span8">
+                    <?php echo $this->getChild($this->_content) ?>
+                </div>
             </div>
         </div>
     </div>
