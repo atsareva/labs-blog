@@ -11,7 +11,8 @@
     
     echo $this->getJs(array(
         Core::getBaseUrl() . "assets/js/jquery-1.7.1.min.js",
-        Core::getBaseUrl() . "assets/js/bootstrap.js"
+        Core::getBaseUrl() . "assets/js/bootstrap.js",
+        Core::getBaseUrl() . "assets/js/jquery.validate.js"
     ));
     ?>
 </head>

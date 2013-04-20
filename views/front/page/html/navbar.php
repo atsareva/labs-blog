@@ -2,7 +2,7 @@
     <div class="navbar-inner">
         <div class="container">
             <div class="span3 offset9 login">
-                <a href="#">Регистрация</a> | <a href="#">Вход</a>
+                <a href="<?php echo Core::getBaseUrl() ?>profile/signup">Регистрация</a> | <a href="<?php echo Core::getBaseUrl() ?>profile/login">Вход</a>
             </div>
         </div>
     </div>

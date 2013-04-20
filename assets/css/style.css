@@ -36,8 +36,8 @@ td.label{padding: 5px 10px;}
 .navbar-fixed-top .container{width: 960px;}
 .header{padding: 30px 0;}
 
-.login{color: #fff;font-size: 16px;margin-top: 10px;text-align: right;}
-.login a{color: #74bdd8;}
+.navbar .login{color: #fff;font-size: 16px;margin-top: 10px;text-align: right;}
+.navbar .login a{color: #74bdd8;}
 
 .brand{margin: 0;}
 .brand h1{font-weight: normal;width: 25%;}
@@ -57,7 +57,12 @@ td.label{padding: 5px 10px;}
 
 .alignCenter{text-align: center;}
 
-
+/* Form */
+.fieldset p{float: left;margin-right: 20px;width: 80px;}
+.fieldset > div{margin: 10px 0;}
+.button-set{text-align: right;margin-top: 20px;}
+.button-set > div{display: inline-block;}
+.button-set a{margin: 0 10px;}
 
 
 p.contacts{color: #005985;font-size: 18px;margin-top: 20px;margin-bottom: -10px;}
@@ -77,3 +82,6 @@ ul.list-article > li > a{color: #3f7e3f;}
 
 .material-notfound{text-align: center; margin: 30px 0;}
 .description h4{text-align: center;}
+
+/* For Login */
+.page-login .login{width: 53%;margin: auto;margin-top: 50px;}
