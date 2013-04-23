@@ -84,4 +84,4 @@ ul.list-article > li > a{color: #3f7e3f;}
 .description h4{text-align: center;}
 
 /* For Login */
-.page-login .login{width: 53%;margin: auto;margin-top: 50px;}
+.page-login .container-shadow .login{width: 53%;margin: auto;margin-top: 50px;}

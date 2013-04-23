@@ -37,11 +37,20 @@ Class Controller_Home extends Controller
                     ->addFieldToFilter('for_index', array('=' => 1))
                     ->getCollection()
                     ->getData();
-            if (!count($menuItems) == 0)
+            if (isset($menuItems[0]->path))
                 $this->redirect($menuItems[0]->path);
+            else
+                $this->redirect('home/front');
         }
 
         $this->_view->setChild('content', $viewPath, $data);
+    }
+
+    public function front()
+    {
+        $materialList = Core::getModel('material')->getCollection();
+        $this->_view->setTitle('Главная')
+                ->setChild('content', 'front/materials/content', array('materialList' => $materialList));
     }
 
     private function _getMaterial()

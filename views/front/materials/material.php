@@ -13,7 +13,7 @@
 </div>
 <div class="author-info-small">
     <p>
-        <a href="<?php echo Core::getBaseUrl() . 'profile/' . $user->getId(); ?>">
+        <a href="<?php echo Core::getBaseUrl() . 'profile/index/' . $user->getId(); ?>">
             <i class="icon-user"></i>
             <span><?php echo $user->getFullName() ?></span>
         </a>
