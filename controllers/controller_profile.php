@@ -56,6 +56,7 @@ class Controller_Profile extends Controller
 
     function login()
     {
+        $session = Core::getSession();
         if (isset($_SESSION['user']) && !empty($_SESSION['user']))
         {
             $this->redirect('/home/front');
@@ -63,12 +64,22 @@ class Controller_Profile extends Controller
 
         if (isset($_POST['login']) && isset($_POST['pass']))
         {
-            $where = array(
-                'user_name' => $_POST['login'],
-                'pass'      => md5($_POST['pass'])
-            );
+            $a = session_id();
+            $user = Core::getModel('user')
+                    ->addFieldToFilter('user_name', array('=' => $_POST['login']))
+                    ->addFieldToFilter('pass', array('=' => md5($_POST['pass'])))
+                    ->getCollection()
+                    ->getData();
+            if (isset($user[0]->id))
+            {
+                if ($user[0]->block == 1)
+                    $error = "Вас заблокировал администратор сайта.";
+                else
+                    $session->setData(array(
+                        'user' => array('')
+                        ));
 
-            $user = $this->select($where, 'users');
+            }
             if (!empty($user) && $user['block'] == 1)
             {
                 $error = "Вас заблокировал администратор сайта.";
