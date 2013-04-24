@@ -10,6 +10,10 @@
                     required: true
                 }
             },
+            messages: {
+                login : "Это обязательное поле!",
+                pass : "Это обязательное поле!"
+            },
             success: function(label) {
                 label.removeClass('error').addClass("valid");
                 $('input[name=' + label[0].htmlFor + ']').parent().removeClass('control-group error').addClass('control-group success');

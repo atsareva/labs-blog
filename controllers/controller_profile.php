@@ -68,6 +68,7 @@ class Controller_Profile extends Controller
 
     function signup()
     {
+        $error = '';
         if (isset($_POST) && !empty($_POST))
         {
             $data = array(
@@ -83,15 +84,9 @@ class Controller_Profile extends Controller
             $this->redirect('/profile/login');
         }
 
-        $array      = $this->front_menu();
-        $menu_name  = $array[0];
-        $items_menu = $array[1];
-
-        $title = 'Регистрация';
-        require 'front/header.php';
-        require 'front/left.php';
-        require 'front/signup.php';
-        require 'front/footer.php';
+        $this->_view->setTitle('Регистрация')
+                ->setBaseClass('signup')
+                ->setChild('content', 'front/profile/signup', array('error' => $error));
     }
 
     public function logout()

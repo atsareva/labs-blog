@@ -28,6 +28,8 @@ dl dt{float: left;margin-right: 10px;}
 
 table td{padding: 5px 10px;}
 
+label.error{color: #b94a48;font-style: italic;margin-left: 100px;font-size: 13px;}
+
 .label{color: #8f8f8f; font-size: 14px;background: none;text-shadow: none;padding: 0;line-height: 20px;font-weight: normal;}
 td.label{padding: 5px 10px;}
 
@@ -81,7 +83,11 @@ ul.list-article > li > a{color: #3f7e3f;}
 .author-info-small p:first-child{pading-left: 0;border: none;}
 
 .material-notfound{text-align: center; margin: 30px 0;}
+.description{word-wrap: break-word;}
 .description h4{text-align: center;}
 
-/* For Login */
-.page-login .container-shadow .login{width: 53%;margin: auto;margin-top: 50px;}
+/* For Login && Signup */
+.page-login .container-shadow .login,
+.page-signup .container-shadow .signup{width: 53%;margin: auto;margin-top: 50px;}
+.page-signup .photo{text-align: center;margin-bottom: 30px;}
+.page-signup .photo a{margin: 0 auto; margin-bottom: 20px;}

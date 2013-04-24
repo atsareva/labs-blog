@@ -3,11 +3,13 @@
     <div class="separator"></div>
     <div class="row-fluid">
         <div class="span4">
-            <?php if ($user->getPhoto()): ?>
-                <img alt="<?php echo $user->getFullName() ?>" title="<?php echo $user->getFullName() ?>" src="<?php echo Core::getBaseUrl() . 'assets' . $user->getPhoto() ?>" />
-            <?php else: ?>
-                <img alt="<?php echo $user->getFullName() ?>" title="<?php echo $user->getFullName() ?>" src="<?php echo Core::getBaseUrl() . 'assets/upload/default.png' ?>" />
-            <?php endif; ?>
+            <a class="thumbnail" href="" onclick="return false;">
+                <?php if ($user->getPhoto()): ?>
+                    <img alt="<?php echo $user->getFullName() ?>" title="<?php echo $user->getFullName() ?>" src="<?php echo Core::getBaseUrl() . 'assets' . $user->getPhoto() ?>" />
+                <?php else: ?>
+                    <img alt="<?php echo $user->getFullName() ?>" title="<?php echo $user->getFullName() ?>" src="<?php echo Core::getBaseUrl() . 'assets/img/default.png' ?>" />
+                <?php endif; ?>
+            </a>
         </div>
         <div class="span8">
             <table>
