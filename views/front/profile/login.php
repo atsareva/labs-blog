@@ -21,7 +21,7 @@
 <h2>Вход на сайт</h2>
 <div class="separator"></div>
 
-<?php if (isset($error)): ?>
+<?php if (($error)): ?>
     <div class="alert alert-error">
         <strong>Ошибка! </strong><?php echo $error; ?>
     </div>

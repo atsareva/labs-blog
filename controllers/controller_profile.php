@@ -5,68 +5,41 @@ require_once CORE_PATH . 'controller/controller' . EXT;
 class Controller_Profile extends Controller
 {
 
-    function index()
+    function index($id)
     {
-        if (!isset($_SESSION['user']) || empty($_SESSION['user']))
+        if (!$this->checkSessionUser())
+            $this->redirect('home');
+
+        $data = array();
+        if (isset($id[0]))
         {
-            header('Location: http://' . $this->BASE_URL . '/profile/login');
+            $user = Core::getModel('user')->load((int) $id[0]);
+            if ($user->getId())
+            {
+                $data = array(
+                    'user'       => $user,
+                    'faculty'    => Core::getModel('faculty')->load($user->getFacultyId()),
+                    'department' => Core::getModel('department')->load($user->getDepartmentId()),
+                    'userStatus' => Core::getModel('user_status')->load($user->getStatusId())
+                );
+            }
         }
 
-        if (isset($_GET['id']))
-        {
-            $where = array(
-                'id' => $_GET['id']
-            );
-            $user  = $this->select($where, 'users');
-
-            $where   = array(
-                'id' => $user['faculty_id']
-            );
-            $faculty = $this->select($where, 'faculties');
-
-            $where      = array(
-                'id' => $user['department_id']
-            );
-            $department = $this->select($where, 'departments');
-
-            $where       = array(
-                'id' => $user['status_id']
-            );
-            $user_status = $this->select($where, 'user_status');
-        }
-
-        $array      = $this->front_menu();
-        $menu_name  = $array[0];
-        $items_menu = $array[1];
-
-        $title = 'Профайл';
-        require 'front/header.php';
-        require 'front/left.php';
-        require 'front/profile.php';
-        require 'front/footer.php';
-    }
-
-    function my_profile()
-    {
-        if (!isset($_SESSION['user']) || empty($_SESSION['user']))
-        {
-            header('Location: http://' . $this->BASE_URL . '/profile/login');
-        }
+        $this->_view->setTitle('Профайл')
+                ->setChild('content', 'front/profile/profile', $data);
     }
 
     function login()
     {
-        $session = Core::getSession();
-        if (isset($_SESSION['user']) && !empty($_SESSION['user']))
-        {
-            $this->redirect('/home/front');
-        }
+        $error     = '';
+        $userModel = Core::getModel('user');
+
+        if ($this->checkSessionUser())
+            $this->redirect('home');
 
         if (isset($_POST['login']) && isset($_POST['pass']))
         {
-            $a = session_id();
-            $user = Core::getModel('user')
-                    ->addFieldToFilter('user_name', array('=' => $_POST['login']))
+            $user = $userModel->addFieldToFilter('user_name', array('=' => $_POST['login']))
                     ->addFieldToFilter('pass', array('=' => md5($_POST['pass'])))
                     ->getCollection()
                     ->getData();
@@ -75,23 +48,12 @@ class Controller_Profile extends Controller
                 if ($user[0]->block == 1)
                     $error = "Вас заблокировал администратор сайта.";
                 else
-                    $session->setData(array(
-                        'user' => array('')
-                        ));
-
-            }
-            if (!empty($user) && $user['block'] == 1)
-            {
-                $error = "Вас заблокировал администратор сайта.";
-            }
-            elseif (!empty($user))
-            {
-                $_SESSION['user'] = array(
-                    'id'        => $user['id'],
-                    'user_name' => $user['user_name'],
-                    'access_id' => $user['access_id']
-                );
-                $this->redirect('/home');
+                {
+                    $userModel->load($user[0]->id)
+                            ->setData('session_id', session_id())
+                            ->save();
+                    $this->redirect('home');
+                }
             }
             else
             {
@@ -101,7 +63,7 @@ class Controller_Profile extends Controller
 
         $this->_view->setTitle('Вход')
                 ->setBaseClass('login')
-                ->setChild('content', 'front/profile/login');
+                ->setChild('content', 'front/profile/login', array('error' => $error));
     }
 
     function signup()
@@ -130,6 +92,34 @@ class Controller_Profile extends Controller
         require 'front/left.php';
         require 'front/signup.php';
         require 'front/footer.php';
+    }
+
+    public function logout()
+    {
+        $userModel = Core::getModel('user');
+
+        $id = Core::getHelper('user')->getCurrentUser();
+        if ($id)
+            $userModel->load($id)
+                    ->setData('session_id', NULL)
+                    ->save();
+        $this->redirect('home');
+    }
+
+    private function checkSessionUser()
+    {
+        $userModel = Core::getModel('user');
+
+        $id = Core::getHelper('user')->getCurrentUser();
+        if ($id)
+        {
+            session_regenerate_id();
+            $userModel->load($id)
+                    ->setData('session_id', session_id())
+                    ->save();
+            return true;
+        }
+        return false;
     }
 
 }

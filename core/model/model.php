@@ -70,10 +70,13 @@ abstract class Model// extends Db
      */
     public function load($id)
     {
-        (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'AND ' . $this->_filterQuery;
-        ($this->_orderBy) ? $orderBy     = ' ORDER BY ' . $this->_orderBy : $orderBy     = '';
-        $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}{$orderBy} {$filterQuery}";
-        $this->_data = (object) $this->_db->sql($query);
+        if ($id)
+        {
+            (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'AND ' . $this->_filterQuery;
+            ($this->_orderBy) ? $orderBy     = ' ORDER BY ' . $this->_orderBy : $orderBy     = '';
+            $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}{$orderBy} {$filterQuery}";
+            $this->_data = (object) $this->_db->sql($query);
+        }
         return $this;
     }
 
