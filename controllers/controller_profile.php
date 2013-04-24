@@ -8,7 +8,7 @@ class Controller_Profile extends Controller
     function index($id)
     {
         if (!$this->checkSessionUser())
-            $this->redirect('home');
+            $this->redirect('profile/login');
 
         $data = array();
         if (isset($id[0]))
