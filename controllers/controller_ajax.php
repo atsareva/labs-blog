@@ -1,13 +1,33 @@
 <?php
 
-require_once 'model.php';
-
-class Controller_Ajax extends Model
+class Controller_Ajax
 {
+
+    public function loadDepartment()
+    {
+        $response = array('data' => false);
+        if (isset($_POST['faculty_id']) && $_POST['faculty_id'] != 0)
+        {
+            $departments = Core::getModel('department')
+                    ->addFieldToFilter('faculty_id', array('=' => $_POST['faculty_id']))
+                    ->getCollection()
+                    ->getData();
+
+            if (!isset($departments[0]->id))
+                $departments = Core::getModel('department')
+                        ->getCollection()
+                        ->getData();
+
+            foreach ($departments as $department)
+                $response['data'][$department->id] = $department->name;
+        }
+
+        echo json_encode($response);
+    }
 
     public function load_users()
     {
-        $query = "SELECT * FROM users";
+        $query  = "SELECT * FROM users";
         $result = $this->sql($query);
 
         if (isset($result[0]) && is_array($result[0]))
@@ -15,20 +35,20 @@ class Controller_Ajax extends Model
             foreach ($result as $key => $value)
             {
                 $data[] = array(
-                    'id' => $result[$key]['id'],
+                    'id'        => $result[$key]['id'],
                     'user_name' => $result[$key]['user_name'],
-                    'email' => $result[$key]['email'],
-                    'photo' => $result[$key]['photo']
+                    'email'     => $result[$key]['email'],
+                    'photo'     => $result[$key]['photo']
                 );
             }
         }
         else
         {
             $data[] = array(
-                'id' => $result['id'],
+                'id'        => $result['id'],
                 'user_name' => $result['user_name'],
-                'email' => $result['email'],
-                'photo' => $result['photo']
+                'email'     => $result['email'],
+                'photo'     => $result['photo']
             );
         }
 
@@ -42,9 +62,9 @@ class Controller_Ajax extends Model
 
         if ($attach == 'material')
         {
-            $where = array(
+            $where     = array(
                 'status' => 1,
-                'trash' => 0
+                'trash'  => 0
             );
             $materials = $this->select($where, 'materials');
             if (!empty($materials) && is_array($materials))
@@ -54,7 +74,7 @@ class Controller_Ajax extends Model
                     foreach ($materials as $value)
                     {
                         $result[] = array(
-                            'id' => $value['id'],
+                            'id'    => $value['id'],
                             'alias' => $value['alias'],
                             'title' => $value['title']
                         );
@@ -63,7 +83,7 @@ class Controller_Ajax extends Model
                 else
                 {
                     $result[] = array(
-                        'id' => $materials['id'],
+                        'id'    => $materials['id'],
                         'alias' => $materials['alias'],
                         'title' => $materials['title']
                     );
@@ -72,9 +92,9 @@ class Controller_Ajax extends Model
         }
         else
         {
-            $where = array(
-                'status' => 1, 
-                'trash' => 0
+            $where      = array(
+                'status' => 1,
+                'trash'  => 0
             );
             $categories = $this->select($where, 'categories');
             if (!empty($categories) && is_array($categories))
@@ -84,7 +104,7 @@ class Controller_Ajax extends Model
                     foreach ($categories as $value)
                     {
                         $result[] = array(
-                            'id' => $value['id'],
+                            'id'    => $value['id'],
                             'alias' => $value['alias'],
                             'title' => $value['title']
                         );
@@ -93,7 +113,7 @@ class Controller_Ajax extends Model
                 else
                 {
                     $result[] = array(
-                        'id' => $categories['id'],
+                        'id'    => $categories['id'],
                         'alias' => $categories['alias'],
                         'title' => $categories['title']
                     );

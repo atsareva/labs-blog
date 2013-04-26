@@ -69,24 +69,37 @@ class Controller_Profile extends Controller
     function signup()
     {
         $error = '';
+        /**
+         * @todo Realise validation for post
+         */
         if (isset($_POST) && !empty($_POST))
         {
-            $data = array(
-                'user_name'     => $_POST['login'],
-                'email'         => $_POST['email'],
-                'pass'          => md5($_POST['pass']),
-                'register_date' => time(),
-                'last_login'    => time(),
-                'access_id'     => 2
-            );
+            session_regenerate_id();
+            $data = $_POST;
 
-            $this->insert($data, 'users');
-            $this->redirect('/profile/login');
+            $data['pass']          = md5($_POST['pass']);
+            $data['register_date'] = time();
+            $data['last_login']    = time();
+            $data['access_id']     = 2;
+            $data['session_id']    = session_id();
+            unset($data['confirm_pass']);
+
+            $user = Core::getModel('user')
+                    ->setData($data)
+                    ->save();
+            $this->redirect('profile/index/' . $user->getId());
         }
+
+        $faculties   = Core::getModel('faculty')->getCollection()->getData();
+        $departments = Core::getModel('department')->getCollection()->getData();
+        $statuses    = Core::getModel('user_status')
+                ->addFieldToFilter('name', array(array('=' => 'студент'), array('=' => 'преподаватель')))
+                ->getCollection()
+                ->getData();
 
         $this->_view->setTitle('Регистрация')
                 ->setBaseClass('signup')
-                ->setChild('content', 'front/profile/signup', array('error' => $error));
+                ->setChild('content', 'front/profile/signup', array('error'       => $error, 'faculties'   => $faculties, 'departments' => $departments, 'statuses'    => $statuses));
     }
 
     public function logout()
