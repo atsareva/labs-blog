@@ -77,6 +77,9 @@ class Controller_Profile extends Controller
             session_regenerate_id();
             $data = $_POST;
 
+            /**
+             * @todo Realise generate salt for password
+             */
             $data['pass']          = md5($_POST['pass']);
             $data['register_date'] = time();
             $data['last_login']    = time();
