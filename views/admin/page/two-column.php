@@ -3,7 +3,8 @@
     "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
     <?php echo $this->getChild($this->_head); ?>
-    <body class="<?php echo $this->getBaseClass()  ?>">
+
+    <body class="<?php echo $this->getBaseClass() ?>">
 
         <?php echo $this->getChild($this->_navBar); ?>
 
@@ -16,13 +17,18 @@
     <div class="container">
         <div class="container-shadow">
             <div class="row-fluid">
-                <?php echo $this->getChild($this->_content) ?>
+                <div class="span4 bs-docs-sidebar">
+                    <?php echo $this->getChild($this->_mainNav) ?>
+                </div>
+                <div class="span8">
+                    <?php echo $this->getChild($this->_content) ?>
+                </div>
             </div>
         </div>
     </div>
 
     <footer class="footer">
-        <?php echo $this->getChild($this->_footer); ?>
+        <?php echo $this->getChild($this->_footer) ?>
     </footer>
 
     <script type="text/javascript">

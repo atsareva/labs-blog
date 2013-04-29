@@ -1,8 +1,9 @@
 <?php
 
-require_once CORE_PATH . 'view/view' . EXT;
+require_once CORE_PATH . 'controller/controller' . EXT;
+require_once CORE_PATH . 'view/view_admin' . EXT;
 
-abstract class Controller
+class Controller_Admin extends Controller
 {
 
     /**
@@ -14,32 +15,7 @@ abstract class Controller
 
     public function __construct()
     {
-        $this->_view = new View();
-    }
-
-    /**
-     * Redirecting to location
-     *
-     * @param string $uri
-     * @param string $method
-     * @param int $httpResponseCode
-     */
-    public function redirect($uri = '', $method = 'location', $httpResponseCode = 302)
-    {
-        $uri = Core::getBaseUrl() . $uri;
-        if (!preg_match('#^https?://#i', $uri))
-        {
-            //$uri = site_url($uri);
-        }
-
-        switch ($method)
-        {
-            case 'refresh' : header("Refresh:0;url=" . $uri);
-                break;
-            default : header("Location: " . $uri, TRUE, $httpResponseCode);
-                break;
-        }
-        exit;
+        $this->_view = new View_Admin();
     }
 
 }

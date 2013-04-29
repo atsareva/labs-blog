@@ -1,8 +1,8 @@
 <?php
 
-require_once CPATH . 'controller_profile' . EXT;
+require_once CORE_PATH . 'controller/controller_admin' . EXT;
 
-class Controller_Auth extends Controller_Profile
+class Controller_Auth extends Controller_Admin
 {
 
     public function login()
@@ -39,6 +39,7 @@ class Controller_Auth extends Controller_Profile
         }
 
         $this->_view->setTitle('Авторизация')
+                ->setTemplate('admin/page/one-column')
                 ->setBaseClass('login')
                 ->setChild('content', 'admin/profile/login', array('error' => $error));
 
@@ -163,6 +164,22 @@ class Controller_Auth extends Controller_Profile
         }
 
         return $result;
+    }
+
+        protected function checkSessionUser()
+    {
+        $userModel = Core::getModel('user');
+
+        $id = Core::getHelper('user')->getCurrentUser();
+        if ($id)
+        {
+            session_regenerate_id();
+            $userModel->load($id)
+                    ->setData('session_id', session_id())
+                    ->save();
+            return $userModel->getAccessId();
+        }
+        return false;
     }
 
 }
