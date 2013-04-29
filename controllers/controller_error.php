@@ -1,8 +1,8 @@
 <?php
 
-require_once CORE_PATH . 'controller/controller' . EXT;
+require_once CORE_PATH . 'controller/controller_front' . EXT;
 
-class Controller_Error extends Controller
+class Controller_Error extends Controller_Front
 {
 
     public function index()

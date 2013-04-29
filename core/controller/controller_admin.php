@@ -1,5 +1,7 @@
 <?php
 
+require_once CORE_PATH . 'view/view' . EXT;
+
 abstract class Controller
 {
 
@@ -9,6 +11,11 @@ abstract class Controller
      * @var object
      */
     public $_view;
+
+    public function __construct()
+    {
+        $this->_view = new View();
+    }
 
     /**
      * Redirecting to location

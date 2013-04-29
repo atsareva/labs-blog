@@ -1,8 +1,8 @@
 <?php
 
-require_once CORE_PATH . 'controller/controller' . EXT;
+require_once CORE_PATH . 'controller/controller_front' . EXT;
 
-class Controller_Profile extends Controller
+class Controller_Profile extends Controller_Front
 {
 
     function index($id)
@@ -117,7 +117,7 @@ class Controller_Profile extends Controller
         $this->redirect('home');
     }
 
-    private function checkSessionUser()
+    protected function checkSessionUser()
     {
         $userModel = Core::getModel('user');
 
@@ -128,7 +128,7 @@ class Controller_Profile extends Controller
             $userModel->load($id)
                     ->setData('session_id', session_id())
                     ->save();
-            return true;
+            return $userModel->getAccessId();
         }
         return false;
     }
