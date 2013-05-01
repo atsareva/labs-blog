@@ -182,7 +182,10 @@ abstract class Model// extends Db
     public function setData($key, $value = null)
     {
         if (is_array($key))
-            $this->_data       = $key;
+        {
+            foreach ($key as $k => $v)
+                $this->_data->$k       = $v;
+        }
         else
             $this->_data->$key = $value;
 

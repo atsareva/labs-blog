@@ -1,36 +1,4 @@
-.head{
-    margin: 13px 0px 3px 4px;
-    color: #494949;
-    font-size: 25px;
-    float: left;
-}
-.footer{
-    padding: 28px 0px 43px 0px;
-    margin-left: auto;
-    margin-right: auto;
-    background: #FFF;
-    *border-collapse: separate;
-    -webkit-border-radius: 0 0 13px 13px;
-    -moz-border-radius: 0 0 13px 13px;
-    border-radius: 0 0 13px 13px;
-}
-body{
-    background: #F0F0F0;
-}
-.my .navbar-inner{
-    background:#fff; 
-    height: 50px;
-}
-.navbar-fixed-top .my-brand{
-    float: right;
-    color: #494949;
-    font-size: 25px;
-    font-family: PTSans, sans-serif;
-    margin-top: 10px;
-}
-.navbar-fixed-top .my-brand .brand_A{
-    color: #4AA2D9;
-}
+/*
 .table-install-A{
     font-weight: bold;
     background: #FFF;
@@ -185,4 +153,24 @@ table.tablesorter thead tr .headerSortDown {
     color: #DDD;
     font-weight: bold;
     margin-right: 5px;
-}
+}*/
+
+body{background: #F0F0F0;}
+.footer{padding: 28px 0px 43px 0px;margin-left: auto;margin-right: auto;background: #FFF;*border-collapse: separate;-webkit-border-radius: 0 0 13px 13px;-moz-border-radius: 0 0 13px 13px;border-radius: 0 0 13px 13px;}
+
+.navbar .navbar-inner{background:#fff;height: 50px;}
+.navbar-fixed-top .my-brand{float: right;color: #494949;font-size: 25px;font-family: PTSans, sans-serif;margin-top: 10px;}
+.navbar-fixed-top .my-brand span{color: #4AA2D9;}
+.navbar .container > div{margin: 13px 0px 3px 4px;color: #494949;font-size: 25px;float: left;}
+
+/* Form */
+.fieldset p{float: left;margin-right: 20px;width: 80px;}
+.fieldset > div{margin: 10px 0;}
+.button-set{text-align: right;margin-top: 20px;}
+.button-set > div{display: inline-block;}
+.button-set a{margin: 0 10px;}
+
+/* For Login */
+.login{margin: 135px auto 0;padding: 5px 30px 30px;width: 320px;height: 100%;background-color: #fff;}
+.login h4{color: #56ACE4; margin-top: 10px;}
+.login .login-form > p{color: #C1C1C1;}

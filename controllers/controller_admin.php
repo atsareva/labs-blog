@@ -1,15 +1,8 @@
 <?php
 
-require_once CORE_PATH . 'controller/controller' . EXT;
-require_once 'core.php';
-require_once 'controller_auth.php';
-require_once 'controller_content.php';
-require_once 'controller_category.php';
-require_once 'controller_menu.php';
-require_once 'controller_users.php';
-require_once 'controller_favourite.php';
+require_once CORE_PATH . 'controller/controller_a' . EXT;
 
-class Controller_Admin extends Controller
+class Controller_Admin extends Controller_A
 {
 
     public function __construct()
@@ -23,19 +16,22 @@ class Controller_Admin extends Controller
 
     public function index()
     {
-        $query = "SELECT * FROM users WHERE id = '{$_SESSION['user']['id']}'";
-        $user  = $this->sql($query);
-
-        $title      = "Панель управления";
-        $menu_index = TRUE;
-
-        $query      = "SELECT id, title FROM menu WHERE trash!=1";
-        $admin_menu = $this->sql($query);
-
-        require 'head.php';
-        require 'admin/menu.php';
-        require 'admin/index.php';
-        require 'footer.php';
+//        $query = "SELECT * FROM users WHERE id = '{$_SESSION['user']['id']}'";
+//        $user  = $this->sql($query);
+//
+//        $title      = "Панель управления";
+//        $menu_index = TRUE;
+//
+//        $query      = "SELECT id, title FROM menu WHERE trash!=1";
+//        $admin_menu = $this->sql($query);
+//
+//        require 'head.php';
+//        require 'admin/menu.php';
+//        require 'admin/index.php';
+//        require 'footer.php';
+        $this->_view->setTitle('Авторизация')
+                ->setChild('content', 'admin/index')
+                ->setBaseClass('login');
     }
 
     public function profile()

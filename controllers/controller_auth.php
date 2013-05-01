@@ -1,8 +1,8 @@
 <?php
 
-require_once CORE_PATH . 'controller/controller_admin' . EXT;
+require_once CORE_PATH . 'controller/controller_a' . EXT;
 
-class Controller_Auth extends Controller_Admin
+class Controller_Auth extends Controller_A
 {
 
     public function login()
@@ -39,39 +39,8 @@ class Controller_Auth extends Controller_Admin
         }
 
         $this->_view->setTitle('Авторизация')
-                ->setTemplate('admin/page/one-column')
-                ->setBaseClass('login')
-                ->setChild('content', 'admin/profile/login', array('error' => $error));
-
-
-//        if (isset($_POST['login']) && isset($_POST['pass']))
-//        {
-//            $where  = array(
-//                'user_name' => "{$_POST['login']}",
-//                'pass'      => md5($_POST['pass'])
-//            );
-//            $result = $this->select($where, 'users');
-//            if (!empty($result))
-//            {
-//                $_SESSION['user'] = array(
-//                    'id'        => $result['id'],
-//                    'user_name' => $result['user_name'],
-//                    'access_id' => $result['access_id']
-//                );
-//
-//                $data = array(
-//                    'id'         => $result['id'],
-//                    'last_login' => time()
-//                );
-//
-//                $this->update($data, 'users');
-//
-//                header('Location: http://' . $this->BASE_URL . '/admin');
-//            }
-//        }
-//        $title = 'Авторизация';
-//        require 'head.php';
-//        require 'login.php';
+                ->setTemplate('admin/profile/login', array('error' => $error))
+                ->setBaseClass('login');
     }
 
     public function logout()
@@ -166,7 +135,7 @@ class Controller_Auth extends Controller_Admin
         return $result;
     }
 
-        protected function checkSessionUser()
+    protected function checkSessionUser()
     {
         $userModel = Core::getModel('user');
 

@@ -11,7 +11,7 @@ class View_Admin extends View
      * @var array
      */
     public $_template = array(
-        'path' => "admin/page/two-column",
+        'path' => "admin/page/one-column",
         'data' => array());
 
     /**

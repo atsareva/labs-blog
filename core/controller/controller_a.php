@@ -3,7 +3,7 @@
 require_once CORE_PATH . 'controller/controller' . EXT;
 require_once CORE_PATH . 'view/view_admin' . EXT;
 
-class Controller_Admin extends Controller
+class Controller_A extends Controller
 {
 
     /**
