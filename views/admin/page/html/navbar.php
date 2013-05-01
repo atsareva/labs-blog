@@ -1,4 +1,4 @@
-<div class="navbar navbar-fixed-top">
+<div class="main navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
             <div>Панель управления.</div>

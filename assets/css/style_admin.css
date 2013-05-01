@@ -73,35 +73,11 @@ table .install-database-info{
     margin-top: 20px;
 }
 
-.login
-{
-    background: #FFFFFF;
-    height: 300px;
-    width: 339px;
-    margin: 135px 0 0;
-}
-
-.login h3{
-    color: #56ACE4;
-    margin: 10px 0 0;
-}
-
 #overview .subnav .nav > li{
     float: left;
 }
 
-#admin-content{
-    width: 940px;
-    background: white;
-    margin-left: 0px;
-    margin-top: 20px;
-}
-.well{
-    margin: 10px;
-}
-.well h4{
-    color: #3198B6;
-}
+
 #overview .dropdown-menu li > a:hover, .dropdown-menu .active > a:hover{
     background: #F5F5F5;
     color: #555555;
@@ -155,13 +131,22 @@ table.tablesorter thead tr .headerSortDown {
     margin-right: 5px;
 }*/
 
-body{background: #F0F0F0;}
-.footer{padding: 28px 0px 43px 0px;margin-left: auto;margin-right: auto;background: #FFF;*border-collapse: separate;-webkit-border-radius: 0 0 13px 13px;-moz-border-radius: 0 0 13px 13px;border-radius: 0 0 13px 13px;}
+body{background: #F0F0F0;padding-top: 70px;}
+.footer{margin-left: auto;margin-right: auto;background: #FFF;*border-collapse: separate;-webkit-border-radius: 0 0 13px 13px;-moz-border-radius: 0 0 13px 13px;border-radius: 0 0 13px 13px;}
 
-.navbar .navbar-inner{background:#fff;height: 50px;}
-.navbar-fixed-top .my-brand{float: right;color: #494949;font-size: 25px;font-family: PTSans, sans-serif;margin-top: 10px;}
-.navbar-fixed-top .my-brand span{color: #4AA2D9;}
-.navbar .container > div{margin: 13px 0px 3px 4px;color: #494949;font-size: 25px;float: left;}
+.navbar .navbar-inner{height: 40px;}
+.navbar.main .navbar-inner{background:#fff;height: 50px;}
+.navbar.main .my-brand{float: right;color: #494949;font-size: 25px;font-family: PTSans, sans-serif;margin-top: 10px;}
+.navbar.main .my-brand span{color: #4AA2D9;}
+.navbar.main .container > div{margin: 13px 0px 3px 4px;color: #494949;font-size: 25px;float: left;}
+
+.admin-content{width: 940px;background: white;margin-left: 0px;margin-top: 20px;}
+.admin-content > .span12{margin-left: 0;}
+.well{margin: 10px;min-height: 350px;}
+.well h4{color: #3198B6;}
+
+.content-head{background: #E4E4E4;border: 1px solid #C6C9C9;font-size: 20px;margin: 5px;padding: 10px;*border-collapse: separate;-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;}
+.content-head .span3{float: left;}
 
 /* Form */
 .fieldset p{float: left;margin-right: 20px;width: 80px;}

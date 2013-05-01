@@ -16,20 +16,8 @@ class Controller_Admin extends Controller_A
 
     public function index()
     {
-//        $query = "SELECT * FROM users WHERE id = '{$_SESSION['user']['id']}'";
-//        $user  = $this->sql($query);
-//
-//        $title      = "Панель управления";
-//        $menu_index = TRUE;
-//
-//        $query      = "SELECT id, title FROM menu WHERE trash!=1";
-//        $admin_menu = $this->sql($query);
-//
-//        require 'head.php';
-//        require 'admin/menu.php';
-//        require 'admin/index.php';
-//        require 'footer.php';
-        $this->_view->setTitle('Авторизация')
+        $this->_view->setTitle('Панель управления')
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuIndex' => true))
                 ->setChild('content', 'admin/index')
                 ->setBaseClass('login');
     }

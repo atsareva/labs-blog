@@ -4,7 +4,7 @@
     <?php
 
     echo $this->getCss(array(
-        Core::getBaseUrl() . "assets/css/bootstrap.css",
+        Core::getBaseUrl() . "assets/css/bootstrap_new.css",
         Core::getBaseUrl() . "assets/css/docs.css",
         Core::getBaseUrl() . "assets/css/style.css"
     ));

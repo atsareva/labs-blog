@@ -58,6 +58,15 @@ class View_Admin extends View
         'data' => array());
 
     /**
+     * Page navbar menu block
+     *
+     * @var array
+     */
+    public $_navBarMenu = array(
+        'path' => 'admin/page/html/navbar-menu',
+        'data' => array());
+
+    /**
      * Page nabigation block
      *
      * @var array

@@ -8,8 +8,16 @@
         <?php echo $this->getChild($this->_navBar); ?>
 
         <div class="container">
-                <?php echo $this->getChild($this->_content) ?>
-        </div>
+            <?php echo $this->getChild($this->_navBarMenu) ?>
+            <div class="row admin-content">
+                <div class="span12">
+                    <?php echo $this->getChild($this->_content) ?>
+                </div>
+            </div>
 
-</body>
+            <footer class="footer">
+                <?php echo $this->getChild($this->_footer); ?>
+            </footer>
+        </div>
+    </body>
 </html>
