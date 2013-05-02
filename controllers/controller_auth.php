@@ -71,16 +71,14 @@ class Controller_Auth extends Controller_A
              * @todo Realise validation for post
              */
             (isset($_POST['save_exit']) && $_POST['save_exit'] == 1) ? $saveExit = true : $saveExit = false;
-            unset($_POST['save_exit']);
 
             $data = $_POST;
             unset($_POST);
 
-            if (empty($data['pass']) || empty($data['confirm_pass']))
-            {
+            if (!empty($data['pass']) && !empty($data['confirm_pass']))
                 $data['pass'] = md5($data['pass']);
-                unset($data['confirm_pass']);
-            }
+
+            unset($data['confirm_pass'], $data['save_exit']);
 
             $user->setData($data)->save();
             if ($saveExit)

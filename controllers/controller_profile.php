@@ -81,7 +81,7 @@ class Controller_Profile extends Controller_Front
             /**
              * @todo Realise generate salt for password
              */
-            $data['pass']          = md5($_POST['pass']);
+            $data['pass']          = md5($data['pass']);
             $data['register_date'] = time();
             $data['last_login']    = time();
             $data['access_id']     = 2;

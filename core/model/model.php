@@ -183,8 +183,10 @@ abstract class Model// extends Db
     {
         if (is_array($key))
         {
-            foreach ($key as $k => $v)
-                $this->_data->$k       = $v;
+            if (isset($this->_data->id))
+                $key['id'] = $this->_data->id;
+
+            $this->_data       = (object)$key;
         }
         else
             $this->_data->$key = $value;
