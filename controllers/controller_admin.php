@@ -10,7 +10,7 @@ class Controller_Admin extends Controller_A
         parent::__construct();
 
         $user = Core::getHelper('user')->getUserInfo();
-        if (!$user && !$user->getId() && $user->getAccessId() < 3)
+        if (!$user || !$user->getId() || $user->getAccessId() < 3)
             $this->redirect('auth/login');
     }
 
