@@ -55,11 +55,7 @@
 .install-menu-active{
     background: #ECF4CA;
 }
-.star
-{
-    font-weight: bold;
-    color: #BA0525;
-}
+
 table .install-database-info{
     padding: 32px 0px 0px 7px;
     color: #75797C;
@@ -108,23 +104,7 @@ table .install-database-info{
     margin-left: -2px;
 }
 
-table.tablesorter thead tr th{
-    vertical-align: middle; 
-    text-align: center;    
-}
 
-table.tablesorter thead tr .header {
-    background-image: url(../img/bg.gif);
-    background-repeat: no-repeat;
-    background-position: center right;
-    cursor: pointer;
-}
-table.tablesorter thead tr .headerSortUp {
-    background-image: url(../img/asc.gif);
-}
-table.tablesorter thead tr .headerSortDown {
-    background-image: url(../img/desc.gif);
-}
 .menu-dash{
     color: #DDD;
     font-weight: bold;
@@ -159,6 +139,7 @@ i[class^="icon-"]{margin-right: 5px;}
 .button-set a{margin: 0 10px;}
 
 label.error{text-align: left;}
+.star{font-weight: bold;color: #BA0525;}
 
 /* For Login */
 .login{margin: 135px auto 0;padding: 5px 30px 30px;width: 320px;height: 100%;background-color: #fff;}
@@ -168,3 +149,9 @@ label.error{text-align: left;}
 /* For Profile */
 .page-admin-profile .well{min-height: 615px;}
 .page-admin-profile .photo{padding: 0 45px;}
+
+/* For Table */
+table.tablesorter thead tr th{vertical-align: middle; text-align: center;}
+table.tablesorter thead tr .header {background-image: url(../img/bg.gif);background-repeat: no-repeat;background-position: center right;cursor: pointer;}
+table.tablesorter thead tr .headerSortUp {background-image: url(../img/asc.gif);}
+table.tablesorter thead tr .headerSortDown {background-image: url(../img/desc.gif);}

@@ -119,8 +119,8 @@ class Controller_Admin extends Controller_A
             $users = Core::getModel('user')
                             ->addFieldToFilter('users.*')
                             ->addFieldToFilter('access_id', array('<' => 4))
-                            ->join('user_status', 'user_status.id = users.status_id', 'user_status.name AS status_id')
-                            ->join('access', 'access.id = users.access_id', 'access.description AS access')
+                            ->join('user_status', 'user_status.id = users.status_id', 'user_status.name AS status_id', 'left')
+                            ->join('access', 'access.id = users.access_id', 'access.description AS access', 'left')
                             ->getCollection()->getData();
 
         $this->_view->setTitle('Пользователи')
