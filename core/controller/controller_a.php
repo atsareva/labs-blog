@@ -16,6 +16,10 @@ class Controller_A extends Controller
     public function __construct()
     {
         $this->_view = new View_Admin();
+
+        $user = Core::getHelper('user')->getUserInfo();
+        if (!$user || !$user->getId() || $user->getAccessId() < 3)
+            $this->redirect('auth/login');
     }
 
 }

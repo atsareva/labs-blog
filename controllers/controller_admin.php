@@ -8,10 +8,6 @@ class Controller_Admin extends Controller_A
     public function __construct()
     {
         parent::__construct();
-
-        $user = Core::getHelper('user')->getUserInfo();
-        if (!$user || !$user->getId() || $user->getAccessId() < 3)
-            $this->redirect('auth/login');
     }
 
     public function index()
@@ -20,46 +16,6 @@ class Controller_Admin extends Controller_A
                 ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuIndex' => true))
                 ->setChild('content', 'admin/index')
                 ->setBaseClass('login');
-    }
-
-    public function profile()
-    {
-        $obj = new Controller_Auth();
-        if (isset($_POST) && !empty($_POST))
-        {
-            $result = $obj->change_profile($_POST);
-        }
-        else
-        {
-            $result = $obj->change_profile();
-            //var_dump($result);die();
-        }
-        unset($obj);
-
-        $query     = "SELECT * FROM faculties";
-        $faculties = $this->sql($query);
-
-        $query       = "SELECT * FROM departments";
-        $departments = $this->sql($query);
-
-        $query       = "SELECT * FROM user_status";
-        $user_status = $this->sql($query);
-
-        if (isset($_POST['save_exit']) && $_POST['save_exit'] == 1)
-        {
-            header('Location: http://' . $this->BASE_URL . '/admin');
-        }
-
-        $title        = "Мой профиль";
-        $menu_profile = TRUE;
-
-        $query      = "SELECT id, title FROM menu WHERE trash!=1";
-        $admin_menu = $this->sql($query);
-
-        require 'head.php';
-        require 'admin/menu.php';
-        require 'admin/profile.php';
-        require 'footer.php';
     }
 
     public function content()

@@ -29,7 +29,7 @@
                     Сайт
                 </li>
                 <li>
-                    <a href="<?php echo Core::getBaseUrl() ?>admin/profile">
+                    <a href="<?php echo Core::getBaseUrl() ?>auth/profile">
                         <i class="icon-user"></i>Мой профиль
                     </a>
                 </li>

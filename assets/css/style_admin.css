@@ -134,6 +134,8 @@ table.tablesorter thead tr .headerSortDown {
 body{background: #F0F0F0;padding-top: 70px;}
 .footer{margin-left: auto;margin-right: auto;background: #FFF;*border-collapse: separate;-webkit-border-radius: 0 0 13px 13px;-moz-border-radius: 0 0 13px 13px;border-radius: 0 0 13px 13px;}
 
+i[class^="icon-"]{margin-right: 5px;}
+
 .navbar .navbar-inner{height: 40px;}
 .navbar.main .navbar-inner{background:#fff;height: 50px;}
 .navbar.main .my-brand{float: right;color: #494949;font-size: 25px;font-family: PTSans, sans-serif;margin-top: 10px;}
@@ -149,8 +151,9 @@ body{background: #F0F0F0;padding-top: 70px;}
 .content-head .span3{float: left;}
 
 /* Form */
-.fieldset p{float: left;margin-right: 20px;width: 80px;}
+.fieldset p{float: left;margin-right: 20px;width: 150px;;}
 .fieldset > div{margin: 10px 0;}
+.fieldset > div:after{clear: both;content: "";display: table;}
 .button-set{text-align: right;margin-top: 20px;}
 .button-set > div{display: inline-block;}
 .button-set a{margin: 0 10px;}
@@ -159,3 +162,7 @@ body{background: #F0F0F0;padding-top: 70px;}
 .login{margin: 135px auto 0;padding: 5px 30px 30px;width: 320px;height: 100%;background-color: #fff;}
 .login h4{color: #56ACE4; margin-top: 10px;}
 .login .login-form > p{color: #C1C1C1;}
+
+/* For Profile */
+.page-admin-profile .well{min-height: 615px;}
+.page-admin-profile .photo{padding: 0 45px;}

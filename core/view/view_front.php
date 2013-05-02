@@ -71,13 +71,13 @@ class View_Front extends View
      *
      * @var string
      */
-    private $_title     = "ZNU LabsBlog";
+    protected $_title     = "ZNU LabsBlog";
 
     /**
      * Page body class
      * 
      * @var string 
      */
-    private $_baseClass = 'page';
+    protected $_baseClass = 'page';
 
 }

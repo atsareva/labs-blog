@@ -80,13 +80,13 @@ class View_Admin extends View
      *
      * @var string
      */
-    private $_title = "ZNU LabsBlog Admin";
+    protected $_title = "ZNU LabsBlog Admin";
 
     /**
      * Page body class
      * 
      * @var string 
      */
-    private $_baseClass = 'page-admin';
+    protected $_baseClass = 'page-admin';
 
 }

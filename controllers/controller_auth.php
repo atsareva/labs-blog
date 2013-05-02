@@ -5,6 +5,11 @@ require_once CORE_PATH . 'controller/controller_a' . EXT;
 class Controller_Auth extends Controller_A
 {
 
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function login()
     {
         $error     = '';
@@ -55,6 +60,43 @@ class Controller_Auth extends Controller_A
         $this->redirect('home');
     }
 
+    public function profile()
+    {
+        $error = '';
+        $user  = Core::getModel('user')->load(Core::getHelper('user')->getCurrentUser());
+
+        if (isset($_POST) && !empty($_POST))
+        {
+            /**
+             * @todo Realise validation for post
+             */
+            (isset($_POST['save_exit']) && $_POST['save_exit'] == 1) ? $saveExit = true : $saveExit = false;
+            unset($_POST['save_exit']);
+
+            $data = $_POST;
+            unset($_POST);
+
+            if (empty($data['pass']) || empty($data['confirm_pass']))
+            {
+                $data['pass'] = md5($data['pass']);
+                unset($data['confirm_pass']);
+            }
+
+            $user->setData($data)->save();
+            if ($saveExit)
+                $this->redirect('admin');
+        }
+
+        $faculties   = Core::getModel('faculty')->getCollection()->getData();
+        $departments = Core::getModel('department')->getCollection()->getData();
+        $statuses    = Core::getModel('user_status')->getCollection()->getData();
+
+        $this->_view->setTitle('Мой профиль')
+                ->setBaseClass('profile')
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuProfile' => true))
+                ->setChild('content', 'admin/profile/profile', array('error'       => $error, 'user' => $user,'faculties'   => $faculties, 'departments' => $departments, 'statuses'    => $statuses));
+    }
+
     public function signup()
     {
         echo "signup";
@@ -65,61 +107,7 @@ class Controller_Auth extends Controller_A
         echo "forgotpass";
     }
 
-    public function change_profile($data = NULL)
-    {
-        if ($data != NULL)
-        {
-            if (empty($data['pass']) || empty($data['confirm_pass']))
-            {
-                $where  = array(
-                    'id' => $_SESSION['user']['id']
-                );
-                $result = $this->select($where, 'users');
-
-                $data['pass'] = $result['pass'];
-            }
-            else
-            {
-                $data['pass']  = md5($data['pass']);
-            }
-            $array         = array(
-                'id'            => $_SESSION['user']['id'],
-                'user_name'     => $data['login'],
-                'full_name'     => $data['full_name'],
-                'pass'          => $data['pass'],
-                'email'         => $data['email'],
-                'faculty_id'    => $data['faculty_id'],
-                'department_id' => $data['department_id'],
-                'status_id'     => $data['status_id'],
-                'photo'         => $data['attachment']
-            );
-            $result_update = $this->update($array, 'users');
-
-            if ($result_update == TRUE)
-            {
-                $where  = array(
-                    'id' => $_SESSION['user']['id']
-                );
-                $result = $this->select($where, 'users');
-                return $result;
-            }
-            else
-            {
-                $result['error'] = "Something error. Try again";
-                return $result;
-            }
-        }
-        else
-        {
-            $where  = array(
-                'id' => $_SESSION['user']['id']
-            );
-            $result = $this->select($_SESSION['user']['id'], 'users');
-            //var_dump($result);die();
-        }
-
-        return $result;
-    }
+    
 
     public function load_user($id)
     {

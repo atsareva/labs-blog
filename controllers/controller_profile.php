@@ -76,6 +76,7 @@ class Controller_Profile extends Controller_Front
         {
             session_regenerate_id();
             $data = $_POST;
+            unset($_POST);
 
             /**
              * @todo Realise generate salt for password

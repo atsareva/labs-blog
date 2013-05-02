@@ -8,7 +8,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li<?php if (isset($menuProfile)): ?> class="active" <?php endif; ?>>
-                            <a href="<?php echo Core::getBaseUrl() ?>admin/profile">
+                            <a href="<?php echo Core::getBaseUrl() ?>auth/profile">
                                 <i class="icon-user<?php if (isset($menuProfile)): ?> icon-white <?php endif; ?>"></i>Мой профиль
                             </a>
                         </li>
