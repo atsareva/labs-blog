@@ -158,6 +158,8 @@ i[class^="icon-"]{margin-right: 5px;}
 .button-set > div{display: inline-block;}
 .button-set a{margin: 0 10px;}
 
+label.error{text-align: left;}
+
 /* For Login */
 .login{margin: 135px auto 0;padding: 5px 30px 30px;width: 320px;height: 100%;background-color: #fff;}
 .login h4{color: #56ACE4; margin-top: 10px;}

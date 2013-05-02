@@ -66,7 +66,7 @@
     // -------------------------------------------------------------------- 
     $(function() {
         // validate signup form on keyup and submit
-        $("#front_signup").validate({
+        $("#profile").validate({
             rules: {
                 user_name: {
                     required: true
@@ -75,11 +75,7 @@
                     required: true,
                     email: true
                 },
-                pass: {
-                    required: true
-                },
                 confirm_pass: {
-                    required: true,
                     equalTo: $('#pass')
                 }
             },
@@ -91,11 +87,7 @@
                     required: "Это обязательное поле!",
                     email: "Пожалуйста, введите правильный e-mail адрес!"
                 },
-                pass: {
-                    required: "Это обязательное поле!"
-                },
                 confirm_pass: {
-                    required: "Это обязательное поле!",
                     equalTo: "Значения полей 'Пароль' и 'Подтвердите пароль' должны совпадать!"
                 },
             },
