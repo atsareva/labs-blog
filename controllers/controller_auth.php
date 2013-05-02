@@ -77,6 +77,8 @@ class Controller_Auth extends Controller_A
 
             if (!empty($data['pass']) && !empty($data['confirm_pass']))
                 $data['pass'] = md5($data['pass']);
+            else
+                unset ($data['pass']);
 
             unset($data['confirm_pass'], $data['save_exit']);
 

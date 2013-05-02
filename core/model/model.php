@@ -41,6 +41,13 @@ abstract class Model// extends Db
     private $_filterQuery = '';
 
     /**
+     * String that will be added to query
+     *
+     * @var string
+     */
+    private $_join = '';
+
+    /**
      * Order By string that will be added to query
      * 
      * @var string
@@ -90,7 +97,9 @@ abstract class Model// extends Db
         (empty($this->_filterField)) ? $filterField = '*' : $filterField = $this->_filterField;
         (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'WHERE ' . $this->_filterQuery;
         (empty($this->_orderBy)) ? $orderBy     = '' : $orderBy     = ' ORDER BY ' . $this->_orderBy;
-        $query       = "SELECT {$filterField} FROM {$this->_tableName} {$filterQuery}{$orderBy}";
+        (empty($this->_join)) ? $join        = '' : $join        = $this->_join;
+
+        $query = "SELECT {$filterField} FROM {$this->_tableName} {$join} {$filterQuery}{$orderBy}";
 
         $result        = $this->_db->sql($query);
         if (isset($result[0]) && is_array($result[0]))
@@ -136,6 +145,13 @@ abstract class Model// extends Db
                 }
             }
         }
+        return $this;
+    }
+
+    public function join($table, $cond, $field, $key = 'inner')
+    {
+        $this->addFieldToFilter($field);
+        $this->_join .= " " . strtoupper($key) . " JOIN {$table} ON {$cond}";
         return $this;
     }
 
@@ -186,7 +202,7 @@ abstract class Model// extends Db
             if (isset($this->_data->id))
                 $key['id'] = $this->_data->id;
 
-            $this->_data       = (object)$key;
+            $this->_data       = (object) $key;
         }
         else
             $this->_data->$key = $value;

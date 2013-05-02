@@ -107,24 +107,25 @@ class Controller_Admin extends Controller_A
 
     function users()
     {
-        $obj   = new Controller_Users();
-        $array = $obj->load_users();
+        $user = Core::getHelper('user')->getUserInfo();
 
-        $data  = $array[0];
-        $admin = $array[1];
+        if ($user->getAccessId() == 5)
+            $users = Core::getModel('user')
+                            ->addFieldToFilter('users.*')
+                            ->join('user_status', 'user_status.id = users.status_id', 'user_status.name AS status_id')
+                            ->join('access', 'access.id = users.access_id', 'access.description AS access')
+                            ->getCollection()->getData();
+        else
+            $users = Core::getModel('user')
+                            ->addFieldToFilter('users.*')
+                            ->addFieldToFilter('access_id', array('<' => 4))
+                            ->join('user_status', 'user_status.id = users.status_id', 'user_status.name AS status_id')
+                            ->join('access', 'access.id = users.access_id', 'access.description AS access')
+                            ->getCollection()->getData();
 
-        unset($obj);
-
-        $title      = "Пользователи";
-        $menu_users = TRUE;
-
-        $query      = "SELECT * FROM menu WHERE trash!=1";
-        $admin_menu = $this->sql($query);
-
-        require 'head.php';
-        require 'admin/menu.php';
-        require 'admin/users.php';
-        require 'footer.php';
+        $this->_view->setTitle('Пользователи')
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuUsers' => true))
+                ->setChild('content', 'admin/users', array('users' => $users));
     }
 
 }
