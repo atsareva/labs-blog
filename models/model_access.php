@@ -10,6 +10,13 @@ class Model_Access extends Model
         $this->_tableName = 'access';
     }
 
+    public function getAccess()
+    {
+        return $this->addFieldToFilter('title', array('!=' => 'for_superadmin'))
+                        ->getCollection()
+                        ->getData();
+    }
+
 }
 
 ?>

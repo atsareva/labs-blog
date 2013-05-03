@@ -164,7 +164,10 @@
             </div>
             <div>
                 <p>E-mail <span class="star">*</span></p>
-                <input type="text" name="email" value=""/>
+                <div class="input-prepend">
+                    <span class="add-on">@</span>
+                    <input type="text" name="email" value=""/>
+                </div>
             </div>
             <div>
                 <p>Skype</p>

@@ -18,6 +18,17 @@ class Controller_Admin extends Controller_A
                 ->setBaseClass('login');
     }
 
+    function users()
+    {
+        $user = Core::getHelper('user')->getUserInfo();
+
+        $users = Core::getModel('user')->loadUsers($user->getAccessId());
+
+        $this->_view->setTitle('Пользователи')
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuUsers' => true))
+                ->setChild('content', 'admin/user/users', array('users' => $users));
+    }
+
     public function content()
     {
         $obj  = new Controller_Content();
@@ -103,17 +114,6 @@ class Controller_Admin extends Controller_A
         unset($obj);
 
         require 'footer.php';
-    }
-
-    function users()
-    {
-        $user = Core::getHelper('user')->getUserInfo();
-
-        $users = Core::getModel('user')->loadUsers($user->getAccessId());
-        
-        $this->_view->setTitle('Пользователи')
-                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuUsers' => true))
-                ->setChild('content', 'admin/users', array('users' => $users));
     }
 
 }

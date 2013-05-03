@@ -131,14 +131,20 @@ i[class^="icon-"]{margin-right: 5px;}
 .content-head .span3{float: left;}
 
 /* Form */
-.fieldset p{float: left;margin-right: 20px;width: 150px;;}
+input{height: auto;}
+
+.fieldset p{float: left;margin-right: 20px;width: 150px;}
 .fieldset > div{margin: 10px 0;}
 .fieldset > div:after{clear: both;content: "";display: table;}
 .button-set{text-align: right;margin-top: 20px;}
 .button-set > div{display: inline-block;}
 .button-set a{margin: 0 10px;}
 
-label.error{text-align: left;}
+.control-group,
+.input-prepend{margin-bottom: 0;}
+.input-prepend input{width: 183px;}
+
+label.error{text-align: left;padding-left: 170px;}
 .star{font-weight: bold;color: #BA0525;}
 
 /* For Login */

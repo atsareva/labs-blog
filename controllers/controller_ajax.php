@@ -49,42 +49,6 @@ class Controller_Ajax
         }
         else
             echo json_encode(array('id' => false));
-
-
-//
-//
-//        $where = array(
-//            'id' => $id
-//        );
-//        $result = $this->select($where, 'users');
-//
-//        if (isset($result) && !empty($result))
-//        {
-//            if ($result['block'])
-//            {
-//                $user = array(
-//                    'id' => (int) $id,
-//                    'block' => 0
-//                );
-//            }
-//            else
-//            {
-//                $user = array(
-//                    'id' => (int) $id,
-//                    'block' => 1
-//                );
-//            }
-//            $this->update($user, 'users');
-//        }
-//
-//        $array = $this->load_users();
-//        $data = $array[0];
-//        $admin = $array[1];
-//
-//        $title = "Пользователи";
-//        $menu_users = TRUE;
-//
-//        require 'admin/users.php';
     }
 
     public function load_users()

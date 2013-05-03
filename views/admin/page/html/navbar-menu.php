@@ -72,7 +72,7 @@
                     </ul>
                 </li>
                 <?php $user = Core::getHelper('user')->getUserInfo() ?>
-                <?php if ($user && $user->getId() && $user->getAccessId() >= 3): ?>
+                <?php if ($user && $user->getId() && $user->getAccessId() > 3): ?>
                     <li<?php if (isset($menuUsers)): ?> class="active" <?php endif; ?>>
                         <a href="<?php echo Core::getBaseUrl() ?>admin/users">
                             <i class="icon-user icon-white"></i>Пользователи
