@@ -62,7 +62,7 @@
     // --------------------------------------------------------------------
     $(function() {
         $('#remove').click(function() {
-            if ($("input[name^=user_]:checked").length > 1)
+            if ($("input[name^=user_]:checked").length >= 1)
             {
                 var ids = '';
                 $.each($("input[name^=user_]:checked"), function(i, element) {
