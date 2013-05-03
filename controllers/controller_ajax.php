@@ -3,6 +3,9 @@
 class Controller_Ajax
 {
 
+    /**
+     * Retrieve department by faculty id
+     */
     public function loadDepartment()
     {
         $response = array('data' => false);
@@ -23,6 +26,65 @@ class Controller_Ajax
         }
 
         echo json_encode($response);
+    }
+
+    /**
+     * Block User by id
+     */
+    public function blockUser()
+    {
+        $id = $_POST['id'];
+
+        $user = Core::getModel('user')->load((int) $id);
+
+        if ($user->getId())
+        {
+            if ($user->getBlock() == 0)
+                $user->setBlock(1);
+            else
+                $user->setBlock(0);
+            $user->save();
+
+            echo json_encode(array('id'    => $user->getId(), 'block' => $user->getBlock()));
+        }
+        else
+            echo json_encode(array('id' => false));
+
+
+//
+//
+//        $where = array(
+//            'id' => $id
+//        );
+//        $result = $this->select($where, 'users');
+//
+//        if (isset($result) && !empty($result))
+//        {
+//            if ($result['block'])
+//            {
+//                $user = array(
+//                    'id' => (int) $id,
+//                    'block' => 0
+//                );
+//            }
+//            else
+//            {
+//                $user = array(
+//                    'id' => (int) $id,
+//                    'block' => 1
+//                );
+//            }
+//            $this->update($user, 'users');
+//        }
+//
+//        $array = $this->load_users();
+//        $data = $array[0];
+//        $admin = $array[1];
+//
+//        $title = "Пользователи";
+//        $menu_users = TRUE;
+//
+//        require 'admin/users.php';
     }
 
     public function load_users()

@@ -23,66 +23,45 @@
         {
             $.ajax({
                 type: "POST",
-                dataType: 'html',
-                url: "/users/block_user",
+                dataType: 'json',
+                url: "<?php echo Core::getBaseUrl() ?>ajax/blockUser",
                 data: 'id=' + id,
-                success: function(data) {
-                    if (data)
+                success: function(response) {
+                    if (response.id)
                     {
-                        $('#load_for_ajax').html(data);
+                        var html = '<a href="" onclick="block_user(' + response.id + ');return false;">';
+                        if (response.block == 0)
+                            html += '<img alt="" title="Разблокировать" src="<?php echo Core::getBaseUrl() ?>assets/img/un-block.png"/>';
+                        else
+                            html += '<img alt="" title="Заблокировать" src="<?php echo Core::getBaseUrl() ?>assets/img/block.png"/>';
+                        html += '</a>';
+                        $('#user_' + response.id + ' td.block-user').html(html);
                     }
                 }
             });
-            return false;
+
         }
-        ;
-        // --------------------------------------------------------------------
-        $(function() {
-            $('#create').click(function() {
-                $.ajax({
-                    dataType: 'html',
-                    url: "/users/create",
-                    success: function(data) {
-                        if (data)
-                        {
-                            $('#admin-content').html(data);
-                        }
-                    }
-                });
-            });
-        });
         // --------------------------------------------------------------------
         $(function() {
             $('#edit').click(function() {
                 if ($("input[name^=user_]:checked").length == 1)
                 {
-                    $.ajax({
-                        type: "POST",
-                        dataType: 'html',
-                        url: "/users/edit",
-                        data: 'id_edit=' + $("input[name^=user_]:checked")[0].defaultValue,
-                        success: function(data) {
-                            if (data)
-                            {
-                                $('#admin-content').html(data);
-                            }
-                        }
-                    });
+                   window.location = '<?php echo Core::getBaseUrl()?>users/edit';
                 }
                 else if ($("input[name^=user_]:checked").length > 1)
                 {
-                    $("#dialog-user").find('label').append('<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Вы выбрали больше одного пользователя для редактирования!</p></div>');
+                    $("#dialog-user").find('label').html('<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Вы выбрали больше одного пользователя для редактирования!</p></div>');
                     dialog_user();
                 }
                 else
                 {
-                    $("#dialog-user").find('label').append('<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Вы не выбрали пользователя для редактирования.</p></div>');
+                    $("#dialog-user").find('label').html('<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Вы не выбрали пользователя для редактирования.</p></div>');
                     dialog_user();
                 }
             });
         });
         // --------------------------------------------------------------------
-<?php if (!empty($data)): ?>
+<?php if (count($users) > 0): ?>
             $(function() {
                 $("#all_user").tablesorter()
                  .tablesorterPager({container: $("#pager")});
@@ -91,14 +70,6 @@
         // --------------------------------------------------------------------
 
     </script>
-    <style type="text/css">
-        .pagedisplay, .pagesize{
-            margin-top: 10px;
-        }
-        #pager .btn{
-            padding: 2px;
-        }
-    </style>
     <!-- dialog users-->
     <div id="dialog-user" style="display: none" title="Предупреждение!">
         <label></label>
@@ -111,13 +82,13 @@
                 Пользователи
             </div>
             <div class="span3 offset3">
-                <a rel="tooltip" title="Создать" id="create" class="btn btn-small btn-info" href="" onclick="return false;">
+                <a rel="tooltip" title="Создать" id="create" class="btn btn-small btn-info" href="<?php echo Core::getBaseUrl() ?>users/create">
                     <i class="icon-plus icon-white"></i>
                 </a>
                 <a rel="tooltip" title=" Редактировать" id="edit" class="btn btn-small btn-info" href="" onclick="return false;">
                     <i class="icon-pencil icon-white"></i>
                 </a>
-                <span  style="border-right: 2px solid #C6C9C9; margin: 0 10px 0 5px;"></span>
+                <span class="border"></span>
                 <a rel="tooltip" title="Отмена" class="btn btn-small btn-info" href="/admin">
                     <i class="icon-home icon-white"></i>
                 </a>
@@ -140,28 +111,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($users as $user): ?>
-                            <tr>
-                                <td><input type="checkbox" name="user_<?php echo $user->id; ?>" value="<?php echo $user->id; ?>" /></td>
-                                <td><?php echo $user->user_name; ?></td>
-                                <td><?php echo $user->full_name; ?></td>
-                                <td><?php echo $user->status_id; ?></td>
-                                <td>
-                                    <a href="" class="block_user" onclick="block_user(<?php echo $user->id; ?>);">
-                                        <?php if ($user->block == 0): ?>
-                                            <img alt="" title="Разблокировать" src="<?php echo Core::getBaseUrl() ?>assets/img/un-block.png"/>
-                                        <?php else: ?>
-                                            <img alt="" title="Заблокировать" src="<?php echo Core::getBaseUrl() ?>assets/img/block.png"/>
-                                        <?php endif; ?>
-                                    </a>
-                                </td>
-                                <td><?php echo $user->email; ?></td>
-                                <td><?php echo $user->access; ?></td>
-                            </tr>
-                        <?php endforeach; ?>
+                        <?php if (count($users) > 0): ?>
+                            <?php foreach ($users as $user): ?>
+                                <tr id="user_<?php echo $user->id ?>">
+                                    <td><input type="checkbox" name="user_<?php echo $user->id; ?>" value="<?php echo $user->id; ?>" /></td>
+                                    <td><?php echo $user->user_name; ?></td>
+                                    <td><?php echo $user->full_name; ?></td>
+                                    <td><?php echo $user->status_id; ?></td>
+                                    <td class="block-user">
+                                        <a href="" onclick="block_user(<?php echo $user->id; ?>);return false;">
+                                               <?php if ($user->block == 0): ?>
+                                                <img alt="" title="Разблокировать" src="<?php echo Core::getBaseUrl() ?>assets/img/un-block.png"/>
+                                            <?php else: ?>
+                                                <img alt="" title="Заблокировать" src="<?php echo Core::getBaseUrl() ?>assets/img/block.png"/>
+                                            <?php endif; ?>
+                                        </a>
+                                    </td>
+                                    <td><?php echo $user->email; ?></td>
+                                    <td><?php echo $user->access; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
-                <?php if (isset($data) && is_array($data)): ?>
+                <?php if (count($users) > 0): ?>
                     <div id="pager">
                         <form>
                             <a class="btn btn-small btn-info first" href="" onclick="return false;">

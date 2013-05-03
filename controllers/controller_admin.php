@@ -109,20 +109,8 @@ class Controller_Admin extends Controller_A
     {
         $user = Core::getHelper('user')->getUserInfo();
 
-        if ($user->getAccessId() == 5)
-            $users = Core::getModel('user')
-                            ->addFieldToFilter('users.*')
-                            ->join('user_status', 'user_status.id = users.status_id', 'user_status.name AS status_id')
-                            ->join('access', 'access.id = users.access_id', 'access.description AS access')
-                            ->getCollection()->getData();
-        else
-            $users = Core::getModel('user')
-                            ->addFieldToFilter('users.*')
-                            ->addFieldToFilter('access_id', array('<' => 4))
-                            ->join('user_status', 'user_status.id = users.status_id', 'user_status.name AS status_id', 'left')
-                            ->join('access', 'access.id = users.access_id', 'access.description AS access', 'left')
-                            ->getCollection()->getData();
-
+        $users = Core::getModel('user')->loadUsers($user->getAccessId());
+        
         $this->_view->setTitle('Пользователи')
                 ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuUsers' => true))
                 ->setChild('content', 'admin/users', array('users' => $users));

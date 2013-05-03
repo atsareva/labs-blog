@@ -155,3 +155,8 @@ table.tablesorter thead tr th{vertical-align: middle; text-align: center;}
 table.tablesorter thead tr .header {background-image: url(../img/bg.gif);background-repeat: no-repeat;background-position: center right;cursor: pointer;}
 table.tablesorter thead tr .headerSortUp {background-image: url(../img/asc.gif);}
 table.tablesorter thead tr .headerSortDown {background-image: url(../img/desc.gif);}
+
+.pagedisplay, .pagesize{margin-top: 10px;}
+#pager .btn{padding: 2px;}
+
+.border{border-right: 2px solid #C6C9C9; margin: 0 10px 0 5px;}

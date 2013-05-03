@@ -81,7 +81,9 @@ abstract class Model// extends Db
         {
             (empty($this->_filterQuery)) ? $filterQuery = '' : $filterQuery = 'AND ' . $this->_filterQuery;
             ($this->_orderBy) ? $orderBy     = ' ORDER BY ' . $this->_orderBy : $orderBy     = '';
-            $query       = "SELECT * FROM {$this->_tableName} WHERE id = {$id}{$orderBy} {$filterQuery}";
+            (empty($this->_join)) ? $join        = '' : $join        = $this->_join;
+
+            $query       = "SELECT * FROM {$this->_tableName} {$join} WHERE {$this->_tableName}.id = {$id}{$orderBy} {$filterQuery}";
             $this->_data = (object) $this->_db->sql($query);
         }
         return $this;
