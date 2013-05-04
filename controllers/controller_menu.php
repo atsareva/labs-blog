@@ -1,17 +1,13 @@
 <?php
 
-require_once 'model.php';
+require_once CORE_PATH . 'controller/controller_a' . EXT;
 
-Class Controller_Menu extends Model
+class Controller_Menu extends Controller_A
 {
 
     public function __construct()
     {
         parent::__construct();
-        if (!isset($_SESSION['user']) || empty($_SESSION['user']))
-        {
-            header('Location: http://' . $this->BASE_URL . '/auth/login');
-        }
     }
 
     public function create()
@@ -19,25 +15,25 @@ Class Controller_Menu extends Model
         if (isset($_POST) && !empty($_POST))
         {
             $data = array(
-                'title' => $_POST['title'],
+                'title'      => $_POST['title'],
                 'show_title' => $_POST['show_title'],
-                'position' => $_POST['position'],
-                'status' => $_POST['status'],
-                'access_id' => $_POST['access']
+                'position'   => $_POST['position'],
+                'status'     => $_POST['status'],
+                'access_id'  => $_POST['access']
             );
 
             if (isset($_POST['id_menu']) && (int) $_POST['id_menu'] == 0)
             {
                 $id_menu = $this->insert($data, 'menu');
-                $where = array(
+                $where   = array(
                     'id' => $id_menu
                 );
             }
             else
             {
                 $data['id'] = (int) $_POST['id_menu'];
-                $data = array_reverse($data);
-                $result = $this->update($data, 'menu');
+                $data       = array_reverse($data);
+                $result     = $this->update($data, 'menu');
                 if ($result)
                 {
                     $where = array(
@@ -60,21 +56,21 @@ Class Controller_Menu extends Model
             }
             else
             {
-                $query = "SELECT * FROM access";
+                $query  = "SELECT * FROM access";
                 $access = $this->sql($query);
 
                 if (isset($_POST['edit_menu']) && $_POST['edit_menu'] != 0)
                 {
-                    $edit = TRUE;
+                    $edit  = TRUE;
                     $title = "Редактировать меню";
                 }
                 else
                 {
-                    $title = "Создать меню";
+                    $title     = "Создать меню";
                 }
                 $menu_menu = TRUE;
 
-                $query = "SELECT id, title FROM menu WHERE trash!=1";
+                $query      = "SELECT id, title FROM menu WHERE trash!=1";
                 $admin_menu = $this->sql($query);
 
                 require 'head.php';
@@ -85,7 +81,7 @@ Class Controller_Menu extends Model
         }
         else
         {
-            $query = "SELECT * FROM access";
+            $query  = "SELECT * FROM access";
             $access = $this->sql($query);
             require_once 'admin/menu/create.php';
         }
@@ -97,19 +93,19 @@ Class Controller_Menu extends Model
         {
             if (isset($_POST['id_edit']))
             {
-                $where = array(
+                $where  = array(
                     'id' => $_POST['id_edit']
                 );
                 $result = $this->select($where, 'menu');
 
-                $query = "SELECT * FROM access";
+                $query  = "SELECT * FROM access";
                 $access = $this->sql($query);
             }
             else
             {
-                
+
             }
-            $edit = TRUE;
+            $edit  = TRUE;
             $title = "Редактировать меню";
             require_once 'admin/menu/create.php';
         }
@@ -119,28 +115,44 @@ Class Controller_Menu extends Model
         }
     }
 
+    public function remove()
+    {
+        $ids = explode(',', trim($_POST['ids'], ','));
+        foreach ($ids as $id)
+            Core::getModel('menu')->load($id)->unsetData()->save();
+    }
+
+    public function publicMenu()
+    {
+        $ids  = explode(',', trim($_POST['ids'], ','));
+        $bool = $_POST['bool'];
+
+        foreach ($ids as $id)
+            Core::getModel('menu')->load($id)->setData('status', $bool)->save();
+    }
+
     public function create_item()
     {
         if (isset($_POST) && !empty($_POST))
         {
             $data = array(
-                'title' => $_POST['title'],
-                'alias' => $_POST['alias'],
-                'status' => $_POST['status'],
-                'menu_id' => $_POST['menu_id'],
+                'title'     => $_POST['title'],
+                'alias'     => $_POST['alias'],
+                'status'    => $_POST['status'],
+                'menu_id'   => $_POST['menu_id'],
                 'parent_id' => $_POST['parent_id'],
                 'access_id' => $_POST['access_id'],
                 'for_index' => $_POST['for_index'],
             );
 
             /**
-             *  находим родительский элемент dash и сохраням новый эл. с значением dash+1 
+             *  находим родительский элемент dash и сохраням новый эл. с значением dash+1
              */
-            $where = array(
-                'id' => $_POST['parent_id'],
+            $where        = array(
+                'id'      => $_POST['parent_id'],
                 'menu_id' => $_POST['menu_id'],
             );
-            $parent = $this->select($where, 'items_menu');
+            $parent       = $this->select($where, 'items_menu');
             (!empty($parent)) ? $data['dash'] = $parent['dash'] + 1 : $data['dash'] = 1;
 
             /**
@@ -148,7 +160,7 @@ Class Controller_Menu extends Model
              */
             $where = array(
                 'parent_id' => $_POST['parent_id'],
-                'menu_id' => $_POST['menu_id'],
+                'menu_id'   => $_POST['menu_id'],
             );
 
             $sibling = $this->select($where, 'items_menu');
@@ -161,7 +173,7 @@ Class Controller_Menu extends Model
                 }
                 else
                 {
-                    $position = 1;
+                    $position         = 1;
                 }
                 $data['order_of'] = $position;
             }
@@ -172,14 +184,14 @@ Class Controller_Menu extends Model
              */
             if ($_POST['for_index'] == 1)
             {
-                $where = array(
+                $where  = array(
                     'for_index' => 1
                 );
                 $result = $this->select($where, 'items_menu');
                 if (!empty($result))
                 {
                     $for_index = array(
-                        'id' => $result['id'],
+                        'id'        => $result['id'],
                         'for_index' => 0
                     );
                     $this->update($for_index, 'items_menu');
@@ -197,7 +209,7 @@ Class Controller_Menu extends Model
                     $data['path'] = '/' . Config::$DEFULT_CONTROLLER . '?' . $_POST['path'];
                 }
                 $id_menu_item = $this->insert($data, 'items_menu');
-                $where = array(
+                $where        = array(
                     'id' => $id_menu_item
                 );
             }
@@ -231,7 +243,7 @@ Class Controller_Menu extends Model
                  */
                 $this->access_items($_POST['id_menu_item'], $_POST['access_id']);
 
-                $where = array(
+                $where          = array(
                     'id' => $_POST['id_menu_item']
                 );
                 $update_element = $this->select($where, 'items_menu');
@@ -258,16 +270,16 @@ Class Controller_Menu extends Model
 
                                 if ($value['id'] == $_POST['position'])
                                 {
-                                    $position = $value['order_of'];
+                                    $position   = $value['order_of'];
                                     $id_sibling = $value['id'];
                                 }
                                 if ($value['id'] == $_POST['id_menu_item'])
                                 {
-                                    $current_order = $value['order_of'];
+                                    $current_order  = $value['order_of'];
                                 }
                             }
                             $update_sibling = array(
-                                'id' => $id_sibling,
+                                'id'       => $id_sibling,
                                 'order_of' => $current_order
                             );
                             $this->update($update_sibling, 'items_menu');
@@ -281,7 +293,7 @@ Class Controller_Menu extends Model
                                     foreach ($old_sibling as $value)
                                     {
                                         $update_sibling = array(
-                                            'id' => $value['id'],
+                                            'id'       => $value['id'],
                                             'order_of' => $value['order_of'] - 1
                                         );
                                         $this->update($update_sibling, 'items_menu');
@@ -290,13 +302,13 @@ Class Controller_Menu extends Model
                                 else
                                 {
                                     $update_sibling = array(
-                                        'id' => $old_sibling['id'],
+                                        'id'       => $old_sibling['id'],
                                         'order_of' => $old_sibling['order_of'] - 1
                                     );
                                     $this->update($update_sibling, 'items_menu');
                                 }
                             }
-                            $position = count($sibling) + 1;
+                            $position       = count($sibling) + 1;
                         }
                     }
                     else
@@ -308,7 +320,7 @@ Class Controller_Menu extends Model
                                 foreach ($old_sibling as $value)
                                 {
                                     $update_sibling = array(
-                                        'id' => $value['id'],
+                                        'id'       => $value['id'],
                                         'order_of' => $value['order_of'] - 1
                                     );
                                     $this->update($update_sibling, 'items_menu');
@@ -317,13 +329,13 @@ Class Controller_Menu extends Model
                             else
                             {
                                 $update_sibling = array(
-                                    'id' => $old_sibling['id'],
+                                    'id'       => $old_sibling['id'],
                                     'order_of' => $old_sibling['order_of'] - 1
                                 );
                                 $this->update($update_sibling, 'items_menu');
                             }
                         }
-                        ($sibling['id'] == $_POST['id_menu_item']) ? $position = 1 : $position = 2;
+                        ($sibling['id'] == $_POST['id_menu_item']) ? $position       = 1 : $position       = 2;
                     }
                 }
                 else
@@ -335,7 +347,7 @@ Class Controller_Menu extends Model
                             foreach ($old_sibling as $value)
                             {
                                 $update_sibling = array(
-                                    'id' => $value['id'],
+                                    'id'       => $value['id'],
                                     'order_of' => $value['order_of'] - 1
                                 );
                                 $this->update($update_sibling, 'items_menu');
@@ -343,20 +355,20 @@ Class Controller_Menu extends Model
                         }
                         else
                         {
-                            $update_sibling = array(
-                                'id' => $old_sibling['id'],
+                            $update_sibling   = array(
+                                'id'       => $old_sibling['id'],
                                 'order_of' => $old_sibling['order_of'] - 1
                             );
                             $this->update($update_sibling, 'items_menu');
                         }
                     }
-                    $position = 1;
+                    $position         = 1;
                 }
                 $data['order_of'] = $position;
 
                 $data['id'] = (int) $_POST['id_menu_item'];
-                $data = array_reverse($data);
-                $result = $this->update($data, 'items_menu');
+                $data       = array_reverse($data);
+                $result     = $this->update($data, 'items_menu');
                 if ($result)
                 {
                     $where = array(
@@ -368,16 +380,16 @@ Class Controller_Menu extends Model
             $result = $this->select($where, 'items_menu');
 
 
-            $main_menu = $this->load_collection('menu');
-            //$child_items = $this->load_collection('items_menu');
+            $main_menu   = $this->load_collection('menu');
+//$child_items = $this->load_collection('items_menu');
             $child_items = $this->load_items($result['menu_id']);
 
-            $where = "SELECT * FROM access";
+            $where  = "SELECT * FROM access";
             $access = $this->sql($where);
 
-            $where = array(
+            $where    = array(
                 'parent_id' => $result['parent_id'],
-                'menu_id' => $result['menu_id']
+                'menu_id'   => $result['menu_id']
             );
             $order_of = $this->select($where, 'items_menu');
 
@@ -390,7 +402,7 @@ Class Controller_Menu extends Model
             {
                 if (isset($_POST['edit_menu_item']) && $_POST['edit_menu_item'] != 0)
                 {
-                    $edit = TRUE;
+                    $edit  = TRUE;
                     $title = "Редактировать пункт меню";
                 }
                 else
@@ -399,9 +411,9 @@ Class Controller_Menu extends Model
                 }
 
                 $_GET['id'] = $_POST['edit_menu_item'];
-                $menu_menu = TRUE;
+                $menu_menu  = TRUE;
 
-                $query = "SELECT id, title FROM menu WHERE trash!=1";
+                $query      = "SELECT id, title FROM menu WHERE trash!=1";
                 $admin_menu = $this->sql($query);
 
                 require 'head.php';
@@ -412,11 +424,11 @@ Class Controller_Menu extends Model
         }
         else
         {
-            $main_menu = $this->load_collection('menu');
-            //$child_items = $this->load_collection('items_menu');
+            $main_menu   = $this->load_collection('menu');
+//$child_items = $this->load_collection('items_menu');
             $child_items = $this->load_items();
 
-            $where = "SELECT * FROM access";
+            $where  = "SELECT * FROM access";
             $access = $this->sql($where);
 
             require_once 'admin/menu/create_menu_item.php';
@@ -429,28 +441,28 @@ Class Controller_Menu extends Model
         {
             if (isset($_POST['id_edit']))
             {
-                $where = array(
+                $where  = array(
                     'id' => $_POST['id_edit']
                 );
                 $result = $this->select($where, 'items_menu');
 
-                $main_menu = $this->load_collection('menu');
+                $main_menu   = $this->load_collection('menu');
                 $child_items = $this->load_items($result['menu_id']);
 
-                $where = "SELECT * FROM access";
+                $where  = "SELECT * FROM access";
                 $access = $this->sql($where);
 
-                $where = array(
+                $where    = array(
                     'parent_id' => $result['parent_id'],
-                    'menu_id' => $result['menu_id']
+                    'menu_id'   => $result['menu_id']
                 );
                 $order_of = $this->select($where, 'items_menu');
             }
             else
             {
-                
+
             }
-            $edit = TRUE;
+            $edit  = TRUE;
             $title = "Редактировать пункт меню";
 
             $_GET['id'] = $_POST['parent_id'];
@@ -474,7 +486,7 @@ Class Controller_Menu extends Model
             foreach ($child as $child_value)
             {
                 $data_child = array(
-                    'id' => $child_value['id'],
+                    'id'        => $child_value['id'],
                     'access_id' => $access
                 );
                 $this->update($data_child, 'items_menu');
@@ -484,8 +496,8 @@ Class Controller_Menu extends Model
 
     public function public_menu()
     {
-        $data = $_POST['data'];
-        $bool = $_POST['bool'];
+        $data  = $_POST['data'];
+        $bool  = $_POST['bool'];
         $array = explode(',', $data);
         if (is_array($array) && !empty($array))
         {
@@ -494,24 +506,24 @@ Class Controller_Menu extends Model
                 if ($bool)
                 {
                     $material = array(
-                        'id' => (int) $value,
+                        'id'     => (int) $value,
                         'status' => 1
                     );
                 }
                 else
                 {
                     $material = array(
-                        'id' => (int) $value,
+                        'id'     => (int) $value,
                         'status' => 0
                     );
                 }
                 $this->update($material, 'menu');
             }
         }
-        $data = $this->load_menu();
-        $count = $this->count_type_items($data);
+        $data     = $this->load_menu();
+        $count    = $this->count_type_items($data);
 
-        $title = "Менеджер меню";
+        $title     = "Менеджер меню";
         $menu_menu = TRUE;
 
 
@@ -520,8 +532,8 @@ Class Controller_Menu extends Model
 
     public function public_menu_item()
     {
-        $data = $_POST['data'];
-        $bool = $_POST['bool'];
+        $data  = $_POST['data'];
+        $bool  = $_POST['bool'];
         $array = explode(',', $data);
         if (is_array($array) && !empty($array))
         {
@@ -541,7 +553,7 @@ Class Controller_Menu extends Model
                 if ($bool)
                 {
                     $menu_item = array(
-                        'id' => (int) $value,
+                        'id'     => (int) $value,
                         'status' => 1
                     );
                     if (!empty($child))
@@ -549,7 +561,7 @@ Class Controller_Menu extends Model
                         foreach ($child as $child_value)
                         {
                             $data_child = array(
-                                'id' => $child_value['id'],
+                                'id'     => $child_value['id'],
                                 'status' => 1
                             );
                             $this->update($data_child, 'items_menu');
@@ -559,7 +571,7 @@ Class Controller_Menu extends Model
                 else
                 {
                     $menu_item = array(
-                        'id' => (int) $value,
+                        'id'     => (int) $value,
                         'status' => 0
                     );
 
@@ -569,7 +581,7 @@ Class Controller_Menu extends Model
                         foreach ($child as $child_value)
                         {
                             $data_child = array(
-                                'id' => $child_value['id'],
+                                'id'     => $child_value['id'],
                                 'status' => 0
                             );
                             $this->update($data_child, 'items_menu');
@@ -579,10 +591,10 @@ Class Controller_Menu extends Model
                 $this->update($menu_item, 'items_menu');
             }
         }
-        $data = $this->load_items($_POST['parent_id']);
+        $data       = $this->load_items($_POST['parent_id']);
 
 
-        $title = "Менеджер меню";
+        $title     = "Менеджер меню";
         $menu_menu = TRUE;
 
         $_GET['id'] = $_POST['parent_id'];
@@ -599,16 +611,16 @@ Class Controller_Menu extends Model
             foreach ($array as $value)
             {
                 $material = array(
-                    'id' => (int) $value,
+                    'id'    => (int) $value,
                     'trash' => 1
                 );
                 $this->update($material, 'menu');
             }
         }
-        $data = $this->load_menu();
-        $count = $this->count_type_items($data);
+        $data     = $this->load_menu();
+        $count    = $this->count_type_items($data);
 
-        $title = "Менеджер меню";
+        $title     = "Менеджер меню";
         $menu_menu = TRUE;
 
         require 'admin/content_menu.php';
@@ -641,7 +653,7 @@ Class Controller_Menu extends Model
                     foreach ($child as $child_value)
                     {
                         $data_child = array(
-                            'id' => $child_value['id'],
+                            'id'    => $child_value['id'],
                             'trash' => 1
                         );
                         $this->update($data_child, 'items_menu');
@@ -649,16 +661,16 @@ Class Controller_Menu extends Model
                 }
 
                 $material = array(
-                    'id' => (int) $value,
+                    'id'    => (int) $value,
                     'trash' => 1
                 );
                 $this->update($material, 'items_menu');
             }
         }
-        $data = $this->load_items($_POST['parent_id']);
+        $data     = $this->load_items($_POST['parent_id']);
 
 
-        $title = "Менеджер меню";
+        $title     = "Менеджер меню";
         $menu_menu = TRUE;
 
         $_GET['id'] = $_POST['parent_id'];
@@ -669,7 +681,7 @@ Class Controller_Menu extends Model
     {
         $result = $this->load_collection('menu');
 
-        //var_dump($result);die();
+//var_dump($result);die();
         if (!empty($result) && is_array($result))
         {
             if (isset($result[0]) && is_array($result[0]))
@@ -679,20 +691,20 @@ Class Controller_Menu extends Model
                     ($value['status'] == 0) ? $status = "Не опубликовано" : $status = "Опубликовано";
 
                     $data[] = array(
-                        'id' => $value['id'],
-                        'title' => $value['title'],
+                        'id'     => $value['id'],
+                        'title'  => $value['title'],
                         'status' => $status
                     );
                 }
             }
             elseif (!empty($result) && is_array($result))
             {
-                //var_dump($result);die();
+//var_dump($result);die();
                 ($result['status'] == 0) ? $status = "Не опубликовано" : $status = "Опубликовано";
 
                 $data = array(
-                    'id' => $result['id'],
-                    'title' => $result['title'],
+                    'id'     => $result['id'],
+                    'title'  => $result['title'],
                     'status' => $status
                 );
             }
@@ -713,16 +725,16 @@ Class Controller_Menu extends Model
         $id = $_POST['id'];
 
         /**
-         * ищем элементы, у которых for_index = 1 и устанавливаем значение == 0 
+         * ищем элементы, у которых for_index = 1 и устанавливаем значение == 0
          */
-        $where = array(
+        $where  = array(
             'for_index' => 1
         );
         $result = $this->select($where, 'items_menu');
         if (!empty($result))
         {
             $data = array(
-                'id' => $result['id'],
+                'id'        => $result['id'],
                 'for_index' => 0
             );
             $this->update($data, 'items_menu');
@@ -733,7 +745,7 @@ Class Controller_Menu extends Model
         if (empty($result) || $result['id'] != $id)
         {
             $menu_item = array(
-                'id' => $id,
+                'id'        => $id,
                 'for_index' => 1
             );
 
@@ -742,7 +754,7 @@ Class Controller_Menu extends Model
         $data = $this->load_items($_POST['parent_id']);
 
 
-        $title = "Менеджер меню";
+        $title     = "Менеджер меню";
         $menu_menu = TRUE;
 
         $_GET['id'] = $_POST['parent_id'];
@@ -758,9 +770,9 @@ Class Controller_Menu extends Model
             foreach ($data as $menu)
             {
 
-                $where = array(
+                $where  = array(
                     'menu_id' => $menu['id'],
-                    'status' => 1
+                    'status'  => 1
                 );
                 $public = $this->select($where, 'items_menu');
                 if (isset($public[0]) && is_array($public[0]))
@@ -776,9 +788,9 @@ Class Controller_Menu extends Model
                     $public = 0;
                 }
 
-                $where = array(
+                $where      = array(
                     'menu_id' => $menu['id'],
-                    'status' => 0
+                    'status'  => 0
                 );
                 $not_public = $this->select($where, 'items_menu');
                 if (isset($not_public[0]) && is_array($not_public[0]))
@@ -797,7 +809,7 @@ Class Controller_Menu extends Model
 
                 $where = array(
                     'menu_id' => $menu['id'],
-                    'trash' => 1
+                    'trash'   => 1
                 );
                 $trash = $this->select($where, 'items_menu');
                 if (isset($trash[0]) && is_array($trash[0]))
@@ -814,17 +826,17 @@ Class Controller_Menu extends Model
                 }
 
                 $count[$menu['id']] = array(
-                    'public' => $public,
+                    'public'     => $public,
                     'not_public' => $not_public,
-                    'trash' => $trash
+                    'trash'      => $trash
                 );
             }
         }
         else
         {
-            $where = array(
+            $where  = array(
                 'menu_id' => $data['id'],
-                'status' => 1
+                'status'  => 1
             );
             $public = $this->select($where, 'items_menu');
             if (isset($public[0]) && is_array($public[0]))
@@ -840,9 +852,9 @@ Class Controller_Menu extends Model
                 $public = 0;
             }
 
-            $where = array(
+            $where      = array(
                 'menu_id' => $data['id'],
-                'status' => 0
+                'status'  => 0
             );
             $not_public = $this->select($where, 'items_menu');
             if (isset($not_public[0]) && is_array($not_public[0]))
@@ -861,7 +873,7 @@ Class Controller_Menu extends Model
 
             $where = array(
                 'menu_id' => $data['id'],
-                'trash' => 1
+                'trash'   => 1
             );
             $trash = $this->select($where, 'items_menu');
             if (isset($trash[0]) && is_array($trash[0]))
@@ -880,9 +892,9 @@ Class Controller_Menu extends Model
 
 
             $count[$data['id']] = array(
-                'public' => $public,
+                'public'     => $public,
                 'not_public' => $not_public,
-                'trash' => $trash
+                'trash'      => $trash
             );
         }
 
@@ -890,5 +902,4 @@ Class Controller_Menu extends Model
     }
 
 }
-
 ?>

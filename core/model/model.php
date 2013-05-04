@@ -382,9 +382,13 @@ abstract class Model// extends Db
         throw new Exception("Invalid method " . get_class($this) . "::" . $method . "(" . print_r($args, 1) . ")");
     }
 
-    public function getTable()
+    public function cleanQuery()
     {
-        
+        $this->_data = array();
+        $this->_filterField = '';
+        $this->_filterQuery = '';
+        $this->_join        = '';
+        $this->_orderBy     = '';
     }
 
 }

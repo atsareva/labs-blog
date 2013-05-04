@@ -55,6 +55,8 @@ class Model_Menu_Items extends Model
             foreach ($mainNav as $item)
                 if ($item->show_title == 1)
                     $this->_menuName[$item->id] = $item->title;
+                else
+                    $this->_menuName[$item->id] = FALSE;
         }
         return $this->_menuName;
     }
@@ -70,11 +72,12 @@ class Model_Menu_Items extends Model
         if ($id)
             $this->addFieldToFilter('menu_id', array('=' => (int) $id));
 
-        $this->addFieldToFilter('status', array('=' => 1));
-        $this->addFieldToFilter('trash', array('=' => 0));
-
-        $this->orderBy('order_of');
-        $result = $this->getCollection()->getData();
+        $this->_setAccessFilter();
+        $result = $this->addFieldToFilter('status', array('=' => 1))
+                        ->addFieldToFilter('trash', array('=' => 0))
+                        ->orderBy('order_of')
+                        ->getCollection()->getData();
+        $this->cleanQuery();
         if (count($result) == 0)
             return FALSE;
 
@@ -94,7 +97,7 @@ class Model_Menu_Items extends Model
     {
         foreach ($menuItems as $item)
         {
-            if ($parentId == $item->parent_id)
+            if (isset($item->parent_id) && $parentId == $item->parent_id)
             {
                 $access = Core::getModel('access')->load($item->access_id);
 
@@ -116,39 +119,43 @@ class Model_Menu_Items extends Model
      */
     private function _setAccessFilter()
     {
-        $this->addFieldToFilter('access_id', array('=' => 1));
-        $session = Core::getSession();
-        if ($session->hasUser())
-        {
-            $accessId = $session->getData('user', 'access_id');
-            switch ($accessId)
-            {
-                case 2:
-                    $this->addFieldToFilter('access_id', array(
-                        array('=' => 1),
-                        array('=' => 2)
-                    ));
-                    break;
-                case 3:
-                    $this->addFieldToFilter('access_id', array(
-                        array('=' => 1),
-                        array('=' => 2),
-                        array('=' => 3)
-                    ));
-                    break;
-                case 4:
-                    $this->addFieldToFilter('access_id', array(
-                        array('=' => 1),
-                        array('=' => 2),
-                        array('=' => 3),
-                        array('=' => 4)
-                    ));
-                    break;
+        $user     = Core::getHelper('user')->getUserInfo();
+        $accessId = 1;
 
-                default:
-                    break;
+        if ($user && $user->getAccessId())
+            $accessId = $user->getAccessId();
+
+        $this->addFieldToFilter('access_id', array('<=' => $accessId));
+    }
+
+    public function countTypeItems($menus)
+    {
+        foreach ($menus as $menu)
+        {
+            if (isset($menu->id))
+            {
+                $menu->public = 0;
+                $menu->material_trash  = 0;
+
+                $this->_setAccessFilter();
+                $items = $this->addFieldToFilter('menu_id', array('=' => $menu->id))
+                        ->getCollection()
+                        ->getData();
+                foreach ($items as $item)
+                {
+                    if (isset($item->id))
+                    {
+                        if ($item->status == 1)
+                            $menu->public++;
+                        if ($item->trash == 1)
+                            $menu->material_trash++;
+                    }
+                }
+                $menu->not_public = (count($items) - $menu->public);
+                $this->cleanQuery();
             }
         }
+        return $menus;
     }
 
 }

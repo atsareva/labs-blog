@@ -2,6 +2,9 @@
 <?php $menuItems      = $menuItemsModel->getMainNavItems() ?>
 
 <?php foreach ($menuItemsModel->getMenus() as $menuId => $menuName): ?>
+    <?php if ($menuName): ?>
+        <h5><?php echo $menuName ?></h5>
+    <?php endif; ?>
     <ul class="nav nav-list bs-docs-sidenav affix-top">
         <?php foreach ($menuItems[$menuId] as $key => $value): ?>
             <li>
