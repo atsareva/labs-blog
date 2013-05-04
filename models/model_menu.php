@@ -27,6 +27,7 @@ class Model_Menu extends Model
         return $this->addFieldToFilter('trash', array('=' => 0))
                         ->addFieldToFilter('status', array('=' => 1))
                         ->addFieldToFilter('access_id', array('<=' => $accessId))
+                        ->orderBy('position')
                         ->getCollection()->getData();
     }
 

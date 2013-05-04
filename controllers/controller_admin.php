@@ -31,34 +31,6 @@ class Controller_Admin extends Controller_A
 
     public function menu($id)
     {
-//        $obj = new Controller_Menu();
-//
-//
-//
-//        $title     = "Менеджер меню";
-//        $menu_menu = TRUE;
-//
-//        $query      = "SELECT id, title FROM menu WHERE trash!=1";
-//        $admin_menu = $this->sql($query);
-//
-//        require 'head.php';
-//        require 'admin/menu.php';
-//
-//        if (isset($_GET['id']) && $_GET['id'] > 0)
-//        {
-//            $data = $obj->load_items($_GET['id']);
-//            require 'admin/menu_item.php';
-//        }
-//        else
-//        {
-//            $data  = $obj->load_menu();
-//            $count = $obj->count_type_items($data);
-//            require 'admin/content_menu.php';
-//        }
-//        unset($obj);
-//
-//        require 'footer.php';
-
         $user = Core::getHelper('user')->getUserInfo();
 
         if (isset($id[0]))
