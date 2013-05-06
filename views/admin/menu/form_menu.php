@@ -7,8 +7,8 @@
         }
         else {
             var err = $("#form_menu").children().find('label.error')
-            $.each(err, function(i, olo) {
-                $('input[name=' + olo.htmlFor + ']').parent().addClass('control-group error');
+            $.each(err, function(i, element) {
+                $('input[name=' + element.htmlFor + ']').parent().addClass('control-group error');
             })
         }
     }
@@ -31,8 +31,22 @@
                 title: {
                     required: true
                 },
-                alias: {
+                show_title: {
                     required: true
+                },
+                position:{
+                    number: true
+                }
+            },
+             messages: {
+                title: {
+                    required: "Это обязательное поле!"
+                },
+                show_title: {
+                    required: "Это обязательное поле!"
+                },
+                position:{
+                    number: "Пожалуйста, введите правильное число!"
                 }
             },
             success: function(label) {
@@ -73,31 +87,25 @@
                 <div class="fieldset">
                     <div>
                         <p>Заголовок <span class="star">*</span></p>
-                        <input name="title" type="text" value="<?php if (isset($menu)):?><?php $menu->getTitle()?><?php endif ?>"/>
+                        <input name="title" type="text" value="<?php if (isset($menu)):?><?php echo $menu->getTitle()?><?php endif ?>"/>
                     </div>
                     <div>
                         <p>Показывать заголовок <span class="star">*</span></p>
                         <span style="margin-right: 50px;">
                             <input type="radio" <?php if (isset($menu) && $menu->getShowTitle() == 0): ?>checked="checked"<?php endif ?> name="show_title" value="0"/>Нет
                         </span>
-                        <input type="radio" <?php if (isset($menu) && $menu->getShowTitle() == 1): ?>checked="checked"<?php endif ?> name="show_title" value="1"/>Да
+                        <input type="radio" <?php if ((isset($menu) && $menu->getShowTitle() == 1) || !isset($menu)): ?>checked="checked"<?php endif ?> name="show_title" value="1"/>Да
                     </div>
                     <div>
                         <p>Состояние</p>
                         <select name="status">
-                            <option value="0" <?php
-                            if (isset($result['status']) && $result['status'] == 0)
-                                echo 'selected="selected"';
-                            ?>>Не опубликовано</option>
-                            <option value="1" <?php
-                            if (isset($result['status']) && $result['status'] == 1)
-                                echo 'selected="selected"';
-                            ?>>Опубликовано</option>
+                            <option value="0" <?php if (isset($menu) && $menu->getStatus() == 0): ?>selected="selected"<?php endif ?>>Не опубликовано</option>
+                            <option value="1" <?php if (isset($menu) && $menu->getStatus() == 0): ?>selected="selected"<?php endif ?>>Опубликовано</option>
                         </select>
                     </div>
                     <div>
                         <p>Позиция</p>
-                        <input name="position" value="<?php if (isset($menu) && $menu->getPosition()):?><?php $menu->getPosition()?><?php endif ?>"/>
+                        <input name="position" value="<?php if (isset($menu) && $menu->getPosition()):?><?php echo $menu->getPosition()?><?php endif ?>"/>
                     </div>
                     <div>
                         <p>Доступ</p>

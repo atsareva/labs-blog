@@ -12,101 +12,23 @@ class Controller_Menu extends Controller_A
 
     public function create()
     {
-//        if (isset($_POST) && !empty($_POST))
-//        {
-//            $data = array(
-//                'title'      => $_POST['title'],
-//                'show_title' => $_POST['show_title'],
-//                'position'   => $_POST['position'],
-//                'status'     => $_POST['status'],
-//                'access_id'  => $_POST['access']
-//            );
-//
-//            if (isset($_POST['id_menu']) && (int) $_POST['id_menu'] == 0)
-//            {
-//                $id_menu = $this->insert($data, 'menu');
-//                $where   = array(
-//                    'id' => $id_menu
-//                );
-//            }
-//            else
-//            {
-//                $data['id'] = (int) $_POST['id_menu'];
-//                $data       = array_reverse($data);
-//                $result     = $this->update($data, 'menu');
-//                if ($result)
-//                {
-//                    $where = array(
-//                        'id' => (int) $_POST['id_menu']
-//                    );
-//                }
-//            }
-//
-//            $result = $this->select($where, 'menu');
-//
-//            $where = array(
-//                'id' => $result['access_id']
-//            );
-//
-//            $user = $this->select($where, 'access');
-//
-//            if (isset($_POST['save_exit']) && $_POST['save_exit'] == 1)
-//            {
-//                header('Location: http://' . $this->BASE_URL . '/admin/menu');
-//            }
-//            else
-//            {
-//                $query  = "SELECT * FROM access";
-//                $access = $this->sql($query);
-//
-//                if (isset($_POST['edit_menu']) && $_POST['edit_menu'] != 0)
-//                {
-//                    $edit  = TRUE;
-//                    $title = "Редактировать меню";
-//                }
-//                else
-//                {
-//                    $title     = "Создать меню";
-//                }
-//                $menu_menu = TRUE;
-//
-//                $query      = "SELECT id, title FROM menu WHERE trash!=1";
-//                $admin_menu = $this->sql($query);
-//
-//                require 'head.php';
-//                require 'admin/menu.php';
-//                require_once 'admin/menu/create.php';
-//                require 'footer.php';
-//            }
-//        }
-//        else
-//        {
-//            $query  = "SELECT * FROM access";
-//            $access = $this->sql($query);
-//            require_once 'admin/menu/create.php';
-//        }
-
-         /**
+        /**
          * @todo Validation
          */
         if (isset($_POST) && !empty($_POST))
         {
-            $data = array(
-                'user_name'     => $_POST['user_name'],
-                'pass'          => md5($_POST['pass']),
-                'email'         => $_POST['email'],
-                'register_date' => time(),
-                'status_id'     => $_POST['status_id'],
-                'access_id'     => $_POST['access_id']
-            );
+            $data = $_POST;
+            unset($data['save_exit']);
 
-            $user = Core::getModel('menu')->setData($data)->save();
+            $menu = Core::getModel('menu')->setData($data)->save();
 
             $saveExit = $_POST['save_exit'];
             unset($_POST);
 
             if ($saveExit)
                 $this->redirect('admin/menu');
+            else
+                $this->redirect('menu/edit/' . $menu->getId());
         }
 
         $head    = 'Создать меню';
@@ -115,38 +37,52 @@ class Controller_Menu extends Controller_A
         $statuses = Core::getModel('user_status')->getCollection()->getData();
         $access   = Core::getModel('access')->getAccess();
 
-        $this->_view->setTitle('Создать пользователя')
+        $this->_view->setTitle('Создать меню')
                 ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuMenu' => true))
                 ->setChild('content', 'admin/menu/form_menu', array('head'     => $head, 'menuUrl'  => $menuUrl, 'statuses' => $statuses, 'access'   => $access));
-
     }
 
-    public function edit()
+    public function edit($id)
     {
-        if (isset($_POST) && !empty($_POST))
+        /**
+         * @todo Validation
+         */
+        if (isset($id[0]))
         {
-            if (isset($_POST['id_edit']))
+            $menu = Core::getModel('menu')->load((int) $id[0]);
+            if ($menu->getId())
             {
-                $where  = array(
-                    'id' => $_POST['id_edit']
-                );
-                $result = $this->select($where, 'menu');
+                if (isset($_POST) && !empty($_POST))
+                {
+                    $data = $_POST;
+                    unset($data['save_exit']);
 
-                $query  = "SELECT * FROM access";
-                $access = $this->sql($query);
+                    $menu->setData($data)->save();
+
+                    $saveExit = $_POST['save_exit'];
+                    unset($_POST);
+
+                    if ($saveExit)
+                        $this->redirect('admin/menu');
+                    else
+                        $this->redirect('menu/edit/' . $menu->getId());
+                }
+
+                $head    = 'Редактировать меню';
+                $menuUrl = Core::getBaseUrl() . 'menu/edit/' . $menu->getId();
+
+                $statuses = Core::getModel('user_status')->getCollection()->getData();
+                $access   = Core::getModel('access')->getAccess();
+
+                $this->_view->setTitle('Редактировать меню')
+                        ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuMenu' => true))
+                        ->setChild('content', 'admin/menu/form_menu', array('head'     => $head, 'menu'     => $menu, 'menuUrl'  => $menuUrl, 'statuses' => $statuses, 'access'   => $access));
             }
             else
-            {
-
-            }
-            $edit  = TRUE;
-            $title = "Редактировать меню";
-            require_once 'admin/menu/create.php';
+                $this->redirect('admin/menu');
         }
         else
-        {
-            header('Location: http://' . $this->BASE_URL . '/admin/menu');
-        }
+            $this->redirect('admin/menu');
     }
 
     public function remove()
@@ -936,4 +872,5 @@ class Controller_Menu extends Controller_A
     }
 
 }
+
 ?>

@@ -34,6 +34,8 @@ class Controller_Users extends Controller_A
 
             if ($saveExit)
                 $this->redirect('admin/users');
+            else
+                $this->redirect('users/edit/' . $user->getId());
         }
 
         $head    = 'Создать пользователя';
