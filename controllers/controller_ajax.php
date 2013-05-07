@@ -51,6 +51,29 @@ class Controller_Ajax
             echo json_encode(array('id' => false));
     }
 
+    /**
+     * Block User by id
+     */
+    public function forIndex()
+    {
+        $id = $_POST['id'];
+
+        $menuItem = Core::getModel('menu_items')->load((int) $id);
+
+        if ($menuItem->getId())
+        {
+            if ($menuItem->getForIndex() == 0)
+                $menuItem->setForIndex(1);
+            else
+                $menuItem->setForIndex(0);
+            $menuItem->save();
+
+            echo json_encode(array('id'    => $menuItem->getId(), 'for_index' => $menuItem->getForIndex()));
+        }
+        else
+            echo json_encode(array('id' => false));
+    }
+
     public function load_users()
     {
         $query  = "SELECT * FROM users";

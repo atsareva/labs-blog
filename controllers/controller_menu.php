@@ -89,7 +89,7 @@ class Controller_Menu extends Controller_A
     {
         $ids = explode(',', trim($_POST['ids'], ','));
         foreach ($ids as $id)
-            Core::getModel('menu')->load($id)->unsetData()->save();
+            Core::getModel('menu')->load((int) $id)->unsetData()->save();
     }
 
     public function publicMenu()
@@ -98,7 +98,23 @@ class Controller_Menu extends Controller_A
         $bool = $_POST['bool'];
 
         foreach ($ids as $id)
-            Core::getModel('menu')->load($id)->setData('status', $bool)->save();
+            Core::getModel('menu')->load((int) $id)->setData('status', $bool)->save();
+    }
+
+    public function publicMenuItem()
+    {
+        $ids  = explode(',', trim($_POST['ids'], ','));
+        $bool = $_POST['bool'];
+
+        foreach ($ids as $id)
+            Core::getModel('menu_items')->load((int) $id)->setData('status', $bool)->save();
+    }
+
+    public function removeItem()
+    {
+        $ids = explode(',', trim($_POST['ids'], ','));
+        foreach ($ids as $id)
+            Core::getModel('menu_items')->load((int) $id)->unsetData()->save();
     }
 
     public function create_item()

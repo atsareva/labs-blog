@@ -20,68 +20,31 @@
     // --------------------------------------------------------------------
     function public_menu_item(bool)
     {
-        if ($("input[name^=menu_item_]:checked").length == 0)
+        if ($("input[name^=menu_item]:checked").length == 0)
         {
             $("#dialog-menu_item").find('label').append('<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Вы не выбрали материал для публикации.</p></div>');
             dialog_menu_item();
         }
         else
         {
-            var data = $("input[name^=menu_item_]:checked");
-            var mas = new Array;
-            $.each(data, function(i, value) {
-                mas[i] = value.defaultValue;
-            });
-            $.ajax({
-                type: "POST",
-                dataType: 'html',
-                url: "/menu/public_menu_item",
-                data: 'data=' + mas + '&bool=' + bool + '&parent_id=<?php echo $_GET['id']; ?>',
-                success: function(data) {
-                    if (data)
-                    {
-                        $('#load_for_ajax').html(data);
-                    }
-                }
-            });
+            if (bool)
+                var status = 'Опубликовано';
+            else
+                var status = 'Неопубликовано';
+            var ids = '';
+                $.each($("input[name^=menu_item]:checked"), function(i, element) {
+                    ids += $(element).val() + ',';
+                    $('#menu_item_' + $(element).val() + ' td.status').html(status);
+                })
+            $.post("<?php echo Core::getBaseUrl() ?>menu/publicMenuItem", {'ids': ids, 'bool': bool});
         }
     }
     // --------------------------------------------------------------------
     $(function() {
-        $('#create').click(function() {
-            $.ajax({
-                type: "GET",
-                dataType: 'html',
-                url: "/menu/create_item",
-                data: 'id=<?php echo $_GET['id']; ?>',
-                success: function(data) {
-                    if (data)
-                    {
-                        $('#admin-content').html(data);
-                    }
-                }
-            });
-        });
-    });
-    // --------------------------------------------------------------------
-    $(function() {
         $('#edit').click(function() {
-            if ($("input[name^=menu_item_]:checked").length == 1)
-            {
-                $.ajax({
-                    type: "POST",
-                    dataType: 'html',
-                    url: "/menu/edit_item_menu",
-                    data: 'id_edit=' + $("input[name^=menu_item_]:checked")[0].defaultValue + '&parent_id=<?php echo $_GET['id']; ?>',
-                    success: function(data) {
-                        if (data)
-                        {
-                            $('#admin-content').html(data);
-                        }
-                    }
-                });
-            }
-            else if ($("input[name^=menu_item_]:checked").length > 1)
+            if ($("input[name^=menu_item]:checked").length == 1)
+                window.location = "<?php echo Core::getBaseUrl() ?>menu/editItem/" + $("input[name^=menu_item]:checked").val();
+            else if ($("input[name^=menu_item]:checked").length > 1)
             {
                 $("#dialog-menu_item").find('label').append('<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Вы выбрали больше одного материала для редактирования!</p></div>');
                 dialog_menu_item();
@@ -96,30 +59,19 @@
     // --------------------------------------------------------------------
     $(function() {
         $('#trash_menu_item').click(function() {
-            if ($("input[name^=menu_item_]:checked").length == 0)
+           if ($("input[name^=menu_item]:checked").length == 0)
             {
                 $("#dialog-menu_item").find('label').append('<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Вы не выбрали материал.</p></div>');
                 dialog_menu_item();
             }
             else
             {
-                var data = $("input[name^=menu_item_]:checked");
-                var mas = new Array;
-                $.each(data, function(i, value) {
-                    mas[i] = value.defaultValue;
-                });
-                $.ajax({
-                    type: "POST",
-                    dataType: 'html',
-                    url: "/menu/trash_menu_item",
-                    data: 'data=' + mas + '&parent_id=<?php echo $_GET['id']; ?>',
-                    success: function(data) {
-                        if (data)
-                        {
-                            $('#load_for_ajax').html(data);
-                        }
-                    }
-                });
+                var ids = '';
+                $.each($("input[name^=menu_item]:checked"), function(i, element) {
+                    ids += $(element).val() + ',';
+                    $('#menu_item_' + $(element).val()).hide();
+                })
+                $.post("<?php echo Core::getBaseUrl() ?>menu/removeItem", {'ids': ids});
             }
         });
     });
@@ -128,20 +80,25 @@
     {
         $.ajax({
             type: "POST",
-            dataType: 'html',
-            url: "/menu/for_index",
-            data: 'id=' + id + '&parent_id=<?php echo $_GET['id']; ?>',
-            success: function(data) {
-                if (data)
+            dataType: 'json',
+            url: "<?php echo Core::getBaseUrl() ?>ajax/forIndex",
+            data: 'id=' + id,
+            success: function(response) {
+                if (response.id)
                 {
-                    $('#load_for_ajax').html(data);
+                    var html = '<a href="" onclick="for_index(' + id + ');return false;">';
+                    if (response.for_index == 0)
+                        html += '<i class="icon-star-empty"></i>';
+                    else
+                        html += '<i class="icon-star"></i>';
+                    html += '</a>';
+                    $('#menu_item_' + response.id + ' td.for_index').html(html);
                 }
             }
         });
     }
-    ;
     // --------------------------------------------------------------------
-<?php if (!empty($data)): ?>
+<?php if (count($menuItems) > 0): ?>
         $(function() {
             $("#all_menu_item").tablesorter()
              .tablesorterPager({container: $("#pager")});
@@ -209,7 +166,7 @@
                             <?php for ($i = 0; $i < $menu['dash'] - 1; $i++): ?>
                                 <?php $dash.= '|----  '; ?>
                             <?php endfor; ?>
-                            <tr>
+                            <tr id="menu_item_<?php echo $key?>">
                                 <td>
                                     <input type="checkbox" name="menu_item_<?php echo $key; ?>" value="<?php echo $key; ?>" />
                                 </td>
@@ -217,15 +174,14 @@
                                     <span class="menu-dash"><?php echo $dash; ?></span>
                                     <?php echo $menu['title']; ?>
                                 </td>
-                                <td>
+                                <td class="status">
                                     <?php if ($menu['status'] == 0): ?>Не опубликовано<?php else: ?>Опубликовано<?php endif; ?>
                                 </td>
                                 <td>
                                     <?php echo $menu['access']; ?>
                                 </td>
-                                <td>
-                                    <a href="" class="for_index" onclick="for_index(<?php echo $key; ?>);
-                return false;">
+                                <td class="for_index">
+                                    <a href="" onclick="for_index(<?php echo $key; ?>);return false;">
                                         <?php if ($menu['for_index'] == 0): ?><i class="icon-star-empty"></i><?php else: ?><i class="icon-star"></i><?php endif; ?>
                                     </a>
                                 </td>

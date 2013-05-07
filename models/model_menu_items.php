@@ -72,14 +72,16 @@ class Model_Menu_Items extends Model
      * @param int $id
      * @return boolean|array
      */
-    public function loadMenuItems($id = NULL)
+    public function loadMenuItems($id = NULL, $status = 1)
     {
         if ($id)
             $this->addFieldToFilter('menu_id', array('=' => (int) $id));
 
         $this->_setAccessFilter();
-        $result = $this->addFieldToFilter('status', array('=' => 1))
-                        ->addFieldToFilter('trash', array('=' => 0))
+        if ($status)
+            $this->addFieldToFilter('status', array('=' => $status));
+
+        $result = $this->addFieldToFilter('trash', array('=' => 0))
                         ->orderBy('order_of')
                         ->getCollection()->getData();
         $this->cleanQuery();
