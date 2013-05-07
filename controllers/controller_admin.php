@@ -34,15 +34,17 @@ class Controller_Admin extends Controller_A
         $user = Core::getHelper('user')->getUserInfo();
 
         if (isset($id[0]))
-            $view = 'admin/menu/menu_item';
+        {
+            $menuItems = Core::getModel('menu_items')->cleanQuery()->loadMenuItems((int) $id[0]);
+            $this->_view->setChild('content', 'admin/menu/menu_item', array('menuItems' => $menuItems));
+        }
         else
         {
             $menu = Core::getModel('menu_items')->countTypeItems(Core::getModel('menu')->loadMenu($user->getAccessId()));
-            $view = 'admin/menu/content_menu';
+            $this->_view->setChild('content', 'admin/menu/content_menu', array('menu' => $menu));
         }
         $this->_view->setTitle('Менеджер меню')
-                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('$menuMenu' => true))
-                ->setChild('content', $view, array('menu' => $menu));
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuMenu' => true));
     }
 
     public function content()

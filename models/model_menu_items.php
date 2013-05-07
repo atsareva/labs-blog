@@ -38,7 +38,7 @@ class Model_Menu_Items extends Model
     public function getMainNavItems()
     {
         foreach ($this->_menuName as $key => $value)
-            $this->_menuItems[$key] = $this->_loadMenuItems($key);
+            $this->_menuItems[$key] = $this->loadMenuItems($key);
         return $this->_menuItems;
     }
 
@@ -72,7 +72,7 @@ class Model_Menu_Items extends Model
      * @param int $id
      * @return boolean|array
      */
-    private function _loadMenuItems($id = NULL)
+    public function loadMenuItems($id = NULL)
     {
         if ($id)
             $this->addFieldToFilter('menu_id', array('=' => (int) $id));
@@ -107,11 +107,12 @@ class Model_Menu_Items extends Model
                 $access = Core::getModel('access')->load($item->access_id);
 
                 $menuTree[$item->id] = array(
-                    'title'  => $item->title,
-                    'path'   => $item->path,
-                    'status' => $item->status,
-                    'access' => $access->getDescription(),
-                    'dash'   => $item->dash
+                    'title'     => $item->title,
+                    'path'      => $item->path,
+                    'status'    => $item->status,
+                    'access'    => $access->getDescription(),
+                    'dash'      => $item->dash,
+                    'for_index' => $item->for_index
                 );
                 $menuTree            = $this->_menuTree($menuItems, $menuTree, $item->id);
             }

@@ -40,7 +40,7 @@
                             <hr/>
                             <?php foreach ($adminMenu as $menu): ?>
                                 <li>
-                                    <a href="<?php echo Core::getBaseUrl() ?>admin/menu/id/<?php echo $menu->id; ?>">
+                                    <a href="<?php echo Core::getBaseUrl() ?>admin/menu/<?php echo $menu->id; ?>">
                                         <i class="icon-align-justify"></i>
                                         <?php echo $menu->title; ?>
                                     </a>

@@ -384,11 +384,13 @@ abstract class Model// extends Db
 
     public function cleanQuery()
     {
-        $this->_data = array();
+        $this->_data        = array();
         $this->_filterField = '';
         $this->_filterQuery = '';
         $this->_join        = '';
         $this->_orderBy     = '';
+
+        return $this;
     }
 
 }

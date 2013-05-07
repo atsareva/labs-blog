@@ -103,13 +103,7 @@ table .install-database-info{
     margin-top: 8px;
     margin-left: -2px;
 }
-
-
-.menu-dash{
-    color: #DDD;
-    font-weight: bold;
-    margin-right: 5px;
-}*/
+*/
 
 body{background: #F0F0F0;padding-top: 70px;}
 .footer{margin-left: auto;margin-right: auto;background: #FFF;*border-collapse: separate;-webkit-border-radius: 0 0 13px 13px;-moz-border-radius: 0 0 13px 13px;border-radius: 0 0 13px 13px;}
@@ -164,5 +158,7 @@ table.tablesorter thead tr .headerSortDown {background-image: url(../img/desc.gi
 
 .pagedisplay, .pagesize{margin-top: 10px;}
 #pager .btn{padding: 2px;}
+
+.menu-dash{color: #DDD;font-weight: bold;margin-right: 5px;}
 
 .border{border-right: 2px solid #C6C9C9; margin: 0 10px 0 5px;}
