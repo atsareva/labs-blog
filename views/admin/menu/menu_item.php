@@ -43,7 +43,7 @@
     $(function() {
         $('#edit').click(function() {
             if ($("input[name^=menu_item]:checked").length == 1)
-                window.location = "<?php echo Core::getBaseUrl() ?>menu/editItem/" + $("input[name^=menu_item]:checked").val();
+                window.location = "<?php echo Core::getBaseUrl() ?>menu/editItem/<?php echo $menuId ?>/" + $("input[name^=menu_item]:checked").val();
             else if ($("input[name^=menu_item]:checked").length > 1)
             {
                 $("#dialog-menu_item").find('label').append('<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Вы выбрали больше одного материала для редактирования!</p></div>');
@@ -120,7 +120,7 @@
             Менеджер пунктов меню
         </div>
         <div class="span5 offset1">
-            <a rel="tooltip" title="Создать" id="create" class="btn btn-small btn-info" href="<?php echo Core::getBaseUrl() ?>menu/createItem">
+            <a rel="tooltip" title="Создать" id="create" class="btn btn-small btn-info" href="<?php echo Core::getBaseUrl() ?>menu/createItem/<?php echo $menuId; ?>">
                 <i class="icon-plus icon-white"></i>
             </a>
             <a rel="tooltip" title=" Редактировать" id="edit" class="btn btn-small btn-info" href="" onclick="return false;">

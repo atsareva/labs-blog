@@ -52,7 +52,7 @@ class Controller_Ajax
     }
 
     /**
-     * Block User by id
+     * Set for Index by ID
      */
     public function forIndex()
     {
@@ -68,41 +68,43 @@ class Controller_Ajax
                 $menuItem->setForIndex(0);
             $menuItem->save();
 
-            echo json_encode(array('id'    => $menuItem->getId(), 'for_index' => $menuItem->getForIndex()));
+            echo json_encode(array('id'        => $menuItem->getId(), 'for_index' => $menuItem->getForIndex()));
         }
         else
             echo json_encode(array('id' => false));
     }
 
-    public function load_users()
+    /**
+     * Retrieve material for attachment to menu item
+     */
+    public function loadAttachment()
     {
-        $query  = "SELECT * FROM users";
-        $result = $this->sql($query);
+        $attach   = $_POST['attach'];
 
-        if (isset($result[0]) && is_array($result[0]))
+        if ($attach === 'material')
         {
-            foreach ($result as $key => $value)
-            {
-                $data[] = array(
-                    'id'        => $result[$key]['id'],
-                    'user_name' => $result[$key]['user_name'],
-                    'email'     => $result[$key]['email'],
-                    'photo'     => $result[$key]['photo']
-                );
-            }
+            $materials = Core::getModel('material')->getCollection()->getData();
+            if (count($materials) > 0)
+                foreach ($materials as $material)
+                    $data[]    = array(
+                        'id'    => $material->id,
+                        'alias' => $material->alias,
+                        'title' => $material->title
+                    );
         }
         else
         {
-            $data[] = array(
-                'id'        => $result['id'],
-                'user_name' => $result['user_name'],
-                'email'     => $result['email'],
-                'photo'     => $result['photo']
-            );
+            $categories = Core::getModel('category')->getCollection()->getData();
+            if (count($categories) > 0)
+                foreach ($categories as $category)
+                    $data[]     = array(
+                        'id'    => $category->id,
+                        'alias' => $category->alias,
+                        'title' => $category->title
+                    );
         }
-
-        $data = json_encode($data);
-        echo $data;
+        if (isset($data))
+            echo json_encode($data);
     }
 
     public function load_attach()
@@ -174,6 +176,37 @@ class Controller_Ajax
             $data = json_encode($result);
             echo $data;
         }
+    }
+
+    public function load_users()
+    {
+        $query  = "SELECT * FROM users";
+        $result = $this->sql($query);
+
+        if (isset($result[0]) && is_array($result[0]))
+        {
+            foreach ($result as $key => $value)
+            {
+                $data[] = array(
+                    'id'        => $result[$key]['id'],
+                    'user_name' => $result[$key]['user_name'],
+                    'email'     => $result[$key]['email'],
+                    'photo'     => $result[$key]['photo']
+                );
+            }
+        }
+        else
+        {
+            $data[] = array(
+                'id'        => $result['id'],
+                'user_name' => $result['user_name'],
+                'email'     => $result['email'],
+                'photo'     => $result['photo']
+            );
+        }
+
+        $data = json_encode($data);
+        echo $data;
     }
 
 }

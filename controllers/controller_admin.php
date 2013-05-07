@@ -36,7 +36,7 @@ class Controller_Admin extends Controller_A
         if (isset($id[0]))
         {
             $menuItems = Core::getModel('menu_items')->cleanQuery()->loadMenuItems((int) $id[0], NULL);
-            $this->_view->setChild('content', 'admin/menu/menu_item', array('menuItems' => $menuItems));
+            $this->_view->setChild('content', 'admin/menu/menu_item', array('menuItems' => $menuItems, 'menuId' => (int) $id[0]));
         }
         else
         {
