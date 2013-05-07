@@ -53,10 +53,15 @@ class Model_Menu_Items extends Model
         if (count($mainNav) > 0)
         {
             foreach ($mainNav as $item)
-                if ($item->show_title == 1)
-                    $this->_menuName[$item->id] = $item->title;
-                else
-                    $this->_menuName[$item->id] = FALSE;
+            {
+                if (isset($item->id))
+                {
+                    if ($item->show_title == 1)
+                        $this->_menuName[$item->id] = $item->title;
+                    else
+                        $this->_menuName[$item->id] = FALSE;
+                }
+            }
         }
         return $this->_menuName;
     }
@@ -134,8 +139,8 @@ class Model_Menu_Items extends Model
         {
             if (isset($menu->id))
             {
-                $menu->public = 0;
-                $menu->material_trash  = 0;
+                $menu->public         = 0;
+                $menu->material_trash = 0;
 
                 $this->_setAccessFilter();
                 $items = $this->addFieldToFilter('menu_id', array('=' => $menu->id))

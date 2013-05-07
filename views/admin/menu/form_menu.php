@@ -100,7 +100,7 @@
                         <p>Состояние</p>
                         <select name="status">
                             <option value="0" <?php if (isset($menu) && $menu->getStatus() == 0): ?>selected="selected"<?php endif ?>>Не опубликовано</option>
-                            <option value="1" <?php if (isset($menu) && $menu->getStatus() == 0): ?>selected="selected"<?php endif ?>>Опубликовано</option>
+                            <option value="1" <?php if (isset($menu) && $menu->getStatus() == 1): ?>selected="selected"<?php endif ?>>Опубликовано</option>
                         </select>
                     </div>
                     <div>
