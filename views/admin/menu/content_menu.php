@@ -116,7 +116,7 @@
                 <i class="icon-trash icon-white"></i>
             </a>
             <span class="border"></span>
-            <a rel="tooltip" title="Отмена" class="btn btn-small btn-info" href="/admin">
+            <a rel="tooltip" title="Отмена" class="btn btn-small btn-info" href="<?php echo Core::getBaseUrl() ?>admin">
                 <i class="icon-home icon-white"></i>
             </a>
         </div>
@@ -140,6 +140,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <?php if (count($menu) > 0): ?>
                     <?php foreach ($menu as $item): ?>
                         <tr id="menu_<?php echo $item->id?>">
                             <td><input type="checkbox" name="menu_<?php echo $item->id; ?>" value="<?php echo $item->id; ?>" /></td>
@@ -150,6 +151,7 @@
                             <td><?php echo $item->material_trash; ?></td>
                         </tr>
                     <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
             <?php if (count($menu) > 0): ?>

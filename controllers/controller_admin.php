@@ -36,7 +36,7 @@ class Controller_Admin extends Controller_A
         if (isset($id[0]))
         {
             $menuItems = Core::getModel('menu_items')->cleanQuery()->loadMenuItems((int) $id[0], NULL);
-            $this->_view->setChild('content', 'admin/menu/menu_item', array('menuItems' => $menuItems, 'menuId' => (int) $id[0]));
+            $this->_view->setChild('content', 'admin/menu/menu_item', array('menuItems' => $menuItems, 'menuId'    => (int) $id[0]));
         }
         else
         {
@@ -49,40 +49,39 @@ class Controller_Admin extends Controller_A
 
     public function content()
     {
-        $obj  = new Controller_Content();
-        $data = $obj->load_material();
-        unset($obj);
+        $user = Core::getHelper('user')->getUserInfo();
 
-        $title                 = "Менеджер материалов";
-        $menu_content          = TRUE;
-        $_SESSION['favourite'] = FALSE;
+        $head      = 'Менеджер материалов';
+        $materials = Core::getModel('material')
+                ->addFieldToFilter('materials.*')
+                ->addFieldToFilter('materials.trash', array('=' => 0))
+                ->join('categories', 'categories.id = materials.category_id', 'categories.title AS category_title', 'left')
+                ->join('users', 'users.id = materials.author_id', 'users.full_name AS author')
+                ->getCollection()
+                ->getData();
 
-        $query      = "SELECT id, title FROM menu WHERE trash!=1";
-        $admin_menu = $this->sql($query);
-
-        require 'head.php';
-        require 'admin/menu.php';
-        require 'admin/material.php';
-        require 'footer.php';
+        $this->_view->setTitle('Менеджер материалов')
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('$menuContent' => true))
+                ->setChild('content', 'admin/material/material', array('materials' => $materials, 'head'      => $head));
     }
 
     public function favourite()
     {
-        $obj  = new Controller_Favourite();
-        $data = $obj->load_material();
-        unset($obj);
+        $user = Core::getHelper('user')->getUserInfo();
 
-        $title                 = "Менеджер материалов";
-        $menu_favourite        = TRUE;
-        $_SESSION['favourite'] = TRUE;
+        $head      = 'Избранные материалы';
+        $materials = Core::getModel('material')
+                ->addFieldToFilter('materials.*')
+                ->addFieldToFilter('materials.trash', array('=' => 0))
+                ->addFieldToFilter('materials.favorite', array('=' => 1))
+                ->join('categories', 'categories.id = materials.category_id', 'categories.title AS category_title', 'left')
+                ->join('users', 'users.id = materials.author_id', 'users.full_name AS author')
+                ->getCollection()
+                ->getData();
 
-        $query      = "SELECT id, title FROM menu WHERE trash!=1";
-        $admin_menu = $this->sql($query);
-
-        require 'head.php';
-        require 'admin/menu.php';
-        require 'admin/material.php';
-        require 'footer.php';
+        $this->_view->setTitle('Менеджер материалов')
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('$menuContent' => true))
+                ->setChild('content', 'admin/material/material', array('materials' => $materials, 'head'      => $head));
     }
 
     public function category()

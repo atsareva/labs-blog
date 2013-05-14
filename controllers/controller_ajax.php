@@ -79,7 +79,7 @@ class Controller_Ajax
      */
     public function loadAttachment()
     {
-        $attach   = $_POST['attach'];
+        $attach = $_POST['attach'];
 
         if ($attach === 'material')
         {
@@ -105,6 +105,29 @@ class Controller_Ajax
         }
         if (isset($data))
             echo json_encode($data);
+    }
+
+    /**
+     * Favorite material by id
+     */
+    public function favoriteMaterial()
+    {
+        $id = $_POST['id'];
+
+        $material = Core::getModel('material')->addFieldToFilter(array('id', 'favorite'))->load((int) $id);
+
+        if ($material->getId())
+        {
+            if ($material->getFavorite() == 0)
+                $material->setFavorite(1);
+            else
+                $material->setFavorite(0);
+            $material->save();
+
+            echo json_encode(array('id'       => $material->getId(), 'favorite' => $material->getFavorite()));
+        }
+        else
+            echo json_encode(array('id' => false));
     }
 
     public function load_attach()

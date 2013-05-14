@@ -1,21 +1,32 @@
 <?php
 
-require_once 'model.php';
-require_once 'controller_favourite.php';
+require_once CORE_PATH . 'controller/controller_a' . EXT;
 
-class Controller_Content extends Model
+class Controller_Material extends Controller_A
 {
 
     public function __construct()
     {
         parent::__construct();
-        if (!isset($_SESSION['user']) || empty($_SESSION['user']))
-        {
-            header('Location: http://' . $this->BASE_URL . '/auth/login');
-        }
     }
 
-    public function index($id=NULL)
+    public function publicMaterial()
+    {
+        $ids  = explode(',', trim($_POST['ids'], ','));
+        $bool = $_POST['bool'];
+
+        foreach ($ids as $id)
+            Core::getModel('material')->addFieldToFilter(array('id', 'status'))->load((int) $id)->setData('status', $bool)->save();
+    }
+
+    public function remove()
+    {
+        $ids = explode(',', trim($_POST['ids'], ','));
+        foreach ($ids as $id)
+            Core::getModel('material')->addFieldToFilter(array('id', 'trash'))->load((int) $id)->setTrash(1)->save();
+    }
+
+    public function index($id = NULL)
     {
         var_dump($id);
         echo $id . 'page index';
@@ -30,14 +41,14 @@ class Controller_Content extends Model
     {
         if (isset($_POST) && !empty($_POST))
         {
-            $data = array(
-                'title' => $_POST['title'],
-                'alias' => $_POST['alias'],
+            $data              = array(
+                'title'       => $_POST['title'],
+                'alias'       => $_POST['alias'],
                 'category_id' => $_POST['category_id'],
-                'status' => $_POST['status'],
-                'favorite' => $_POST['favorite'],
-                'full_text' => $_POST['content'],
-                'intro_text' => $_POST['intro_text'],
+                'status'      => $_POST['status'],
+                'favorite'    => $_POST['favorite'],
+                'full_text'   => $_POST['content'],
+                'intro_text'  => $_POST['intro_text'],
             );
             (!empty($_POST['author_id'])) ? $data['author_id'] = $_POST['author_id'] : $data['author_id'] = $_SESSION['user']['id'];
 
@@ -56,19 +67,19 @@ class Controller_Content extends Model
             if (isset($_POST['id_material']) && (int) $_POST['id_material'] == 0)
             {
                 $id_material = $this->insert($data, 'materials');
-                $where = array(
+                $where       = array(
                     'id' => $id_material
                 );
             }
             else
             {
-                $data['modified'] = time();
+                $data['modified']    = time();
                 $data['modified_by'] = $_SESSION['user']['id'];
 
 
                 $data['id'] = (int) $_POST['id_material'];
 
-                $where = array(
+                $where      = array(
                     'id' => (int) $_POST['id_material']
                 );
                 $result_ver = $this->select($where, 'materials');
@@ -78,7 +89,7 @@ class Controller_Content extends Model
                     $data['version'] = $result_ver['version'] + 1;
                 }
 
-                $data = array_reverse($data);
+                $data   = array_reverse($data);
                 $result = $this->update($data, 'materials');
                 if ($result)
                 {
@@ -113,16 +124,16 @@ class Controller_Content extends Model
 
                 if (isset($_POST['edit_material']) && $_POST['edit_material'] != 0)
                 {
-                    $edit = TRUE;
+                    $edit  = TRUE;
                     $title = "Редактировать материал";
                 }
                 else
                 {
-                    $title = "Создать материал";
+                    $title        = "Создать материал";
                 }
                 $menu_content = TRUE;
 
-                $query = "SELECT id, title FROM menu WHERE trash!=1";
+                $query      = "SELECT id, title FROM menu WHERE trash!=1";
                 $admin_menu = $this->sql($query);
 
                 require 'head.php';
@@ -149,7 +160,7 @@ class Controller_Content extends Model
         {
             if (isset($_POST['id_edit']))
             {
-                $where = array(
+                $where  = array(
                     'id' => $_POST['id_edit']
                 );
                 $result = $this->select($where, 'materials');
@@ -158,11 +169,11 @@ class Controller_Content extends Model
                     'id' => $result['author_id']
                 );
 
-                $user = $this->select($where, 'users');
+                $user     = $this->select($where, 'users');
             }
             $category = $this->load_collection('categories');
 
-            $edit = TRUE;
+            $edit  = TRUE;
             $title = "Редактировать материал";
             require_once 'admin/material/create.php';
         }
@@ -181,8 +192,8 @@ class Controller_Content extends Model
 
     public function public_material()
     {
-        $data = $_POST['data'];
-        $bool = $_POST['bool'];
+        $data  = $_POST['data'];
+        $bool  = $_POST['bool'];
         $array = explode(',', $data);
         if (is_array($array) && !empty($array))
         {
@@ -191,14 +202,14 @@ class Controller_Content extends Model
                 if ($bool)
                 {
                     $material = array(
-                        'id' => (int) $value,
+                        'id'     => (int) $value,
                         'status' => 1
                     );
                 }
                 else
                 {
                     $material = array(
-                        'id' => (int) $value,
+                        'id'     => (int) $value,
                         'status' => 0
                     );
                 }
@@ -207,15 +218,15 @@ class Controller_Content extends Model
         }
         if (isset($_SESSION['favourite']) && $_SESSION['favourite'] == TRUE)
         {
-            $obj = new Controller_Favourite();
+            $obj  = new Controller_Favourite();
             $data = $obj->load_material();
             unset($obj);
         }
         else
         {
-            $data = $this->load_material();
+            $data          = $this->load_material();
         }
-        $title = "Менеджер материалов";
+        $title         = "Менеджер материалов";
         $menu_material = TRUE;
 
         require 'admin/material.php';
@@ -223,7 +234,7 @@ class Controller_Content extends Model
 
     public function favorite_material()
     {
-        $data = $_POST['data'];
+        $data  = $_POST['data'];
         $array = explode(',', $data);
         if (is_array($array) && !empty($array))
         {
@@ -231,7 +242,7 @@ class Controller_Content extends Model
             {
                 if (isset($_POST['radio']) && $_POST['radio'] == 1)
                 {
-                    $where = array(
+                    $where  = array(
                         'id' => $value
                     );
                     $result = $this->select($where, 'materials');
@@ -239,14 +250,14 @@ class Controller_Content extends Model
                     if ($result['favorite'])
                     {
                         $material = array(
-                            'id' => (int) $value,
+                            'id'       => (int) $value,
                             'favorite' => 0
                         );
                     }
                     else
                     {
                         $material = array(
-                            'id' => (int) $value,
+                            'id'       => (int) $value,
                             'favorite' => 1
                         );
                     }
@@ -254,7 +265,7 @@ class Controller_Content extends Model
                 else
                 {
                     $material = array(
-                        'id' => (int) $value,
+                        'id'       => (int) $value,
                         'favorite' => 1
                     );
                 }
@@ -263,7 +274,7 @@ class Controller_Content extends Model
         }
         if (isset($_SESSION['favourite']) && $_SESSION['favourite'] == TRUE)
         {
-            $obj = new Controller_Favourite();
+            $obj  = new Controller_Favourite();
             $data = $obj->load_material();
             unset($obj);
         }
@@ -272,7 +283,7 @@ class Controller_Content extends Model
             $data = $this->load_material();
         }
 
-        $title = "Менеджер материалов";
+        $title         = "Менеджер материалов";
         $menu_material = TRUE;
 
         require 'admin/material.php';
@@ -288,7 +299,7 @@ class Controller_Content extends Model
             foreach ($array as $value)
             {
                 $material = array(
-                    'id' => (int) $value,
+                    'id'    => (int) $value,
                     'trash' => 1
                 );
                 $this->update($material, 'materials');
@@ -296,7 +307,7 @@ class Controller_Content extends Model
         }
         if (isset($_SESSION['favourite']) && $_SESSION['favourite'] == TRUE)
         {
-            $obj = new Controller_Favourite();
+            $obj  = new Controller_Favourite();
             $data = $obj->load_material();
             unset($obj);
         }
@@ -305,7 +316,7 @@ class Controller_Content extends Model
             $data = $this->load_material();
         }
 
-        $title = "Менеджер материалов";
+        $title         = "Менеджер материалов";
         $menu_material = TRUE;
 
         require 'admin/material.php';
@@ -328,24 +339,24 @@ class Controller_Content extends Model
                     }
                     else
                     {
-                        $where = array(
+                        $where    = array(
                             'id' => $value['category_id']
                         );
                         $category = $this->select($where, 'categories');
                         $category = $category['title'];
                     }
 
-                    $sql = "SELECT user_name FROM users WHERE id='{$value['author_id']}'";
+                    $sql        = "SELECT user_name FROM users WHERE id='{$value['author_id']}'";
                     $result_sql = $this->sql($sql);
 
                     $data[] = array(
-                        'id' => $value['id'],
-                        'title' => $value['title'],
-                        'status' => $status,
+                        'id'       => $value['id'],
+                        'title'    => $value['title'],
+                        'status'   => $status,
                         'favorite' => $value['favorite'],
                         'category' => $category,
-                        'author' => $result_sql['user_name'],
-                        'data' => date('d.m.Y', $value['created'])
+                        'author'   => $result_sql['user_name'],
+                        'data'     => date('d.m.Y', $value['created'])
                     );
                 }
             }
@@ -360,24 +371,24 @@ class Controller_Content extends Model
                 }
                 else
                 {
-                    $where = array(
+                    $where    = array(
                         'id' => $result['category_id']
                     );
                     $category = $this->select($where, 'categories');
                     $category = $category['title'];
                 }
 
-                $sql = "SELECT user_name FROM users WHERE id='{$result['author_id']}'";
+                $sql        = "SELECT user_name FROM users WHERE id='{$result['author_id']}'";
                 $result_sql = $this->sql($sql);
 
                 $data = array(
-                    'id' => $result['id'],
-                    'title' => $result['title'],
-                    'status' => $status,
+                    'id'       => $result['id'],
+                    'title'    => $result['title'],
+                    'status'   => $status,
                     'favorite' => $result['favorite'],
                     'category' => $category,
-                    'author' => $result_sql['user_name'],
-                    'data' => date('d.m.Y', $result['created'])
+                    'author'   => $result_sql['user_name'],
+                    'data'     => date('d.m.Y', $result['created'])
                 );
             }
             else
