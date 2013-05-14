@@ -10,34 +10,38 @@ class Controller_Material extends Controller_A
         parent::__construct();
     }
 
-    public function publicMaterial()
-    {
-        $ids  = explode(',', trim($_POST['ids'], ','));
-        $bool = $_POST['bool'];
-
-        foreach ($ids as $id)
-            Core::getModel('material')->addFieldToFilter(array('id', 'status'))->load((int) $id)->setData('status', $bool)->save();
-    }
-
-    public function remove()
-    {
-        $ids = explode(',', trim($_POST['ids'], ','));
-        foreach ($ids as $id)
-            Core::getModel('material')->addFieldToFilter(array('id', 'trash'))->load((int) $id)->setTrash(1)->save();
-    }
-
-    public function index($id = NULL)
-    {
-        var_dump($id);
-        echo $id . 'page index';
-    }
-
-    public function create_page()
-    {
-        require_once 'page.php';
-    }
-
     public function create()
+    {
+        /**
+         * @todo Validation
+         */
+        if (isset($_POST) && !empty($_POST))
+        {
+            $data = $_POST;
+            unset($data['save_exit']);
+
+            $menu = Core::getModel('menu')->setData($data)->save();
+
+            $saveExit = $_POST['save_exit'];
+            unset($_POST);
+
+            if ($saveExit)
+                $this->redirect('admin/menu');
+            else
+                $this->redirect('menu/edit/' . $menu->getId());
+        }
+
+        $head        = 'Создать материал';
+        $materialUrl = Core::getBaseUrl() . 'material/create';
+
+        $access = Core::getModel('access')->getAccess();
+
+        $this->_view->setTitle($head)
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuContent' => true))
+                ->setChild('content', 'admin/material/form', array('head'    => $head, 'menuUrl' => $materialUrl, 'access'  => $access));
+    }
+
+    public function create2()
     {
         if (isset($_POST) && !empty($_POST))
         {
@@ -154,7 +158,54 @@ class Controller_Material extends Controller_A
         }
     }
 
-    public function edit()
+    public function edit($id)
+    {
+        /**
+         * @todo Validation
+         */
+        if (isset($id[0]))
+        {
+            $material = Core::getModel('material')->load((int) $id[0]);
+            if ($material->getId())
+            {
+                if (isset($_POST) && !empty($_POST))
+                {
+                    $data = $_POST;
+                    unset($data['save_exit']);
+
+                    $menu = Core::getModel('menu')->setData($data)->save();
+
+                    $saveExit = $_POST['save_exit'];
+                    unset($_POST);
+
+                    if ($saveExit)
+                        $this->redirect('admin/menu');
+                    else
+                        $this->redirect('menu/edit/' . $menu->getId());
+                }
+
+                $head        = 'Редактировать материал';
+                $materialUrl = Core::getBaseUrl() . 'material/edit';
+
+                $categories = Core::getModel('category')
+                        ->addFieldToFilter('trash', array('=' => 0))
+                        ->getCollection()
+                        ->getData();
+
+                $author = Core::getModel('user')->load($material->getAuthorId());
+
+                $this->_view->setTitle($head)
+                        ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('menuContent' => true))
+                        ->setChild('content', 'admin/material/form', array('head'     => $head, 'menuUrl'  => $materialUrl, 'material' => $material, 'categories' => $categories, 'author' => $author));
+            }
+            else
+                $this->redirect('admin/content');
+        }
+        else
+            $this->redirect('admin/content');
+    }
+
+    public function edit2()
     {
         if (isset($_POST) && !empty($_POST))
         {
@@ -188,6 +239,33 @@ class Controller_Material extends Controller_A
                 header('Location: http://' . $this->BASE_URL . '/admin/content');
             }
         }
+    }
+
+    public function publicMaterial()
+    {
+        $ids  = explode(',', trim($_POST['ids'], ','));
+        $bool = $_POST['bool'];
+
+        foreach ($ids as $id)
+            Core::getModel('material')->addFieldToFilter(array('id', 'status'))->load((int) $id)->setData('status', $bool)->save();
+    }
+
+    public function remove()
+    {
+        $ids = explode(',', trim($_POST['ids'], ','));
+        foreach ($ids as $id)
+            Core::getModel('material')->addFieldToFilter(array('id', 'trash'))->load((int) $id)->setTrash(1)->save();
+    }
+
+    public function index($id = NULL)
+    {
+        var_dump($id);
+        echo $id . 'page index';
+    }
+
+    public function create_page()
+    {
+        require_once 'page.php';
     }
 
     public function public_material()

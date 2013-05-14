@@ -130,6 +130,21 @@ class Controller_Ajax
             echo json_encode(array('id' => false));
     }
 
+    public function loadUsers()
+    {
+        $users = Core::getModel('user')->getCollection()->getData();
+
+        foreach ($users as $user)
+            $data[] = array(
+                'id'        => $user->id,
+                'user_name' => $user->user_name,
+                'email'     => $user->email,
+                'photo'     => Core::getBaseUrl() . $user->photo
+            );
+
+        echo json_encode($data);
+    }
+
     public function load_attach()
     {
         $attach = $_POST['attach'];
@@ -199,37 +214,6 @@ class Controller_Ajax
             $data = json_encode($result);
             echo $data;
         }
-    }
-
-    public function load_users()
-    {
-        $query  = "SELECT * FROM users";
-        $result = $this->sql($query);
-
-        if (isset($result[0]) && is_array($result[0]))
-        {
-            foreach ($result as $key => $value)
-            {
-                $data[] = array(
-                    'id'        => $result[$key]['id'],
-                    'user_name' => $result[$key]['user_name'],
-                    'email'     => $result[$key]['email'],
-                    'photo'     => $result[$key]['photo']
-                );
-            }
-        }
-        else
-        {
-            $data[] = array(
-                'id'        => $result['id'],
-                'user_name' => $result['user_name'],
-                'email'     => $result['email'],
-                'photo'     => $result['photo']
-            );
-        }
-
-        $data = json_encode($data);
-        echo $data;
     }
 
 }
