@@ -269,7 +269,7 @@ echo $this->getCss(array(
                     </tr>
                     <tr class="span10">
                         <td>
-                            <textarea id="full_text" name="content"><?php if (isset($material) && $material->getFullText()): ?><?php echo $material->getFullText() ?><?php endif; ?></textarea>
+                            <textarea id="full_text" name="full_text"><?php if (isset($material) && $material->getFullText()): ?><?php echo $material->getFullText() ?><?php endif; ?></textarea>
                         </td>
                     </tr>
                 </table>
@@ -286,7 +286,7 @@ echo $this->getCss(array(
                     <tr>
                         <td class="span3">
                             Автор
-                            <input type="hidden" name="author_id" value="<?php if (isset($author)): ?><?php echo $author->getId() ?><?php endif; ?>"/>
+                            <input type="hidden" name="author_id" value="<?php if (isset($author)):?><?php echo $author->getId() ?><?php endif; ?>"/>
                         </td>
                         <td>
                             <input class="disabled" disabled="" name="author" type="text" value="<?php if (isset($author)): ?><?php echo $author->getUserName() ?><?php endif; ?>"/>
@@ -298,13 +298,7 @@ echo $this->getCss(array(
                     <tr>
                         <td>Псевдоним автора</td>
                         <td>
-                            <input name="author_pseudo" type="text" value="<?php if (isset($author) && $author->getAuthorPseudo()): ?><?php echo $author->getAuthorPseudo() ?><?php endif; ?>"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Дата создания</td>
-                        <td>
-                            <input class="datepicker" name="created" type="text" value="<?php if (isset($material)): ?><?php echo date('m/d/Y', $material->getCreated()) ?><?php endif; ?>"/>
+                            <input name="author_pseudo" type="text" value="<?php if (isset($material) && $material->getAuthorPseudo()): ?><?php echo $material->getAuthorPseudo() ?><?php endif; ?>"/>
                         </td>
                     </tr>
                     <tr>

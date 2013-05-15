@@ -20,7 +20,7 @@ class Helper_User
         if ($id)
         {
             $user = Core::getModel('user')
-                    ->addFieldToFilter(array('id', 'user_name', 'full_name', 'access_id'))
+                    ->addFieldToFilter(array('id', 'user_name', 'full_name', 'access_id', 'photo'))
                     ->load($id);
             return $user;
         }
