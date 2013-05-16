@@ -86,20 +86,20 @@ class Controller_Admin extends Controller_A
 
     public function category()
     {
-        $obj  = new Controller_Category();
-        $data = $obj->load_category();
-        unset($obj);
 
-        $title         = "Менеджер категорий";
-        $menu_category = TRUE;
+        $user = Core::getHelper('user')->getUserInfo();
 
-        $query      = "SELECT id, title FROM menu WHERE trash!=1";
-        $admin_menu = $this->sql($query);
+        $head      = 'Менеджер категорий';
+        $categories = Core::getModel('category')
+                ->addFieldToFilter('categories.*')
+                ->addFieldToFilter('categories.trash', array('=' => 0))
+                ->join('users', 'users.id = categories.author_id', 'users.full_name AS author')
+                ->getCollection()
+                ->getData();
 
-        require 'head.php';
-        require 'admin/menu.php';
-        require 'admin/category.php';
-        require 'footer.php';
+        $this->_view->setTitle($head)
+                ->setChild('navBarMenu', 'admin/page/html/navbar-menu', array('$menuCategory' => true))
+                ->setChild('content', 'admin/category/category', array('categories' => $categories, 'head'       => $head));
     }
 
 }

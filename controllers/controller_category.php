@@ -1,29 +1,41 @@
 <?php
 
-require_once 'model.php';
+require_once CORE_PATH . 'controller/controller_a' . EXT;
 
-Class Controller_Category extends Model
+class Controller_Category extends Controller_A
 {
 
     public function __construct()
     {
         parent::__construct();
-        if (!isset($_SESSION['user']) || empty($_SESSION['user']))
-        {
-            header('Location: http://' . $this->BASE_URL . '/auth/login');
-        }
+    }
+
+    public function publicCategory()
+    {
+        $ids  = explode(',', trim($_POST['ids'], ','));
+        $bool = $_POST['bool'];
+
+        foreach ($ids as $id)
+            Core::getModel('category')->addFieldToFilter(array('id', 'status'))->load((int) $id)->setData('status', $bool)->save();
+    }
+
+    public function remove()
+    {
+        $ids = explode(',', trim($_POST['ids'], ','));
+        foreach ($ids as $id)
+            Core::getModel('category')->addFieldToFilter(array('id', 'trash'))->load((int) $id)->setTrash(1)->save();
     }
 
     public function create()
     {
         if (isset($_POST) && !empty($_POST))
         {
-            $data = array(
-                'title' => $_POST['title'],
-                'alias' => $_POST['alias'],
-                'status' => $_POST['status'],
+            $data              = array(
+                'title'     => $_POST['title'],
+                'alias'     => $_POST['alias'],
+                'status'    => $_POST['status'],
                 'full_text' => $_POST['content'],
-                'created' => time()
+                'created'   => time()
             );
             (!empty($_POST['author_id'])) ? $data['author_id'] = $_POST['author_id'] : $data['author_id'] = $_SESSION['user']['id'];
 
@@ -34,15 +46,15 @@ Class Controller_Category extends Model
             if (isset($_POST['id_category']) && (int) $_POST['id_category'] == 0)
             {
                 $id_category = $this->insert($data, 'categories');
-                $where = array(
+                $where       = array(
                     'id' => $id_category
                 );
             }
             else
             {
                 $data['id'] = (int) $_POST['id_category'];
-                $data = array_reverse($data);
-                $result = $this->update($data, 'categories');
+                $data       = array_reverse($data);
+                $result     = $this->update($data, 'categories');
                 if ($result)
                 {
                     $where = array(
@@ -67,16 +79,16 @@ Class Controller_Category extends Model
             {
                 if (isset($_POST['edit_category']) && $_POST['edit_category'] != 0)
                 {
-                    $edit = TRUE;
+                    $edit  = TRUE;
                     $title = "Редактировать категорию";
                 }
                 else
                 {
-                    $title = "Создать категорию";
+                    $title         = "Создать категорию";
                 }
                 $menu_category = TRUE;
 
-                $query = "SELECT id, title FROM menu WHERE trash!=1";
+                $query      = "SELECT id, title FROM menu WHERE trash!=1";
                 $admin_menu = $this->sql($query);
 
                 require 'head.php';
@@ -97,7 +109,7 @@ Class Controller_Category extends Model
         {
             if (isset($_POST['id_edit']))
             {
-                $where = array(
+                $where  = array(
                     'id' => $_POST['id_edit']
                 );
                 $result = $this->select($where, 'categories');
@@ -112,7 +124,7 @@ Class Controller_Category extends Model
             {
                 
             }
-            $edit = TRUE;
+            $edit  = TRUE;
             $title = "Редактировать категорию";
             require_once 'admin/category/create.php';
         }
@@ -124,8 +136,8 @@ Class Controller_Category extends Model
 
     public function public_category()
     {
-        $data = $_POST['data'];
-        $bool = $_POST['bool'];
+        $data  = $_POST['data'];
+        $bool  = $_POST['bool'];
         $array = explode(',', $data);
         if (is_array($array) && !empty($array))
         {
@@ -134,23 +146,23 @@ Class Controller_Category extends Model
                 if ($bool)
                 {
                     $material = array(
-                        'id' => (int) $value,
+                        'id'     => (int) $value,
                         'status' => 1
                     );
                 }
                 else
                 {
                     $material = array(
-                        'id' => (int) $value,
+                        'id'     => (int) $value,
                         'status' => 0
                     );
                 }
                 $this->update($material, 'categories');
             }
         }
-        $data = $this->load_category();
+        $data     = $this->load_category();
 
-        $title = "Менеджер категорий";
+        $title         = "Менеджер категорий";
         $menu_category = TRUE;
 
         require 'admin/category.php';
@@ -166,15 +178,15 @@ Class Controller_Category extends Model
             foreach ($array as $value)
             {
                 $material = array(
-                    'id' => (int) $value,
+                    'id'    => (int) $value,
                     'trash' => 1
                 );
                 $this->update($material, 'categories');
             }
         }
-        $data = $this->load_category();
+        $data     = $this->load_category();
 
-        $title = "Менеджер категорий";
+        $title         = "Менеджер категорий";
         $menu_category = TRUE;
 
         require 'admin/category.php';
@@ -192,15 +204,15 @@ Class Controller_Category extends Model
                 {
                     ($value['status'] == 0) ? $status = "Не опубликовано" : $status = "Опубликовано";
 
-                    $sql = "SELECT user_name FROM users WHERE id='{$value['author_id']}'";
+                    $sql        = "SELECT user_name FROM users WHERE id='{$value['author_id']}'";
                     $result_sql = $this->sql($sql);
 
                     $data[] = array(
-                        'id' => $value['id'],
-                        'title' => $value['title'],
+                        'id'     => $value['id'],
+                        'title'  => $value['title'],
                         'status' => $status,
                         'author' => $result_sql['user_name'],
-                        'data' => date('d.m.Y', $value['created'])
+                        'data'   => date('d.m.Y', $value['created'])
                     );
                 }
             }
@@ -209,15 +221,15 @@ Class Controller_Category extends Model
                 //var_dump($result);die();
                 ($result['status'] == 0) ? $status = "Не опубликовано" : $status = "Опубликовано";
 
-                $sql = "SELECT user_name FROM users WHERE id='{$result['author_id']}'";
+                $sql        = "SELECT user_name FROM users WHERE id='{$result['author_id']}'";
                 $result_sql = $this->sql($sql);
 
                 $data = array(
-                    'id' => $result['id'],
-                    'title' => $result['title'],
+                    'id'     => $result['id'],
+                    'title'  => $result['title'],
                     'status' => $status,
                     'author' => $result_sql['user_name'],
-                    'data' => date('d.m.Y', $result['created'])
+                    'data'   => date('d.m.Y', $result['created'])
                 );
             }
             else
