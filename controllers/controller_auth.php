@@ -107,22 +107,6 @@ class Controller_Auth extends Controller_A
         echo "forgotpass";
     }
 
-    
-
-    public function load_user($id)
-    {
-        if (!is_array($data))
-        {
-            $where = array(
-                'id' => $id
-            );
-
-            $result = $this->select($where, 'users');
-        }
-
-        return $result;
-    }
-
     protected function checkSessionUser()
     {
         $userModel = Core::getModel('user');
