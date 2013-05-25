@@ -41,7 +41,7 @@ class SecurityCore
      *
      * @var string
      */
-    public $_secOnerrorRedirectTo = '';
+    public $_secOnerrorRedirectTo = 'labs-blog.com/';
 
     /**
      * The session is only valid, when the same webbrowser is used. A weak but
@@ -132,8 +132,6 @@ class SecurityCore
     {
         if (!$this->_secBaseDir)
             $this->_secBaseDir = dirname(__FILE__) . DIRECTORY_SEPARATOR;
-
-        $this->_secOnerrorRedirectTo = Core::getBaseUrl();
 
         if ($this->_secErrors)
         {
