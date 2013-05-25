@@ -1,6 +1,6 @@
 <?php
 
-require_once 'core/SecurityCore.php';
+require_once 'Config.php';
 
 class Security
 {
@@ -8,10 +8,11 @@ class Security
     private static $_securityCore = '';
     public static $_secDebug     = 0;
     public static $_secTokenName = 'secTokenName';
+    public static $_secAppSalt   = '';
 
     public static function run()
     {
-        self::$_securityCore = new SecurityCore();
+        self::$_securityCore = new Config();
 
         restore_error_handler();
         if (self::$_secDebug || self::$_securityCore->_secErrors)
@@ -21,6 +22,26 @@ class Security
         }
         else
             error_reporting(0);
+
+        self::_secAppSalt();
+    }
+
+    /**
+     * Generates unique SALT value to be used with all MD5 hashes.
+     * Salt is valid until salt file is removed (normally never)
+     */
+    private static function _secAppSalt()
+    {
+        if (!file_exists(self::$_securityCore->_secBaseDir . 'app_salt.txt'))
+        {
+            $applicationSalt = md5(uniqid(rand(), TRUE));
+            file_put_contents(self::$_securityCore->_secBaseDir . 'app_salt.txt', $applicationSalt);
+            chmod($logFile, 0777);
+
+            self::$_secAppSalt = $applicationSalt;
+        }
+        else
+            self::$_secAppSalt = file_get_contents(self::$_securityCore->_secBaseDir . 'app_salt.txt');
     }
 
     private function _seqErrorHandler($code = '', $msg = '', $file = '', $line = '')
