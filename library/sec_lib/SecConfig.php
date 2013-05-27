@@ -1,6 +1,6 @@
 <?php
 
-class SecurityCore
+class SecConfig
 {
 
     /**
@@ -41,7 +41,7 @@ class SecurityCore
      *
      * @var string
      */
-    public $_secOnerrorRedirectTo = 'labs-blog.com/';
+    public $_secOnerrorRedirectTo = 'http://labs-blog.com/';
 
     /**
      * The session is only valid, when the same webbrowser is used. A weak but
