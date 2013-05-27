@@ -26,6 +26,7 @@ class Security
             error_reporting(0);
 
         self::_secAppSalt();
+        self::_secSecureSession();
     }
 
     /**
@@ -34,16 +35,16 @@ class Security
      */
     private static function _secAppSalt()
     {
-        if (!file_exists(self::$_secConfig->_secBaseDir . 'app_salt.txt'))
+        if (!file_exists(self::$_secConfig->_secBaseDir . 'var/app_salt.txt'))
         {
             $applicationSalt = md5(uniqid(rand(), TRUE));
-            file_put_contents(self::$_secConfig->_secBaseDir . 'app_salt.txt', $applicationSalt);
+            file_put_contents(self::$_secConfig->_secBaseDir . 'var/app_salt.txt', $applicationSalt);
             chmod($logFile, 0777);
 
             self::$_secAppSalt = $applicationSalt;
         }
         else
-            self::$_secAppSalt = file_get_contents(self::$_secConfig->_secBaseDir . 'app_salt.txt');
+            self::$_secAppSalt = file_get_contents(self::$_secConfig->_secBaseDir . 'var/app_salt.txt');
     }
 
     private function _seqErrorHandler($code = '', $msg = '', $file = '', $line = '')
@@ -72,7 +73,7 @@ class Security
         if (self::$_secConfig->_secLog)
         {
             $rootdir = self::$_secConfig->_secBaseDir;
-            $logfile = fopen($rootdir . "seq_log/log.txt", "a");
+            $logfile = fopen($rootdir . "var/log/log.txt", "a");
             fputs($logfile, date("d.m.Y, H:i:s", time()) .
                     ", " . $_SERVER['REMOTE_ADDR'] .
                     ", [" . $source . "]" .
@@ -93,7 +94,7 @@ class Security
      *
      * @return boolean
      */
-    public function secSecureSession()
+    private static function _secSecureSession()
     {
         if (!self::$_secConfig->_secSecureSession)
             return FALSE;
