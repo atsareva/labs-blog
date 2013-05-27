@@ -8,6 +8,8 @@ class Security
     private static $_secConfig       = '';
     private static $_httpCookieVars  = array();
     private static $_httpSessionVars = array();
+    private static $_httpGetVars     = array();
+    private static $_httpPostVars    = array();
     public static $_secDebug        = 0;
     public static $_secTokenName    = 'secTokenName';
     public static $_secAppSalt      = '';
@@ -27,6 +29,168 @@ class Security
 
         self::_secAppSalt();
         self::_secSecureSession();
+
+        self::_secDataDump();
+    }
+
+    /**
+     * Checks a Token against CSRF-Attacks.
+     * Gets Token out of GET/POST-request and checks for validity.
+     * If specific name given, Token will only be valid for that named action.
+     */
+    public static function secCheckToken($originName = '')
+    {
+        $tokenName = self::_secCreateTokenName($originName);
+
+        $tokenArray = $_SESSION['SEC']['SEC_TOKEN'];
+
+        if (!isset($tokenArray) || !is_array($tokenArray))
+        {
+            seq_log_('secCheckToken: no SESSION found at execution time. Call secCheckToken after session start.', '');
+            return false;
+        }
+
+        $tokenValue = self::_QbHttpVars2Array($tokenName, 'pg');
+
+        if (strlen($tokenValue) == 32)
+        {
+
+            if (isset($tokenArray[$tokenName]) && isset($tokenArray[$tokenName]['token']) && $tokenArray[$tokenName]['token'] == $tokenValue)
+            {
+                $tokenAge = time() - $tokenArray[$tokenName]['time'];
+                if ($tokenAge > self::$_secConfig->_secTokenLifeTime)
+                {
+                    self::_secDebug($tokenAge . ">" . self::$_secConfig->_secTokenLifeTime);
+                    self::_secLog('secCheckToken: CSRF token expired', $tokenAge - self::$_secConfig->_secTokenLifeTime);
+                    self::_secTerminateSession();
+                }
+
+                if ($tokenArray[$tokenName]['once'])
+                    unset($_SESSION['SEQ']['SEQ_TOKEN'][$tokenName]); // no replay
+// SESSION OK
+            }
+            else
+            {
+                self::_secLog('secCheckToken: wrong CSRF token', '');
+                self::_secTerminateSession();
+            }
+        }
+        else
+        {
+            self::_secLog('secCheckToken: CSRF token required', $tokenValue);
+            self::_secTerminateSession();
+        }
+    }
+
+    /**
+     * Generates Token name.
+     *
+     * @return string
+     */
+    private static function _secCreateTokenName($originName = '')
+    {
+        $headerHash = '';
+        if (self::$_secConfig->_secSessionHeadersCheck)
+            $headerHash = self::_secUseragentFingerprint();
+
+        $originName = $originName ? md5($originName . $headerHash . session_id() . self::_secAppSalt()) : md5($headerHash . session_id() . self::_secAppSalt());
+
+        return 'SEQ_TOKEN_' . $originName;
+    }
+
+    /**
+     *
+     * @param string $var - explicit variable
+     * @param string $selection (p - for POST, s- for SESSION, g - for GET)
+     * @return array
+     */
+    private static function _QbHttpVars2Array($var = '', $selection = 'ps')
+    {
+        $data = null;
+        if ($var)
+        {
+            if (ini_get('register_long_arrays'))
+            {
+                if (isset(self::$_httpPostVars) && array_key_exists($var, self::$_httpPostVars) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
+                    $data = self::$_httpPostVars[$var];
+                else if (isset(self::$_httpGetVars) && array_key_exists($var, self::$_httpGetVars) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
+                    $data = self::$_httpGetVars[$var];
+                else if (isset(self::$_httpSessionVars) && array_key_exists($var, self::$_httpSessionVars) && (strpos(strtolower($selection), 's') > -1 || !$selection))
+                    $data = self::$_httpSessionVars[$var];
+            }
+
+            if (!isset($data))
+            {
+                if (array_key_exists($var, $_POST) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
+                    $data = $_POST[$var];
+                else if (array_key_exists($var, $_GET) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
+                    $data = $_GET[$var];
+                else if ($_SESSION && array_key_exists($var, $_SESSION) && (strpos(strtolower($selection), 's') > -1 || !$selection))
+                    $data = $_SESSION[$var];
+            }
+
+            if (!isset($data) && function_exists('_QbSpecialParamDelimeter') && array_key_exists($var, self::_QbSpecialParamDelimeter()))
+            {
+                $data = self::_QbSpecialParamDelimeter();
+                $data = $data[$var];
+            }
+        }
+        else
+        {
+            if (ini_get('register_long_arrays'))
+            {
+                if (isset(self::$_httpSessionVars) && (strpos(strtolower($selection), 's') > -1 || !$selection))
+                    $data = self::$_httpSessionVars;
+
+                if (isset(self::$_httpGetVars) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
+                    $data = self::$_httpGetVars;
+
+                if (isset(self::$_httpPostVars) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
+                    $data = self::$_httpPostVars;
+            }
+            if (isset($data))
+            {
+                if (isset($_SESSION) && (strpos(strtolower($selection), 's') > -1 || !$selection))
+                    $data = $_SESSION;
+
+                if (isset($_GET) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
+                    $data = $_GET;
+
+                if (isset($_POST) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
+                    $data = $_POST;
+            }
+
+            if (!isset($data) && function_exists('_QbSpecialParamDelimeter'))
+                $data = self::_QbSpecialParamDelimeter();
+        }
+
+        return $data;
+    }
+
+    private static function _QbSpecialParamDelimeter()
+    {
+        // set the HTTP GET parameters manually if search_engine_friendly_urls is enabled
+        $params = array();
+        if (strlen(getenv('PATH_INFO')) > 1)
+        {
+            $GET_array = array();
+            $PHP_SELF  = str_replace(getenv('PATH_INFO'), '', $PHP_SELF);
+            $vars      = explode('/', substr(getenv('PATH_INFO'), 1));
+            for ($i = 0, $n = sizeof($vars); $i < $n; $i++)
+            {
+                if (strpos($vars[$i], '[]'))
+                    $GET_array[substr($vars[$i], 0, -2)][] = $vars[$i + 1];
+                else
+                    $params[$vars[$i]]                     = $vars[$i + 1];
+                $i++;
+            }
+
+            if (sizeof($GET_array) > 0)
+                while (list($key, $value) = each($GET_array))
+                    $params[$key] = $value;
+        }
+
+        return $params;
     }
 
     /**
@@ -38,7 +202,9 @@ class Security
         if (!file_exists(self::$_secConfig->_secBaseDir . 'var/app_salt.txt'))
         {
             $applicationSalt = md5(uniqid(rand(), TRUE));
-            file_put_contents(self::$_secConfig->_secBaseDir . 'var/app_salt.txt', $applicationSalt);
+            $logFile         = self::$_secConfig->_secBaseDir . 'var/app_salt.txt';
+
+            file_put_contents($logFile, $applicationSalt);
             chmod($logFile, 0777);
 
             self::$_secAppSalt = $applicationSalt;
@@ -85,6 +251,7 @@ class Security
                     ", " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '') .
                     "\n");
             fclose($logfile);
+            chmod($logfile, 0777);
         }
     }
 
@@ -248,10 +415,85 @@ class Security
         }
     }
 
-    public static function _secDebug($string = '')
+    private static function _secDebug($string = '')
     {
         if (self::$_secConfig->_secDebug)
             echo "<br>------" . $string . "<br>";
+    }
+
+    /**
+     * Generates data dump of incomming data.
+     * Output is to be analysed to design an appropriate SANITIZE - filter
+     */
+    public static function _secDataDump()
+    {
+        $datafile = self::$_secConfig->_secBaseDir . "var/dump/app_data.txt";
+
+        if (isset($_GET))
+            foreach ($_GET as $param => $value)
+                $appdata .= '[_GET] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        if (isset(self::$_httpGetVars))
+            foreach (self::$_httpGetVars as $param => $value)
+                $appdata .= '[HGET] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        if (isset($_POST))
+            foreach ($_POST as $param => $value)
+                $appdata .= '[_POS] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        if (isset(self::$_httpPostVars))
+            foreach (self::$_httpPostVars as $param => $value)
+                $appdata .= '[HPOS] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        if (isset($_COOKIE))
+            foreach ($_COOKIE as $param => $value)
+                $appdata .= '[_COO] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        if (isset(self::$_httpCookieVars))
+            foreach (self::$_httpCookieVars as $param => $value)
+                $appdata .= '[HCOO] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        if (isset($_SESSION))
+            foreach ($_SESSION as $param => $value)
+                $appdata .= '[_SES] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        if (isset(self::$_httpSessionVars))
+            foreach (self::$_httpSessionVars as $param => $value)
+                $appdata .= '[HSES] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        if (isset($_SERVER))
+            foreach ($_SERVER as $param => $value)
+                $appdata .= '[ SERV] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+
+        $appdata .= "====================================================================================================\n";
+
+        file_put_contents($datafile, $appdata, FILE_APPEND);
+        chmod($datafile, 0777);
+    }
+
+    /**
+     * Retrieve array as string
+     *
+     * @param array $array
+     * @param string $message
+     * @param int $level
+     * @return string
+     */
+    private static function _secDataDumpRecursive($array, $message, $level)
+    {
+        if (is_array($array))
+        {
+            foreach ($array as $key => $value)
+            {
+                (is_array($array[$key])) ? $recursive = PHP_EOL . self::_logVarDump((array) $array[$key], $message, ($level + 1)) : $recursive = $array[$key];
+                for ($i = 0; $i <= ($level); $i++)
+                    $message .= "\t";
+                $message .= "[" . (string) $key . "]" . ' => ' . (string) $recursive . PHP_EOL;
+            }
+        }
+        else
+            return $array;
+        return $message;
     }
 
 }
