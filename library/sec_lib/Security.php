@@ -25,6 +25,8 @@ class Security
 
         self::_secAppSalt();
         self::_secSecureSession();
+
+        self::_secLog('HERE');
     }
 
     /**
@@ -117,8 +119,7 @@ class Security
      */
     public static function secOutput($string = '')
     {
-        $string = mb_convert_encoding($string, "UTF-8", "7bit, UTF-7, UTF-8, UTF-16, ISO-8859-1, ASCII");
-        $string = self::_seqRemoveSlashes($string);
+        $string = self::_secRemoveSlashes((mb_convert_encoding($string, "UTF-8", "7bit, UTF-7, UTF-8, UTF-16, ISO-8859-1, ASCII")));
         self::_secCheckIntrusion($string);
 
         $output = '';
@@ -191,22 +192,6 @@ class Security
             for ($t = 0; $t < count($minValList); $t++)
                 if (strtoupper(trim($minValList[$t])) == 'NULL')
                     return true; // if zero value allowed, then ok
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         }
 
@@ -384,6 +369,36 @@ class Security
     }
 
     /**
+     * Prepares input for usage within MYSQL-query
+     * Type, min-max Length
+     */
+    public static function secMySql($string = '', $type = '', $minValue = null, $maxValue = null, $varName = '', $source = '')
+    {
+        $orig = self::_secRemoveSlashes($string);
+
+        self::_secCheckIntrusion($orig, $source);
+
+        if ($type != '' && $orig != '')
+            $orig = self::_secCheckType($orig, $type, $minValue, $maxValue, $varName, $source);
+
+        /* automatically choose best function to escape input */
+        if (!(mysql_error()))
+        {
+            $pEscapeFunc = create_function('$match_', 'return mysql_real_escape_string($match_);');
+            $secValue    = $pEscapeFunc($orig);
+        }
+        /* fallback if mysql is not available yet */
+        if (mysql_error())
+        {
+            $pEscapeFunc = create_function('$match_', 'return mysql_escape_string($match_);');
+            $secValue    = $pEscapeFunc($orig);
+        }
+
+        self::_secDebug($secValue);
+        return $secValue;
+    }
+
+    /**
      * Check string type
      * returns empty string if type or length dont match
      * returns input string if all OK
@@ -411,7 +426,7 @@ class Security
         return $string;
     }
 
-    private static function _seqRemoveSlashes($string = '')
+    private static function _secRemoveSlashes($string = '')
     {
         $orig     = $string;
         $stripped = stripslashes($orig);
@@ -731,9 +746,9 @@ class Security
     {
         if (self::$_secConfig->_secLog)
         {
-            $rootdir = self::$_secConfig->_secBaseDir;
-            $logfile = fopen($rootdir . "var/log/log.txt", "a");
-            fputs($logfile, date("d.m.Y, H:i:s", time()) .
+            $logFile = self::$_secConfig->_secBaseDir . 'var/log/log.txt';
+
+            $contents = date("d.m.Y, H:i:s", time()) .
                     ", " . $_SERVER['REMOTE_ADDR'] .
                     ", [" . $source . "]" .
                     ", " . $message .
@@ -742,9 +757,10 @@ class Security
                     ", " . $_SERVER['PHP_SELF'] .
                     ", " . $_SERVER['HTTP_USER_AGENT'] .
                     ", " . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '') .
-                    "\n");
-            fclose($logfile);
-            chmod($logfile, 0777);
+                    "\n";
+
+            file_put_contents($logFile, $contents, FILE_APPEND | LOCK_EX);
+            chmod($logFile, 0777);
         }
     }
 

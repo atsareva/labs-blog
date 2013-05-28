@@ -2,4 +2,4 @@
 /assets/resize/cache
 /assets/upload/
 /var
-/library/sec_lib/var
+/library/sec_lib/var/*
