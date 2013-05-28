@@ -25,8 +25,6 @@ class Security
 
         self::_secAppSalt();
         self::_secSecureSession();
-
-        self::_secDataDump();
     }
 
     /**
@@ -374,7 +372,7 @@ class Security
         $seqSessName = self::$_secConfig->_secSessionName ? self::$_secConfig->_secSessionName : session_name();
 
         // expire cookie
-        if (self::$_secConfig->_secSecureCookie && $_COOKIE && isset($_COOKIE[$seqSessName]) && !headers_sent())
+        if (self::$_secConfig->_secSecureCookies && $_COOKIE && isset($_COOKIE[$seqSessName]) && !headers_sent())
         {
             // could we be too early to know 'path' or 'domain' settings?
             $cookieData = session_get_cookie_params();
@@ -452,27 +450,27 @@ class Security
 
         if (isset($_GET))
             foreach ($_GET as $param => $value)
-                $appdata .= '[GET] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[GET] ' . $param . '=' . ((is_array($value)) ? self::_secDataDumpRecursive($value, '', 0) : $value) . "\n";
 
         if (isset($_POST))
             foreach ($_POST as $param => $value)
-                $appdata .= '[POST] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[POST] ' . $param . '=' . ((is_array($value)) ? self::_secDataDumpRecursive($value, '', 0) : $value) . "\n";
 
         if (isset($_COOKIE))
             foreach ($_COOKIE as $param => $value)
-                $appdata .= '[COOKIE] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[COOKIE] ' . $param . '=' . ((is_array($value)) ? self::_secDataDumpRecursive($value, '', 0) : $value) . "\n";
 
         if (isset($_SESSION))
             foreach ($_SESSION as $param => $value)
-                $appdata .= '[SESSION] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[SESSION] ' . $param . '=' . ((is_array($value)) ? self::_secDataDumpRecursive($value, '', 0) : $value) . "\n";
 
         if (isset($_SERVER))
             foreach ($_SERVER as $param => $value)
-                $appdata .= '[SERVER] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[SERVER] ' . $param . '=' . ((is_array($value)) ? self::_secDataDumpRecursive($value, '', 0) : $value) . "\n";
 
         $appdata .= "====================================================================================================\n";
 
-        file_put_contents($datafile, $appdata, FILE_APPEND);
+        file_put_contents($datafile, $appdata, FILE_APPEND | LOCK_EX);
         chmod($datafile, 0777);
     }
 
@@ -490,14 +488,12 @@ class Security
         {
             foreach ($array as $key => $value)
             {
-                (is_array($array[$key])) ? $recursive = PHP_EOL . self::_logVarDump((array) $array[$key], $message, ($level + 1)) : $recursive = $array[$key];
+                (is_array($array[$key])) ? $recursive = PHP_EOL . self::_secDataDumpRecursive((array) $array[$key], $message, ($level + 1)) : $recursive = $array[$key];
                 for ($i = 0; $i <= ($level); $i++)
                     $message .= "\t";
                 $message .= "[" . (string) $key . "]" . ' => ' . (string) $recursive . PHP_EOL;
             }
         }
-        else
-            return $array;
         return $message;
     }
 

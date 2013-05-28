@@ -39,6 +39,7 @@ class Controller_Profile extends Controller_Front
 
         if (isset($_POST['login']) && isset($_POST['pass']))
         {
+            Security::secCheckToken('userLogin');
             $user = $userModel->addFieldToFilter('user_name', array('=' => $_POST['login']))
                     ->addFieldToFilter('pass', array('=' => md5($_POST['pass'])))
                     ->getCollection()

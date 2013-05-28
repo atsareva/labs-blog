@@ -33,6 +33,7 @@
 
 <div class="login">
     <form id="front_login" method="post" action="<?php echo Core::getBaseUrl() ?>profile/login">
+        <?php echo Security::secFtoken('userLogin') ?>
         <div class="fieldset">
             <div>
                 <p>Логин <span class="star">*</span></p>
