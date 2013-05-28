@@ -10,10 +10,11 @@ define('HR', 'Helper_');
 $core = 'core';
 
 $controllers = 'controllers';
-$views = 'views';
-$models = 'models';
-$helper = 'helper';
-$config = 'config';
+$views       = 'views';
+$models      = 'models';
+$helper      = 'helper';
+$config      = 'config';
+$lib         = 'library';
 
 $install = 'install';
 
@@ -25,6 +26,7 @@ define('VPATH', $path . DIRECTORY_SEPARATOR . $views . DIRECTORY_SEPARATOR);
 define('MPATH', $path . DIRECTORY_SEPARATOR . $models . DIRECTORY_SEPARATOR);
 define('HPATH', $path . DIRECTORY_SEPARATOR . $helper . DIRECTORY_SEPARATOR);
 define('CONFIG_PATH', $path . DIRECTORY_SEPARATOR . $config . DIRECTORY_SEPARATOR);
+define('LPATH', $path . DIRECTORY_SEPARATOR . $lib . DIRECTORY_SEPARATOR);
 
 define('IPATH', $path . DIRECTORY_SEPARATOR . $install . DIRECTORY_SEPARATOR);
 
@@ -45,6 +47,9 @@ if (!is_file(CONFIG_PATH . 'config' . EXT))
 
 session_start();
 
+require_once LPATH . 'sec_lib/Security' . EXT;
+Security::run();
+
 require_once CORE_PATH . 'core' . EXT;
 Core::run();
 
@@ -53,7 +58,7 @@ function RemoveDir($path)
     if (file_exists($path) && is_dir($path))
     {
         $dirHandle = opendir($path);
-        while (false !== ($file = readdir($dirHandle)))
+        while (false !== ($file      = readdir($dirHandle)))
         {
             if ($file != '.' && $file != '..')// исключаем папки с назварием '.' и '..' 
             {
