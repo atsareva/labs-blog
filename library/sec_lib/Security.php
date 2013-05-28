@@ -197,6 +197,8 @@ class Security
 
 
 
+
+
         }
 
         $typeNumeric = is_numeric($string);
@@ -231,7 +233,7 @@ class Security
      */
     public static function secIsStr($string = '', $minvalue = null, $maxvalue = null, $varname = '', $source = '')
     {
-        self::_secCheckIntrusion($string_, $source);
+        self::_secCheckIntrusion($string, $source);
 
         $typeString = is_string($string);
         if ($typeString)
@@ -258,6 +260,28 @@ class Security
     }
 
     /**
+     * Length of input must be between given values
+     */
+    public static function secIsBeween($string = '', $minValue = null, $maxValue = null, $varName = '', $source = '')
+    {
+        $minValue = trim($minValue);
+        if (isset($minValue) && $minValue != '' && strlen($string) < $minValue)
+        {
+            self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': length below MIN (' . $minValue . ')', $string, $source);
+            self::_secReaction(true /* from filter */);
+            return false;
+        }
+        $maxValue = trim($maxValue);
+        if (isset($maxValue) && $maxValue != '' && strlen($string) > $maxValue)
+        {
+            self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': length beneath MAX (' . $maxValue . ')', $string, $source);
+            self::_secReaction(true /* from filter */);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Check string type
      * returns empty string if type or length dont match
      * returns input string if all OK
@@ -274,7 +298,7 @@ class Security
                     return '';
                 break;
             case 'STR' :
-                if (!SEQ_ISSTR($string, $minValue, $maxValue, $varName, $source))
+                if (!self::secIsStr($string, $minValue, $maxValue, $varName, $source))
                     return '';
                 break;
             default:
