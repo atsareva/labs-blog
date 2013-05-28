@@ -168,6 +168,87 @@ class Security
         self::_secLog('secError: ', $string);
     }
 
+    /**
+     * Check string type
+     * returns empty string if type or length dont match
+     * returns input string if all OK
+     */
+    public static function secType($string = '', $type = '', $minValue = null, $maxValue = null, $varName = '' /* for logging */, $source = ' SRC'/* for logging */)
+    {
+        return self::_secCheckType($string, $type, $minValue, $maxValue, $varName, $source);
+    }
+
+    /**
+     * Input must be a number and between given values
+     */
+    public static function secIsNum($string = '', $minValue = null, $maxValue = null, $varName = '', $source = '')
+    {
+        self::_secCheckIntrusion($string, $source);
+
+        $minValList = split(',', $minValue);
+        if (strlen($string) == 0)
+        {
+            for ($t = 0; $t < count($minValList); $t++)
+                if (strtoupper(trim($minValList[$t])) == 'NULL')
+                    return true; // if zero value allowed, then ok
+
+        }
+
+        $typeNumeric = is_numeric($string);
+        if ($typeNumeric)
+        {
+            for ($t = 0; $t < count($minValList); $t++)
+            {
+                $minValue = trim($minValList[$t]);
+                if (isset($minValue) && $minValue != '' && strtoupper($minValue) != 'NULL' && $string < $minValue)
+                {
+                    self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': INT below MIN (' . $minValue . ')', $string, $source);
+                    self::_secReaction(true /* from filter */);
+                    return false;
+                }
+            }
+            $maxValue = trim($maxValue);
+            if (isset($maxValue) && $maxValue != '' && $string > $maxValue)
+            {
+                self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': INT beneath MAX (' . $maxValue . ')', $string, $source);
+                self::_secReaction(true /* from filter */);
+                return false;
+            }
+            return true;
+        }
+        self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': INT param not INT', $string, $source);
+        self::_secReaction(true /* from filter */);
+        return false;
+    }
+
+    /**
+     * Check string type
+     * returns empty string if type or length dont match
+     * returns input string if all OK
+     */
+    private static function _secCheckType($string = '', $type = '', $minValue = null, $maxValue = null, $varName = '' /* for logging */, $source = ''/* for logging */)
+    {
+        self::_secCheckIntrusion($string, $source);
+
+        switch (strtoupper(trim($type)))
+        {
+            case 'NUM' :
+            case 'INT' :
+                if (!self::secIsNum($string, $minValue, $maxValue, $varName, $source))
+                    return '';
+                break;
+            case 'STR' :
+                if (!SEQ_ISSTR($string, $minValue, $maxValue, $varName, $source))
+                    return '';
+                break;
+            default:
+                if (!SEQ_ISBETWEEN($string, $minValue, $maxValue, $varName, $source))
+                    return '';
+                break;
+        }
+        return $string;
+    }
+
     private static function _seqRemoveSlashes($string = '')
     {
         $orig     = $string;
