@@ -108,6 +108,215 @@ class Security
     }
 
     /**
+     * Secures input string against XSS-attacks.
+     * Return value can be send to browser securely.
+     * supports single & multi byte UTF-8
+     * 
+     * @param string $string
+     * @return string
+     */
+    public static function secOutput($string = '')
+    {
+        $string = mb_convert_encoding($string, "UTF-8", "7bit, UTF-7, UTF-8, UTF-16, ISO-8859-1, ASCII");
+        $string = self::_seqRemoveSlashes($string);
+        self::_secCheckIntrusion($string);
+
+        $output = '';
+
+        for ($i = 0; $i < strlen($string); $i++)
+        {
+            if (preg_match('/([a-zA-Z0-9_.-])/', $string[$i]))
+            {
+                $output .= $string[$i];
+                continue;
+            }
+            $byte = ord($string[$i]);
+            if ($byte <= 127)
+            {
+                $length = 1;
+                $output .= sprintf("&#x%04s;", dechex(self::_uniord(mb_substr($string, $i, $length))));
+            }
+            else if ($byte >= 194 && $byte <= 223)
+            {
+                $length = 2;
+                $output .= sprintf("&#x%04s;", dechex(self::_uniord(mb_substr($string, $i, $length))));
+            }
+            else if ($byte >= 224 && $byte <= 239)
+            {
+                $length = 3;
+                $output .= sprintf("&#x%04s;", dechex(self::_uniord(mb_substr($string, $i, $length))));
+            }
+            else if ($byte >= 240 && $byte <= 244)
+            {
+                $length = 4;
+                $output .= sprintf("&#x%04s;", dechex(self::_uniord(mb_substr($string, $i, $length))));
+            }
+        }
+
+        return $output;
+    }
+
+    private static function _seqRemoveSlashes($string = '')
+    {
+        $orig     = $string;
+        $stripped = stripslashes($orig);
+
+        if ($orig != $stripped)
+        {
+            $escaped  = addslashes($stripped);
+            if ($orig == $escaped)
+                $secValue = stripslashes($escaped);
+            else
+                $secValue = $orig;
+        }
+        else
+            $secValue = $orig;
+
+        return $secValue;
+    }
+
+    private static function _uniord($c)
+    {
+        $h = ord($c{0});
+        if ($h <= 0x7F)
+            return $h;
+        else if ($h < 0xC2)
+            return false;
+        else if ($h <= 0xDF)
+            return ($h & 0x1F) << 6 | (ord($c{1}) & 0x3F);
+        else if ($h <= 0xEF)
+            return ($h & 0x0F) << 12 | (ord($c{1}) & 0x3F) << 6 | (ord($c{2}) & 0x3F);
+        else if ($h <= 0xF4)
+            return ($h & 0x0F) << 18 | (ord($c{1}) & 0x3F) << 12 | (ord($c{2}) & 0x3F) << 6 | (ord($c{3}) & 0x3F);
+        else
+            return false;
+    }
+
+    /**
+     * Helper for Intrusion Detection System
+     */
+    private static function _secCheckIntrusion($string = '', $source = '')
+    {
+        /* array scan is later required */
+        if (is_array($string))
+            return false;
+
+        $scanValue = $string;
+        $matches   = false;
+
+        /* scan for SQL-attack pattern */
+        if (preg_match("/(\%27)|(\')|(\')|(%2D%2D)|(\/\*)/i", $scanValue) || /* (\-\-)  deleted. no meaning for MySQL */
+                /* (\/\*) added. Comment sign for MySQL */
+                preg_match("/\w*(\%27)|'(\s|\+)*((\%6F)|o|(\%4F))((\%72)|r|(\%52))/i", $scanValue) ||
+                preg_match("/((\%27)|')(\s|\+)*union/i", $scanValue))
+        {
+            self::_secLog('SQL Injection detected', $scanValue, $source);
+            $matches = true;
+        }
+
+        /* scan for XSS-attack pattern */
+        if (preg_match("/((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/i", $scanValue) ||
+                preg_match("/((\%3C)|<)((\%69)|i|(\%49))((\%6D)|m|(\%4D))((\%67)|g|(\%47))[^\n]+((\%3E)|>)/i", $scanValue))
+        {
+            self::_secLog('XSS detected', $scanValue, $source);
+            $matches = true;
+        }
+
+        /* scan for Mail-Header-attack pattern */
+        if (preg_match("/(Content-Transfer-Encoding:|MIME-Version:|content-type:|Subject:|to:|cc:|bcc:|from:|reply-to:)/ims", $scanValue))
+        {
+            self::_secLog('Mail-Header Injection detected', $scanValue, $source);
+            $matches = true;
+        }
+
+        /* scan for "Special chars" pattern */
+        if (preg_match("/%0A|\\r|%0D|\\n|%00|\\0|%09|\\t|%01|%02|%03|%04|%05|%06|%07|%08|%09|%0B|%0C|%0E|%0F|%10|%11|%12|%13/i", $scanValue))
+        {
+            self::_secLog('Special Chars detected', $scanValue, $source);
+            $matches = true;
+        }
+
+        $matches = self::_secGlobalsOverwrite($scanValue, $source);
+
+        if ($matches)
+            self::_secReaction();
+
+        return $matches;
+    }
+
+    /**
+     * Helper for "globals overwrite" scan
+     *
+     * @param string $string
+     * @param string $source
+     * @return boolean
+     */
+    private static function _secGlobalsOverwrite($string = '', $source = '')
+    {
+        $matches    = false;
+        $globalVars = array(
+            '_SERVER',
+            '_ENV',
+            '_COOKIE',
+            '_GET',
+            '_POST',
+            '_FILES',
+            '_REQUEST',
+            '_SESSION',
+            'GLOBALS'
+        );
+
+        if (preg_match("/^(" . implode("|", $globalVars) . ")/", $string, $match))
+        {
+            self::_secLog('Global VAR overwrite detected', $string, $source);
+            $matches = true;
+        }
+        return $matches;
+    }
+
+    /**
+     * Executes defined reaction on detected security breach.
+     */
+    private static function _secReaction($filter = false)
+    {
+        $action = self::$_secConfig->_secIdsOnAttackAction;
+
+        // call is comming from filter check
+        if ($filter)
+            $action = self::$_secConfig->_secFilterNoMathAction;
+
+        $actionArray = split(' ', $action);
+        if (in_array('delay', $actionArray))
+            sleep(50);
+
+        if (in_array('logout', $actionArray))
+            self::_secTerminateSession();
+
+        if (in_array('redirect', $actionArray))
+        {
+            if (!headers_sent() && !empty(self::$_secConfig->_secOnerrorRedirectTo))
+            {
+                $saveSession = '';
+
+                // if known and found in query string, keep session id when redirect
+                if ($_SERVER['QUERY_STRING'])
+                {
+                    $secSessName = self::$_secConfig->_secSessionName ? self::$_secConfig->_secSessionName : session_name();
+                    $queryPairs  = split('&', $_SERVER['QUERY_STRING']);
+                    for ($t = 0; $t < length($queryPairs); $t++)
+                    {
+                        $pairs       = split('=', $queryPairs[$t]);
+                        if ($pairs[0] == $secSessName)
+                            $saveSession = join($queryPairs[$t]);
+                    }
+                }
+
+                header("Location: " . self::$_secConfig->_secOnerrorRedirectTo . '?' . $saveSession);
+            }
+        }
+    }
+
+    /**
      * Generates Token name.
      *
      * @param string $originName
