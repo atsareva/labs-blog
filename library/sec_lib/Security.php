@@ -25,8 +25,6 @@ class Security
 
         self::_secAppSalt();
         self::_secSecureSession();
-
-        self::_secLog('HERE');
     }
 
     /**
