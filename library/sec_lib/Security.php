@@ -156,6 +156,18 @@ class Security
         return $output;
     }
 
+    /**
+     * Error output with XSS-prevention.
+     * Can be turned off globally to supress informative errors.
+     */
+    public static function secError($string = '')
+    {
+        if (self::$_secConfig->secErrors)
+            echo self::secOutput($string);
+
+        self::_secLog('secError: ', $string);
+    }
+
     private static function _seqRemoveSlashes($string = '')
     {
         $orig     = $string;
