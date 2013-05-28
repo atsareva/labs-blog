@@ -109,25 +109,12 @@ class Security
         $data = null;
         if ($var)
         {
-            if (ini_get('register_long_arrays'))
-            {
-                if (isset(self::$_httpPostVars) && array_key_exists($var, self::$_httpPostVars) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
-                    $data = self::$_httpPostVars[$var];
-                else if (isset(self::$_httpGetVars) && array_key_exists($var, self::$_httpGetVars) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
-                    $data = self::$_httpGetVars[$var];
-                else if (isset(self::$_httpSessionVars) && array_key_exists($var, self::$_httpSessionVars) && (strpos(strtolower($selection), 's') > -1 || !$selection))
-                    $data = self::$_httpSessionVars[$var];
-            }
-
-            if (!isset($data))
-            {
-                if (array_key_exists($var, $_POST) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
-                    $data = $_POST[$var];
-                else if (array_key_exists($var, $_GET) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
-                    $data = $_GET[$var];
-                else if ($_SESSION && array_key_exists($var, $_SESSION) && (strpos(strtolower($selection), 's') > -1 || !$selection))
-                    $data = $_SESSION[$var];
-            }
+            if (array_key_exists($var, $_POST) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
+                $data = $_POST[$var];
+            else if (array_key_exists($var, $_GET) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
+                $data = $_GET[$var];
+            else if ($_SESSION && array_key_exists($var, $_SESSION) && (strpos(strtolower($selection), 's') > -1 || !$selection))
+                $data = $_SESSION[$var];
 
             if (!isset($data) && function_exists('_QbSpecialParamDelimeter') && array_key_exists($var, self::_QbSpecialParamDelimeter()))
             {
@@ -137,28 +124,14 @@ class Security
         }
         else
         {
-            if (ini_get('register_long_arrays'))
-            {
-                if (isset(self::$_httpSessionVars) && (strpos(strtolower($selection), 's') > -1 || !$selection))
-                    $data = self::$_httpSessionVars;
+            if (isset($_SESSION) && (strpos(strtolower($selection), 's') > -1 || !$selection))
+                $data = $_SESSION;
 
-                if (isset(self::$_httpGetVars) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
-                    $data = self::$_httpGetVars;
+            if (isset($_GET) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
+                $data = $_GET;
 
-                if (isset(self::$_httpPostVars) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
-                    $data = self::$_httpPostVars;
-            }
-            if (isset($data))
-            {
-                if (isset($_SESSION) && (strpos(strtolower($selection), 's') > -1 || !$selection))
-                    $data = $_SESSION;
-
-                if (isset($_GET) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
-                    $data = $_GET;
-
-                if (isset($_POST) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
-                    $data = $_POST;
-            }
+            if (isset($_POST) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
+                $data = $_POST;
 
             if (!isset($data) && function_exists('_QbSpecialParamDelimeter'))
                 $data = self::_QbSpecialParamDelimeter();
@@ -266,14 +239,13 @@ class Security
         if (!self::$_secConfig->_secSecureSession)
             return FALSE;
 
-        if (!isset($_SESSION) && !isset(self::$_httpSessionVars))
+        if (!isset($_SESSION))
         {
             self::_secLog('secSecureSession: no SESSION found at execution time. Call secSecureSession after session start.', '');
             return false;
         }
 
-        $sessionData = '';
-        (ini_get('register_long_arrays') && isset(self::$_httpSessionVars)) ? $sessionData = self::$_httpSessionVars : $sessionData = $_SESSION;
+        $sessionData = $_SESSION;
 
         if (!isset($sessionData['SEC']))
             $sessionData['SEC'] = array();
@@ -333,9 +305,6 @@ class Security
 
         $sessionData['SEC']['session_touchtime'] = time();
 
-        if (ini_get('register_long_arrays') && isset(self::$_httpSessionVars))
-            self::$_httpSessionVars = $sessionData;
-
         $_SESSION = $sessionData;
     }
 
@@ -347,7 +316,7 @@ class Security
         $seqSessName = self::$_secConfig->_secSessionName ? self::$_secConfig->_secSessionName : session_name();
 
         // expire cookie
-        if (self::$_secConfig->_secSecureCookie && ($_COOKIE || self::$_httpCookieVars) && isset($_COOKIE[$seqSessName]) && !headers_sent())
+        if (self::$_secConfig->_secSecureCookie && $_COOKIE && isset($_COOKIE[$seqSessName]) && !headers_sent())
         {
             // could we be too early to know 'path' or 'domain' settings?
             $cookieData = session_get_cookie_params();
@@ -355,17 +324,11 @@ class Security
 
             if (isset($_SESSION))
                 $_COOKIE = array();
-
-            if (isset(self::$_httpCookieVars))
-                self::$_httpCookieVars = array();
         }
 
         // unset session variables
         if (isset($_SESSION))
             $_SESSION = array();
-
-        if (isset(self::$_httpSessionVars))
-            self::$_httpSessionVars = array();
 
         session_unset();
 
@@ -431,39 +394,23 @@ class Security
 
         if (isset($_GET))
             foreach ($_GET as $param => $value)
-                $appdata .= '[_GET] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
-
-        if (isset(self::$_httpGetVars))
-            foreach (self::$_httpGetVars as $param => $value)
-                $appdata .= '[HGET] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[GET] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
 
         if (isset($_POST))
             foreach ($_POST as $param => $value)
-                $appdata .= '[_POS] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
-
-        if (isset(self::$_httpPostVars))
-            foreach (self::$_httpPostVars as $param => $value)
-                $appdata .= '[HPOS] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[POST] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
 
         if (isset($_COOKIE))
             foreach ($_COOKIE as $param => $value)
-                $appdata .= '[_COO] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
-
-        if (isset(self::$_httpCookieVars))
-            foreach (self::$_httpCookieVars as $param => $value)
-                $appdata .= '[HCOO] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[COOKIE] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
 
         if (isset($_SESSION))
             foreach ($_SESSION as $param => $value)
-                $appdata .= '[_SES] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
-
-        if (isset(self::$_httpSessionVars))
-            foreach (self::$_httpSessionVars as $param => $value)
-                $appdata .= '[HSES] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[SESSION] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
 
         if (isset($_SERVER))
             foreach ($_SERVER as $param => $value)
-                $appdata .= '[ SERV] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
+                $appdata .= '[SERVER] ' . $param . '=' . self::_secDataDumpRecursive($value, '', 0) . "\n";
 
         $appdata .= "====================================================================================================\n";
 
