@@ -199,6 +199,15 @@ class Security
 
 
 
+
+
+
+
+
+
+
+
+
         }
 
         $typeNumeric = is_numeric($string);
@@ -279,6 +288,99 @@ class Security
             return false;
         }
         return true;
+    }
+
+    /**
+     * Apply urldecode on input until all occurences are decoded.
+     * Handles multiple encoded inputs
+     */
+    public static function secUrlDecode($string = '')
+    {
+        $unescaped = mb_convert_encoding($string, "UTF-8", "auto");
+        while (urldecode($unescaped) != $unescaped)
+            $unescaped = urldecode($unescaped);
+
+        return $unescaped;
+    }
+
+    /**
+     * Tries to make sure, the file path is local.
+     */
+    public static function secLocFile($path = '')
+    {
+        $path         = realpath(self::secUrlDecode($path));
+        $pathCheck    = preg_replace('/\\\/', '/', strtolower($path));
+        $docpathCheck = preg_replace('/\\\/', '/', strtolower($_SERVER['DOCUMENT_ROOT']));
+
+        self::_secDebug($pathCheck . '###' . $docpathCheck);
+
+        if ($path && strpos($pathCheck, $docpathCheck) !== 0)
+        {
+            self::_secLog('secLocFile: Path not in BASEPATH', $pathCheck);
+            self::_secReaction();
+            $path = '';
+        }
+        else if (empty($path))
+        {
+            self::_secLog('secLocFile: Path not local or damaged', $path);
+            self::_secReaction();
+        }
+
+        return $path;
+    }
+
+    /**
+     * Checks variables to avoid Mail Header Injection
+     * Set second param to "false" when checking mail body elsewere all line breaks
+     * and carriage returns will be deleted.
+     */
+    public static function secEmail($param = '', $lbcr = true)
+    {
+        self::_secCheckIntrusion($param);
+
+        /* replace until done */
+        while (!isset($filtered) || $param != $filtered)
+        {
+            if (isset($filtered))
+                $param = $filtered;
+
+            $filtered = preg_replace("/(Content-Transfer-Encoding:|MIME-Version:|content-type:|" .
+                    "Subject:|to:|cc:|bcc:|from:|reply-to:)/ims", "", $param);
+        }
+        unset($filtered);
+
+        if ($lbcr)
+        {
+            /* replace until done */
+            while (!isset($filtered) || $param != $filtered)
+            {
+                if (isset($filtered))
+                    $param = $filtered;
+
+                $filtered = preg_replace("/(%0A|\\\\r|%0D|\\\\n|%00|\\\\0|%09|\\\\t|%01|%02|%03|%04|%05|" .
+                        "%06|%07|%08|%09|%0B|%0C|%0E|%0F|%10|%11|%12|%13)/ims", "", $param);
+            }
+        }
+        return $param;
+    }
+
+    /**
+     * Checks variables to avoid HTTP Header Injection
+     */
+    public static function secHeader($param = '')
+    {
+        self::_secCheckIntrusion($param);
+
+        /* replace until done */
+        while (!isset($filtered) || $param != $filtered)
+        {
+            if (isset($filtered))
+                $param = $filtered;
+
+            $filtered = preg_replace("/(%0A|\\\\r|%0D|\\\\n|%00|\\\\0|%09|\\\\t|%01|%02|%03|%04|%05|" .
+                    "%06|%07|%08|%09|%0B|%0C|%0E|%0F|%10|%11|%12|%13)/ims", "", $param);
+        }
+        return $param;
     }
 
     /**
