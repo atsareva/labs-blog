@@ -192,6 +192,11 @@ class Security
                 if (strtoupper(trim($minValList[$t])) == 'NULL')
                     return true; // if zero value allowed, then ok
 
+
+
+
+
+
         }
 
         $typeNumeric = is_numeric($string);
@@ -217,6 +222,37 @@ class Security
             return true;
         }
         self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': INT param not INT', $string, $source);
+        self::_secReaction(true /* from filter */);
+        return false;
+    }
+
+    /**
+     * Input must be a string and between given values
+     */
+    public static function secIsStr($string = '', $minvalue = null, $maxvalue = null, $varname = '', $source = '')
+    {
+        self::_secCheckIntrusion($string_, $source);
+
+        $typeString = is_string($string);
+        if ($typeString)
+        {
+            $minValue = trim($minValue);
+            if (isset($minValue) && $minValue != '' && strlen($string) < $minValue)
+            {
+                self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': STR length below MIN (' . $minValue . ')', $string, $source);
+                self::_secReaction(true /* from filter */);
+                return false;
+            }
+            $maxValue = trim($maxValue);
+            if (isset($maxValue) && $maxValue != '' && strlen($string) > $maxValue)
+            {
+                self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': STR length beneath MAX (' . $maxValue . ')', $string, $source);
+                self::_secReaction(true /* from filter */);
+                return false;
+            }
+            return true;
+        }
+        self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': STR Param not STRING', $string, $source);
         self::_secReaction(true /* from filter */);
         return false;
     }
