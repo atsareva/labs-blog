@@ -5,14 +5,10 @@ require_once 'SecConfig.php';
 class Security
 {
 
-    private static $_secConfig       = '';
-    private static $_httpCookieVars  = array();
-    private static $_httpSessionVars = array();
-    private static $_httpGetVars     = array();
-    private static $_httpPostVars    = array();
-    public static $_secDebug        = 0;
-    public static $_secTokenName    = 'secTokenName';
-    public static $_secAppSalt      = '';
+    private static $_secConfig    = '';
+    public static $_secDebug     = 0;
+    public static $_secTokenName = 'secTokenName';
+    public static $_secAppSalt   = '';
 
     public static function run()
     {
@@ -34,6 +30,27 @@ class Security
     }
 
     /**
+     * Generate a Token against CSRF-Attacks.
+     * Generates a Token to be inserted into a Form.
+     * If specific name given, Token will only be valid for that named action.
+     */
+    public static function secFtoken($formName = '', $once = false)
+    {
+        return '<input type="hidden" name="' . self::_secCreateTokenName($formName) .
+                '" value="' . self::_secCreateTokenValue($formName, $once) . '" />' . "\n";
+    }
+
+    /**
+     * Generate a Token against CSRF-Attacks.
+     * Generates a Token to be inserted into a Link.
+     * If specific name given, Token will only be valid for that named action.
+     */
+    public static function secLtoken($linkName = '', $once = false)
+    {
+        return self::_secCreateTokenName($linkName) . '=' . self::_secCreateTokenValue($linkName, $once);
+    }
+
+    /**
      * Checks a Token against CSRF-Attacks.
      * Gets Token out of GET/POST-request and checks for validity.
      * If specific name given, Token will only be valid for that named action.
@@ -42,7 +59,7 @@ class Security
     {
         $tokenName = self::_secCreateTokenName($originName);
 
-        $tokenArray = $_SESSION['SEC']['SEC_TOKEN'];
+        $tokenArray = $_SESSION['SEC']['sec_token'];
 
         if (!isset($tokenArray) || !is_array($tokenArray))
         {
@@ -66,7 +83,7 @@ class Security
                 }
 
                 if ($tokenArray[$tokenName]['once'])
-                    unset($_SESSION['SEQ']['SEQ_TOKEN'][$tokenName]); // no replay
+                    unset($_SESSION['SEC']['sec_token'][$tokenName]); // no replay
 // SESSION OK
             }
             else
@@ -85,6 +102,7 @@ class Security
     /**
      * Generates Token name.
      *
+     * @param string $originName
      * @return string
      */
     private static function _secCreateTokenName($originName = '')
@@ -96,6 +114,36 @@ class Security
         $originName = $originName ? md5($originName . $headerHash . session_id() . self::_secAppSalt()) : md5($headerHash . session_id() . self::_secAppSalt());
 
         return 'SEQ_TOKEN_' . $originName;
+    }
+
+    /**
+     * Generates Token value.
+     *
+     * @param string $originname
+     * @param boolean $once
+     * @return string
+     */
+    private static function _secCreateTokenValue($originname = '', $once = false)
+    {
+        $tokenName = self::_secCreateTokenName($originname);
+
+        if (!isset($_SESSION['SEC']))
+        {
+            $_SESSION['SEC']              = array();
+            $_SESSION['SEC']['sec_token'] = array();
+        }
+
+        if (!isset($_SESSION['SEC']['sec_token'][$tokenName]))
+            $_SESSION['SEC']['sec_token'][$tokenName] = array('token' => md5(uniqid(rand(), true)), 'time'  => time(), 'once'  => $once ? true : false);
+
+        else
+        {
+            // set single use token
+            $_SESSION['SEC']['sec_token'][$tokenName]['once'] = $once ? true : false;
+            $token                                            = $_SESSION['SEC']['sec_token'][$tokenName]['token'];
+        }
+
+        return $token;
     }
 
     /**
