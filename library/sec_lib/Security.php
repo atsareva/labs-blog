@@ -33,6 +33,10 @@ class Security
      * Generate a Token against CSRF-Attacks.
      * Generates a Token to be inserted into a Form.
      * If specific name given, Token will only be valid for that named action.
+     *
+     * @param string $formName
+     * @param bool $once
+     * @return string
      */
     public static function secFtoken($formName = '', $once = false)
     {
@@ -44,6 +48,10 @@ class Security
      * Generate a Token against CSRF-Attacks.
      * Generates a Token to be inserted into a Link.
      * If specific name given, Token will only be valid for that named action.
+     *
+     * @param string $linkName
+     * @param bool $once
+     * @return string
      */
     public static function secLtoken($linkName = '', $once = false)
     {
@@ -54,6 +62,8 @@ class Security
      * Checks a Token against CSRF-Attacks.
      * Gets Token out of GET/POST-request and checks for validity.
      * If specific name given, Token will only be valid for that named action.
+     *
+     * @param string $originName
      */
     public static function secCheckToken($originName = '')
     {
