@@ -184,12 +184,18 @@ class Security
     {
         self::_secCheckIntrusion($string, $source);
 
-        $minValList = split(',', $minValue);
+        $minValList = explode(',', $minValue);
         if (strlen($string) == 0)
         {
             for ($t = 0; $t < count($minValList); $t++)
                 if (strtoupper(trim($minValList[$t])) == 'NULL')
                     return true; // if zero value allowed, then ok
+
+
+
+
+
+
 
         }
 
@@ -249,6 +255,62 @@ class Security
         self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': STR Param not STRING', $string, $source);
         self::_secReaction(true /* from filter */);
         return false;
+    }
+
+    /**
+     * Valid Email
+     *
+     * @param	string
+     * @return	bool
+     */
+    public static function secValidEmail($str)
+    {
+        return (!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $str)) ? FALSE : TRUE;
+    }
+
+    /**
+     * Validate IP Address
+     *
+     * @param	string
+     * @return	string
+     */
+    public static function secValidIp($ip)
+    {
+        $ipSegments = explode('.', $ip);
+
+        // Always 4 segments needed
+        if (count($ipSegments) != 4)
+            return FALSE;
+
+        // IP can not start with 0
+        if ($ipSegments[0][0] == '0')
+            return FALSE;
+
+        // Check each segment
+        foreach ($ipSegments as $segment)
+        {
+            // IP segments must be digits and can not be
+            // longer than 3 digits or greater then 255
+            if ($segment == '' OR preg_match("/[^0-9]/", $segment) OR $segment > 255 OR strlen($segment) > 3)
+                return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    /**
+     * Match one field to another
+     *
+     * @param	string
+     * @param	field
+     * @return	bool
+     */
+    public static function secMatches($str, $field)
+    {
+        if (!isset($_POST[$field]))
+            return FALSE;
+
+        return ($str !== $_POST[$field]) ? FALSE : TRUE;
     }
 
     /**
@@ -553,7 +615,7 @@ class Security
         if ($filter)
             $action = self::$_secConfig->_secFilterNoMathAction;
 
-        $actionArray = split(' ', $action);
+        $actionArray = explode(' ', $action);
         if (in_array('delay', $actionArray))
             sleep(50);
 
@@ -570,10 +632,10 @@ class Security
                 if ($_SERVER['QUERY_STRING'])
                 {
                     $secSessName = self::$_secConfig->_secSessionName ? self::$_secConfig->_secSessionName : session_name();
-                    $queryPairs  = split('&', $_SERVER['QUERY_STRING']);
+                    $queryPairs  = explode('&', $_SERVER['QUERY_STRING']);
                     for ($t = 0; $t < length($queryPairs); $t++)
                     {
-                        $pairs       = split('=', $queryPairs[$t]);
+                        $pairs       = explode('=', $queryPairs[$t]);
                         if ($pairs[0] == $secSessName)
                             $saveSession = join($queryPairs[$t]);
                     }

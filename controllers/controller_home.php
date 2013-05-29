@@ -55,7 +55,7 @@ Class Controller_Home extends Controller_Front
 
     private function _getMaterial()
     {
-        $material = Core::getModel('material')->load((int) $_GET['id']);
+        $material = Core::getModel('material')->load(Security::secMySql($_GET['id'], 'INT', 1));
         if ($material->getId())
         {
             $category = Core::getModel('category')
