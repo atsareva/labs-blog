@@ -126,6 +126,7 @@
     </div>
 
     <form id="front_signup" method="post" action="<?php echo Core::getBaseUrl() ?>profile/signup">
+        <?php echo Security::secFtoken('userSignup') ?>
         <div class="fieldset">
             <div>
                 <p>Логин <span class="star">*</span></p>

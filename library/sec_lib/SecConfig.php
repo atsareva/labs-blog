@@ -112,7 +112,7 @@ class SecConfig
      * 
      * @var string
      */
-    public $_secIdsOnAttackAction = 'logout redirect';
+    public $_secIdsOnAttackAction = 'logout delay redirect';
 
     /**
      * What happens when a value does not match its filter.
@@ -124,7 +124,7 @@ class SecConfig
      *
      * @var string
      */
-    public $_secFilterNoMathAction = 'redirect';
+    public $_secFilterNoMathAction = 'redirect delay';
     
     private $_secStartOk = true;
 

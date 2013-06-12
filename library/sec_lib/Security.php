@@ -15,8 +15,7 @@ class Security
         self::$_secConfig = new SecConfig();
 
         restore_error_handler();
-        if (self::$_secDebug || self::$_secConfig->_secErrors)
-        {
+        if (self::$_secDebug || self::$_secConfig->_secErrors) {
             error_reporting(E_USER_ERROR | E_USER_WARNING);
             set_error_handler('_secErrorHandler');
         }
@@ -69,22 +68,18 @@ class Security
 
         $tokenArray = $_SESSION['SEC']['sec_token'];
 
-        if (!isset($tokenArray) || !is_array($tokenArray))
-        {
+        if (!isset($tokenArray) || !is_array($tokenArray)) {
             self::_secLog('secCheckToken: no SESSION found at execution time. Call secCheckToken after session start.', '');
             return false;
         }
 
         $tokenValue = self::_QbHttpVars2Array($tokenName, 'pg');
 
-        if (strlen($tokenValue) == 32)
-        {
+        if (strlen($tokenValue) == 32) {
 
-            if (isset($tokenArray[$tokenName]) && isset($tokenArray[$tokenName]['token']) && $tokenArray[$tokenName]['token'] == $tokenValue)
-            {
+            if (isset($tokenArray[$tokenName]) && isset($tokenArray[$tokenName]['token']) && $tokenArray[$tokenName]['token'] == $tokenValue) {
                 $tokenAge = time() - $tokenArray[$tokenName]['time'];
-                if ($tokenAge > self::$_secConfig->_secTokenLifeTime)
-                {
+                if ($tokenAge > self::$_secConfig->_secTokenLifeTime) {
                     self::_secDebug($tokenAge . ">" . self::$_secConfig->_secTokenLifeTime);
                     self::_secLog('secCheckToken: CSRF token expired', $tokenAge - self::$_secConfig->_secTokenLifeTime);
                     self::_secTerminateSession();
@@ -92,16 +87,17 @@ class Security
 
                 if ($tokenArray[$tokenName]['once'])
                     unset($_SESSION['SEC']['sec_token'][$tokenName]); // no replay
+
+                if (isset($_POST[$tokenName]))
+                    unset($_POST[$tokenName]);
 // SESSION OK
             }
-            else
-            {
+            else {
                 self::_secLog('secCheckToken: wrong CSRF token', '');
                 self::_secTerminateSession();
             }
         }
-        else
-        {
+        else {
             self::_secLog('secCheckToken: CSRF token required', $tokenValue);
             self::_secTerminateSession();
         }
@@ -122,31 +118,25 @@ class Security
 
         $output = '';
 
-        for ($i = 0; $i < strlen($string); $i++)
-        {
-            if (preg_match('/([a-zA-Z0-9_.-])/', $string[$i]))
-            {
+        for ($i = 0; $i < strlen($string); $i++) {
+            if (preg_match('/([a-zA-Z0-9_.-])/', $string[$i])) {
                 $output .= $string[$i];
                 continue;
             }
             $byte = ord($string[$i]);
-            if ($byte <= 127)
-            {
+            if ($byte <= 127) {
                 $length = 1;
                 $output .= sprintf("&#x%04s;", dechex(self::_uniord(mb_substr($string, $i, $length))));
             }
-            else if ($byte >= 194 && $byte <= 223)
-            {
+            else if ($byte >= 194 && $byte <= 223) {
                 $length = 2;
                 $output .= sprintf("&#x%04s;", dechex(self::_uniord(mb_substr($string, $i, $length))));
             }
-            else if ($byte >= 224 && $byte <= 239)
-            {
+            else if ($byte >= 224 && $byte <= 239) {
                 $length = 3;
                 $output .= sprintf("&#x%04s;", dechex(self::_uniord(mb_substr($string, $i, $length))));
             }
-            else if ($byte >= 240 && $byte <= 244)
-            {
+            else if ($byte >= 240 && $byte <= 244) {
                 $length = 4;
                 $output .= sprintf("&#x%04s;", dechex(self::_uniord(mb_substr($string, $i, $length))));
             }
@@ -185,8 +175,7 @@ class Security
         self::_secCheckIntrusion($string, $source);
 
         $minValList = explode(',', $minValue);
-        if (strlen($string) == 0)
-        {
+        if (strlen($string) == 0) {
             for ($t = 0; $t < count($minValList); $t++)
                 if (strtoupper(trim($minValList[$t])) == 'NULL')
                     return true; // if zero value allowed, then ok
@@ -194,27 +183,20 @@ class Security
 
 
 
-
-
-
         }
 
         $typeNumeric = is_numeric($string);
-        if ($typeNumeric)
-        {
-            for ($t = 0; $t < count($minValList); $t++)
-            {
+        if ($typeNumeric) {
+            for ($t = 0; $t < count($minValList); $t++) {
                 $minValue = trim($minValList[$t]);
-                if (isset($minValue) && $minValue != '' && strtoupper($minValue) != 'NULL' && $string < $minValue)
-                {
+                if (isset($minValue) && $minValue != '' && strtoupper($minValue) != 'NULL' && $string < $minValue) {
                     self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': INT below MIN (' . $minValue . ')', $string, $source);
                     self::_secReaction(true /* from filter */);
                     return false;
                 }
             }
             $maxValue = trim($maxValue);
-            if (isset($maxValue) && $maxValue != '' && $string > $maxValue)
-            {
+            if (isset($maxValue) && $maxValue != '' && $string > $maxValue) {
                 self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': INT beneath MAX (' . $maxValue . ')', $string, $source);
                 self::_secReaction(true /* from filter */);
                 return false;
@@ -234,18 +216,15 @@ class Security
         self::_secCheckIntrusion($string, $source);
 
         $typeString = is_string($string);
-        if ($typeString)
-        {
+        if ($typeString) {
             $minValue = trim($minValue);
-            if (isset($minValue) && $minValue != '' && strlen($string) < $minValue)
-            {
+            if (isset($minValue) && $minValue != '' && strlen($string) < $minValue) {
                 self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': STR length below MIN (' . $minValue . ')', $string, $source);
                 self::_secReaction(true /* from filter */);
                 return false;
             }
             $maxValue = trim($maxValue);
-            if (isset($maxValue) && $maxValue != '' && strlen($string) > $maxValue)
-            {
+            if (isset($maxValue) && $maxValue != '' && strlen($string) > $maxValue) {
                 self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': STR length beneath MAX (' . $maxValue . ')', $string, $source);
                 self::_secReaction(true /* from filter */);
                 return false;
@@ -265,6 +244,8 @@ class Security
      */
     public static function secValidEmail($str)
     {
+        self::_secCheckIntrusion($str);
+
         return (!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $str)) ? FALSE : TRUE;
     }
 
@@ -276,6 +257,8 @@ class Security
      */
     public static function secValidIp($ip)
     {
+        self::_secCheckIntrusion($ip);
+
         $ipSegments = explode('.', $ip);
 
         // Always 4 segments needed
@@ -287,8 +270,7 @@ class Security
             return FALSE;
 
         // Check each segment
-        foreach ($ipSegments as $segment)
-        {
+        foreach ($ipSegments as $segment) {
             // IP segments must be digits and can not be
             // longer than 3 digits or greater then 255
             if ($segment == '' OR preg_match("/[^0-9]/", $segment) OR $segment > 255 OR strlen($segment) > 3)
@@ -319,15 +301,13 @@ class Security
     public static function secIsBeween($string = '', $minValue = null, $maxValue = null, $varName = '', $source = '')
     {
         $minValue = trim($minValue);
-        if (isset($minValue) && $minValue != '' && strlen($string) < $minValue)
-        {
+        if (isset($minValue) && $minValue != '' && strlen($string) < $minValue) {
             self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': length below MIN (' . $minValue . ')', $string, $source);
             self::_secReaction(true /* from filter */);
             return false;
         }
         $maxValue = trim($maxValue);
-        if (isset($maxValue) && $maxValue != '' && strlen($string) > $maxValue)
-        {
+        if (isset($maxValue) && $maxValue != '' && strlen($string) > $maxValue) {
             self::_secLog(($varName ? $varName : 'UNKNOWN VAR') . ': length beneath MAX (' . $maxValue . ')', $string, $source);
             self::_secReaction(true /* from filter */);
             return false;
@@ -359,14 +339,12 @@ class Security
 
         self::_secDebug($pathCheck . '###' . $docpathCheck);
 
-        if ($path && strpos($pathCheck, $docpathCheck) !== 0)
-        {
+        if ($path && strpos($pathCheck, $docpathCheck) !== 0) {
             self::_secLog('secLocFile: Path not in BASEPATH', $pathCheck);
             self::_secReaction();
             $path = '';
         }
-        else if (empty($path))
-        {
+        else if (empty($path)) {
             self::_secLog('secLocFile: Path not local or damaged', $path);
             self::_secReaction();
         }
@@ -384,8 +362,7 @@ class Security
         self::_secCheckIntrusion($param);
 
         /* replace until done */
-        while (!isset($filtered) || $param != $filtered)
-        {
+        while (!isset($filtered) || $param != $filtered) {
             if (isset($filtered))
                 $param = $filtered;
 
@@ -394,11 +371,9 @@ class Security
         }
         unset($filtered);
 
-        if ($lbcr)
-        {
+        if ($lbcr) {
             /* replace until done */
-            while (!isset($filtered) || $param != $filtered)
-            {
+            while (!isset($filtered) || $param != $filtered) {
                 if (isset($filtered))
                     $param = $filtered;
 
@@ -417,8 +392,7 @@ class Security
         self::_secCheckIntrusion($param);
 
         /* replace until done */
-        while (!isset($filtered) || $param != $filtered)
-        {
+        while (!isset($filtered) || $param != $filtered) {
             if (isset($filtered))
                 $param = $filtered;
 
@@ -442,14 +416,12 @@ class Security
             $orig = self::_secCheckType($orig, $type, $minValue, $maxValue, $varName, $source);
 
         /* automatically choose best function to escape input */
-        if (!(mysql_error()))
-        {
+        if (!(mysql_error())) {
             $pEscapeFunc = create_function('$match_', 'return mysql_real_escape_string($match_);');
             $secValue    = $pEscapeFunc($orig);
         }
         /* fallback if mysql is not available yet */
-        if (mysql_error())
-        {
+        if (mysql_error()) {
             $pEscapeFunc = create_function('$match_', 'return mysql_escape_string($match_);');
             $secValue    = $pEscapeFunc($orig);
         }
@@ -467,8 +439,7 @@ class Security
     {
         self::_secCheckIntrusion($string, $source);
 
-        switch (strtoupper(trim($type)))
-        {
+        switch (strtoupper(trim($type))) {
             case 'NUM' :
             case 'INT' :
                 if (!self::secIsNum($string, $minValue, $maxValue, $varName, $source))
@@ -491,8 +462,7 @@ class Security
         $orig     = $string;
         $stripped = stripslashes($orig);
 
-        if ($orig != $stripped)
-        {
+        if ($orig != $stripped) {
             $escaped  = addslashes($stripped);
             if ($orig == $escaped)
                 $secValue = stripslashes($escaped);
@@ -538,35 +508,32 @@ class Security
         if (preg_match("/(\%27)|(\')|(\')|(%2D%2D)|(\/\*)/i", $scanValue) || /* (\-\-)  deleted. no meaning for MySQL */
                 /* (\/\*) added. Comment sign for MySQL */
                 preg_match("/\w*(\%27)|'(\s|\+)*((\%6F)|o|(\%4F))((\%72)|r|(\%52))/i", $scanValue) ||
-                preg_match("/((\%27)|')(\s|\+)*union/i", $scanValue))
-        {
+                preg_match("/((\%27)|')(\s|\+)*union/i", $scanValue)) {
             self::_secLog('SQL Injection detected', $scanValue, $source);
             $matches = true;
         }
 
         /* scan for XSS-attack pattern */
         if (preg_match("/((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/i", $scanValue) ||
-                preg_match("/((\%3C)|<)((\%69)|i|(\%49))((\%6D)|m|(\%4D))((\%67)|g|(\%47))[^\n]+((\%3E)|>)/i", $scanValue))
-        {
+                preg_match("/((\%3C)|<)((\%69)|i|(\%49))((\%6D)|m|(\%4D))((\%67)|g|(\%47))[^\n]+((\%3E)|>)/i", $scanValue)) {
             self::_secLog('XSS detected', $scanValue, $source);
             $matches = true;
         }
 
         /* scan for Mail-Header-attack pattern */
-        if (preg_match("/(Content-Transfer-Encoding:|MIME-Version:|content-type:|Subject:|to:|cc:|bcc:|from:|reply-to:)/ims", $scanValue))
-        {
+        if (preg_match("/(Content-Transfer-Encoding:|MIME-Version:|content-type:|Subject:|to:|cc:|bcc:|from:|reply-to:)/ims", $scanValue)) {
             self::_secLog('Mail-Header Injection detected', $scanValue, $source);
             $matches = true;
         }
 
         /* scan for "Special chars" pattern */
-        if (preg_match("/%0A|\\r|%0D|\\n|%00|\\0|%09|\\t|%01|%02|%03|%04|%05|%06|%07|%08|%09|%0B|%0C|%0E|%0F|%10|%11|%12|%13/i", $scanValue))
-        {
+        if (preg_match("/%0A|\\r|%0D|\\n|%00|\\0|%09|\\t|%01|%02|%03|%04|%05|%06|%07|%08|%09|%0B|%0C|%0E|%0F|%10|%11|%12|%13/i", $scanValue)) {
             self::_secLog('Special Chars detected', $scanValue, $source);
             $matches = true;
         }
 
-        $matches = self::_secGlobalsOverwrite($scanValue, $source);
+        if (self::_secGlobalsOverwrite($scanValue, $source))
+            $matches = true;
 
         if ($matches)
             self::_secReaction();
@@ -596,8 +563,7 @@ class Security
             'GLOBALS'
         );
 
-        if (preg_match("/^(" . implode("|", $globalVars) . ")/", $string, $match))
-        {
+        if (preg_match("/^(" . implode("|", $globalVars) . ")/", $string, $match)) {
             self::_secLog('Global VAR overwrite detected', $string, $source);
             $matches = true;
         }
@@ -622,19 +588,15 @@ class Security
         if (in_array('logout', $actionArray))
             self::_secTerminateSession();
 
-        if (in_array('redirect', $actionArray))
-        {
-            if (!headers_sent() && !empty(self::$_secConfig->_secOnerrorRedirectTo))
-            {
+        if (in_array('redirect', $actionArray)) {
+            if (!headers_sent() && !empty(self::$_secConfig->_secOnerrorRedirectTo)) {
                 $saveSession = '';
 
                 // if known and found in query string, keep session id when redirect
-                if ($_SERVER['QUERY_STRING'])
-                {
+                if ($_SERVER['QUERY_STRING']) {
                     $secSessName = self::$_secConfig->_secSessionName ? self::$_secConfig->_secSessionName : session_name();
                     $queryPairs  = explode('&', $_SERVER['QUERY_STRING']);
-                    for ($t = 0; $t < length($queryPairs); $t++)
-                    {
+                    for ($t = 0; $t < length($queryPairs); $t++) {
                         $pairs       = explode('=', $queryPairs[$t]);
                         if ($pairs[0] == $secSessName)
                             $saveSession = join($queryPairs[$t]);
@@ -674,17 +636,16 @@ class Security
     {
         $tokenName = self::_secCreateTokenName($originname);
 
-        if (!isset($_SESSION['SEC']))
-        {
+        if (!isset($_SESSION['SEC'])) {
             $_SESSION['SEC']              = array();
             $_SESSION['SEC']['sec_token'] = array();
         }
 
-        if (!isset($_SESSION['SEC']['sec_token'][$tokenName]))
-            $_SESSION['SEC']['sec_token'][$tokenName] = array('token' => md5(uniqid(rand(), true)), 'time'  => time(), 'once'  => $once ? true : false);
-
-        else
-        {
+        if (!isset($_SESSION['SEC']['sec_token'][$tokenName])) {
+            $token                                    = md5(uniqid(rand(), true));
+            $_SESSION['SEC']['sec_token'][$tokenName] = array('token' => $token, 'time'  => time(), 'once'  => $once ? true : false);
+        }
+        else {
             // set single use token
             $_SESSION['SEC']['sec_token'][$tokenName]['once'] = $once ? true : false;
             $token                                            = $_SESSION['SEC']['sec_token'][$tokenName]['token'];
@@ -702,8 +663,7 @@ class Security
     private static function _QbHttpVars2Array($var = '', $selection = 'ps')
     {
         $data = null;
-        if ($var)
-        {
+        if ($var) {
             if (array_key_exists($var, $_POST) && (strpos(strtolower($selection), 'p') > -1 || !$selection))
                 $data = $_POST[$var];
             else if (array_key_exists($var, $_GET) && (strpos(strtolower($selection), 'g') > -1 || !$selection))
@@ -711,14 +671,12 @@ class Security
             else if ($_SESSION && array_key_exists($var, $_SESSION) && (strpos(strtolower($selection), 's') > -1 || !$selection))
                 $data = $_SESSION[$var];
 
-            if (!isset($data) && function_exists('_QbSpecialParamDelimeter') && array_key_exists($var, self::_QbSpecialParamDelimeter()))
-            {
+            if (!isset($data) && function_exists('_QbSpecialParamDelimeter') && array_key_exists($var, self::_QbSpecialParamDelimeter())) {
                 $data = self::_QbSpecialParamDelimeter();
                 $data = $data[$var];
             }
         }
-        else
-        {
+        else {
             if (isset($_SESSION) && (strpos(strtolower($selection), 's') > -1 || !$selection))
                 $data = $_SESSION;
 
@@ -739,13 +697,11 @@ class Security
     {
         // set the HTTP GET parameters manually if search_engine_friendly_urls is enabled
         $params = array();
-        if (strlen(getenv('PATH_INFO')) > 1)
-        {
+        if (strlen(getenv('PATH_INFO')) > 1) {
             $GET_array = array();
             $PHP_SELF  = str_replace(getenv('PATH_INFO'), '', $PHP_SELF);
             $vars      = explode('/', substr(getenv('PATH_INFO'), 1));
-            for ($i = 0, $n = sizeof($vars); $i < $n; $i++)
-            {
+            for ($i = 0, $n = sizeof($vars); $i < $n; $i++) {
                 if (strpos($vars[$i], '[]'))
                     $GET_array[substr($vars[$i], 0, -2)][] = $vars[$i + 1];
                 else
@@ -767,8 +723,7 @@ class Security
      */
     private static function _secAppSalt()
     {
-        if (!file_exists(self::$_secConfig->_secBaseDir . 'var/app_salt.txt'))
-        {
+        if (!file_exists(self::$_secConfig->_secBaseDir . 'var/app_salt.txt')) {
             $applicationSalt = md5(uniqid(rand(), TRUE));
             $logFile         = self::$_secConfig->_secBaseDir . 'var/app_salt.txt';
 
@@ -783,8 +738,7 @@ class Security
 
     private function _secErrorHandler($code = '', $msg = '', $file = '', $line = '')
     {
-        switch ($code)
-        {
+        switch ($code) {
             case E_ERROR:
                 self::_secLog('Script Error', "line: $line script: $file error: $code reason: $msg");
                 break;
@@ -804,8 +758,7 @@ class Security
      */
     private static function _secLog($message = '', $testName = '', $source = '')
     {
-        if (self::$_secConfig->_secLog)
-        {
+        if (self::$_secConfig->_secLog) {
             $logFile = self::$_secConfig->_secBaseDir . 'var/log/log.txt';
 
             $contents = date("d.m.Y, H:i:s", time()) .
@@ -835,8 +788,7 @@ class Security
         if (!self::$_secConfig->_secSecureSession)
             return FALSE;
 
-        if (!isset($_SESSION))
-        {
+        if (!isset($_SESSION)) {
             self::_secLog('secSecureSession: no SESSION found at execution time. Call secSecureSession after session start.', '');
             return false;
         }
@@ -846,17 +798,13 @@ class Security
         if (!isset($sessionData['SEC']))
             $sessionData['SEC'] = array();
 
-        if (!isset($sessionData['SEC']['session_touchtime']))
-        {
-            if (self::$_secConfig->_secSecureCookies)
-            {
-                if (function_exists('ini_set'))
-                {
+        if (!isset($sessionData['SEC']['session_touchtime'])) {
+            if (self::$_secConfig->_secSecureCookies) {
+                if (function_exists('ini_set')) {
                     ini_set('session.cookie_lifetime', self::$_secConfig->_secSessionLifeTime);
                     ini_set('session.cookie_httponly', true);
                 }
-                if (function_exists('session_set_cookie_params'))
-                {
+                if (function_exists('session_set_cookie_params')) {
                     $cookieData = session_get_cookie_params();
                     session_set_cookie_params(self::$_secConfig->_secSessionLifeTime, $cookieData['path'], $cookieData['domain'], $cookieData['secure'], true);
                 }
@@ -873,27 +821,22 @@ class Security
             if (self::$_secConfig->_secSessionHeadersCheck)
                 $sessionData['SEC']['agent_key'] = self::_secUseragentFingerprint();
         }
-        else if (self::$_secConfig->_secSessionRefresh == 0 || isset($sessionData['SEC']['session_touchtime']))
-        {
+        else if (self::$_secConfig->_secSessionRefresh == 0 || isset($sessionData['SEC']['session_touchtime'])) {
 
-            if (isset($sessionData['SEC']['session_creationtime']) && (time() - $sessionData['SEC']['session_creationtime']) > self::$_secConfig->_secSessionAbsoluteLifeTime)
-            {
+            if (isset($sessionData['SEC']['session_creationtime']) && (time() - $sessionData['SEC']['session_creationtime']) > self::$_secConfig->_secSessionAbsoluteLifeTime) {
                 self::_secLog('SESSION TERMINATED: absolute sessionlifetime expired', '');
                 self::_secTerminateSession();
             }
 
-            if (isset($sessionData['SEC']['agent_key']))
-            {
-                if ($sessionData['SEC']['agent_key'] != self::_secUseragentFingerprint())
-                {
+            if (isset($sessionData['SEC']['agent_key'])) {
+                if ($sessionData['SEC']['agent_key'] != self::_secUseragentFingerprint()) {
                     self::_secLog('SESSION TERMINATED: Agent Fingerprint Changed.', '');
                     self::_secTerminateSession();
                 }
             }
 
             $sessionAge = time() - $sessionData['SEC']['session_touchtime'];
-            if (self::$_secConfig->_secSessionRefresh == 0 || $sessionAge > self::$_secConfig->_secSessionRefresh)
-            {
+            if (self::$_secConfig->_secSessionRefresh == 0 || $sessionAge > self::$_secConfig->_secSessionRefresh) {
                 if (!headers_sent())
                     session_regenerate_id(true);
             }
@@ -912,8 +855,7 @@ class Security
         $secSessName = self::$_secConfig->_secSessionName ? self::$_secConfig->_secSessionName : session_name();
 
         // expire cookie
-        if (self::$_secConfig->_secSecureCookies && $_COOKIE && isset($_COOKIE[$secSessName]) && !headers_sent())
-        {
+        if (self::$_secConfig->_secSecureCookies && $_COOKIE && isset($_COOKIE[$secSessName]) && !headers_sent()) {
             // could we be too early to know 'path' or 'domain' settings?
             $cookieData = session_get_cookie_params();
             setcookie($secSessName, '', time() - self::$_secConfig->_secSessionLifeTime, $cookieData['path'], $cookieData['domain']);
@@ -928,8 +870,7 @@ class Security
 
         session_unset();
 
-        if ($redirectExit)
-        {
+        if ($redirectExit) {
             // redirect to location OR
             self::_secTerminate('redirect');
             die;
@@ -955,8 +896,7 @@ class Security
     private static function _secTerminate($reason = '')
     {
         // better to redirect in any case? it is less informative!
-        switch ($reason)
-        {
+        switch ($reason) {
             case 'err':
                 echo "<b>Undefined action.</b>";
                 die;
@@ -1024,10 +964,8 @@ class Security
      */
     private static function _secDataDumpRecursive($array, $message, $level)
     {
-        if (is_array($array))
-        {
-            foreach ($array as $key => $value)
-            {
+        if (is_array($array)) {
+            foreach ($array as $key => $value) {
                 (is_array($array[$key])) ? $recursive = PHP_EOL . self::_secDataDumpRecursive((array) $array[$key], $message, ($level + 1)) : $recursive = $array[$key];
                 for ($i = 0; $i <= ($level); $i++)
                     $message .= "\t";
